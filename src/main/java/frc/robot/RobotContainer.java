@@ -29,7 +29,7 @@ public class RobotContainer {
         new Trigger(controller::getBackButtonPressed)
                 .onTrue(new InstantCommand(drivetrainSubsystem::zeroGyroscope));
 
-        new Trigger(controller::getRightBumperPressed)
+        new Trigger(controller::getRightBumperButtonPressed)
                 .onTrue(new InstantCommand(drivetrainSubsystem::setSlowDrive));
 
         new Trigger(controller::getLeftBumperButtonPressed)
