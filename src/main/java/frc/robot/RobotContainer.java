@@ -1,10 +1,8 @@
 package frc.robot;
 
 import frc.robot.commands.AutoDriveCommand;
-import frc.robot.commands.LimelightControlCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.LimelightSubsystem;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -21,8 +19,6 @@ public class RobotContainer {
     
     private final XboxController controller = new XboxController(0);
     
-    private static final LimelightSubsystem m_limelightsub = new LimelightSubsystem("limelight", Constants.LIMELIGHT_OFFSETS);
-
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -35,9 +31,6 @@ public class RobotContainer {
 
         new Trigger(controller::getRightBumperPressed)
                 .onTrue(new InstantCommand(drivetrainSubsystem::setSlowDrive));
-
-        new Trigger(controller::getAButtonPressed)
-            .onTrue(new LimelightControlCommand(m_limelightsub, drivetrainSubsystem, 7, controller, Constants.INTAKE_ALIGN_OFFSET));
 
         new Trigger(controller::getLeftBumperButtonPressed)
             .onTrue(new InstantCommand(drivetrainSubsystem::toggleRobotRelativeDrive));
