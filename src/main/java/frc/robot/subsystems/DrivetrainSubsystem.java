@@ -141,7 +141,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         ModuleConfig moduleConfig = new ModuleConfig(
                 0.0508, // wheel radius in meters (example: 3 inches converted to meters)
-                4.17, // max drive velocity in meters per second
+                MAX_VELOCITY_METERS_PER_SECOND, // max drive velocity in meters per second
                 1.3, // coefficient of friction TODO: ask patricia
                 krakenMotor, // DCMotor object
                 55.0, // current limit in Amps
@@ -153,7 +153,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         } catch (Exception e) {
             // Handle exception as needed???
             e.printStackTrace();
-            config = new RobotConfig(16, 1.075, moduleConfig, 0.508);
+            config = new RobotConfig(16, 1.075, moduleConfig, Constants.DRIVETRAIN_TRACKWIDTH_METERS);
         }
 
         AutoBuilder.configure(
