@@ -3,15 +3,15 @@ package frc.com.swervedrivespecialties.swervelib;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public interface SteerController {
-    MotorController getSteerMotor();
+  MotorController getSteerMotor();
 
-    AbsoluteEncoder getSteerEncoder();
+  AbsoluteEncoder getSteerEncoder();
 
-    double getReferenceAngle();
+  double getReferenceAngle();
 
-    void setReferenceAngle(double referenceAngleRadians);
+  void setReferenceAngle(double referenceAngleRadians);
 
-    double getStateAngle();
+  double getStateAngle();
 
-    void resetToAbsolute();
+  void resetToAbsolute();
 }

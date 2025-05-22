@@ -3,11 +3,11 @@ package frc.com.swervedrivespecialties.swervelib;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public interface DriveController {
-    MotorController getDriveMotor();
+  MotorController getDriveMotor();
 
-    void setReferenceVoltage(double voltage);
+  void setReferenceVoltage(double voltage);
 
-    double getStateVelocity();
+  double getStateVelocity();
 
-    double getStateDistance();
+  double getStateDistance();
 }
