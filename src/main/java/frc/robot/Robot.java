@@ -1,6 +1,8 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger; //PLEASE NOTE THIS IS NOT THE FIRST LOGGER OPTION VS CODE SUGGESTS IMPORTING
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,8 +12,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
     private RobotContainer container;
+    private Command mechStopCommand;
+
 
     public Robot() {
+        Logger.start();
     }
 
     @Override
@@ -26,8 +31,14 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
+    public void disabledPeriodic(){
+        // mechStopCommand.schedule();
+        //System.out.println("DISABLED INIT YAY");
+    }
+
+    @Override
     public void autonomousInit() {
-        // m_autonomousCommand = container.getAutonomousCommand();
+         m_autonomousCommand = container.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
@@ -36,12 +47,14 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        // container.setDefaultTeleopCommand();
+        container.setDefaultTeleopCommand();
 
         // This makes sure that the autonomous stops running when teleop starts
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+         mechStopCommand.schedule();
+       // container.stopElevator();
     }
 
     @Override
