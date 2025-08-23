@@ -12,7 +12,7 @@ public class DriveTwoMeters extends Command {
     this.drivetrainSubsystem = drivetrainSubsystem;
     addRequirements(drivetrainSubsystem);
     double currentX = drivetrainSubsystem.getPose().getX();
-    double targetX = currentX + 2;
+    double targetX = currentX + 2.0;
     Pose2d targetLocation =
         new Pose2d(
             targetX, drivetrainSubsystem.getPose().getY(), drivetrainSubsystem.getRotation());
@@ -25,8 +25,9 @@ public class DriveTwoMeters extends Command {
   public void execute() {
     System.out.println("XXXXXX-actually moving two meters-XXXXXX");
     System.out.println(drivetrainSubsystem.getPose());
+    System.out.println("target: " + drivetrainSubsystem.getTargetPose());
     drivetrainSubsystem.runVelocity(
-        ChassisSpeeds.fromFieldRelativeSpeeds(1, 0, 0, drivetrainSubsystem.getRotation()));
+        ChassisSpeeds.fromFieldRelativeSpeeds(1.5, 0, 0, drivetrainSubsystem.getRotation()));
   }
 
   @Override
