@@ -24,7 +24,9 @@ public class DriveTwoMeters extends Command {
   @Override
   public void execute() {
     System.out.println("XXXXXX-actually moving two meters-XXXXXX");
-    drivetrainSubsystem.runVelocity(new ChassisSpeeds(0.2, 0, 0));
+    System.out.println(drivetrainSubsystem.getPose());
+    drivetrainSubsystem.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(1, 0, 0, drivetrainSubsystem.getRotation()));
   }
 
   @Override
