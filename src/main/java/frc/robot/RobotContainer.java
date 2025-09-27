@@ -150,7 +150,7 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.toRadians(180))));
                       } else {
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.toRadians(180))));
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.toRadians(0))));
                       } 
                     }, drive)
                 .ignoringDisable(true));
