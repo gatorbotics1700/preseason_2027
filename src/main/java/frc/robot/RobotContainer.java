@@ -18,8 +18,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -197,14 +197,20 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     () -> {
-                      if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
+                      if (DriverStation.getAlliance().isPresent()
+                          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.toRadians(180))));
+                            new Pose2d(
+                                drive.getPose().getTranslation(),
+                                new Rotation2d(Math.toRadians(180))));
                       } else {
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.toRadians(0))));
-                      } 
-                    }, drive)
+                            new Pose2d(
+                                drive.getPose().getTranslation(),
+                                new Rotation2d(Math.toRadians(0))));
+                      }
+                    },
+                    drive)
                 .ignoringDisable(true));
 
     PathConstraints constraints =
