@@ -9,38 +9,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
+//things this subsystem needs to handle: 
+//a TalonFX motor, and its DutyCycleOut, which you will use to set the motor speeds
+//the position of the turret--methods and ratios you may find helpful for this: 
+//the turret is on a 42:1 gear ratio, and you can get the motor position with .getPosition().getValueAsDouble()
+
 public class TurretSubsystem extends SubsystemBase {
-
-  public final TalonFX motor;
-  private static double voltage;
-
-  private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+  //TODO create your variables here (hint: you should only need two)
 
   public TurretSubsystem() {
-    motor = new TalonFX(Constants.TURRET_MOTOR_CAN_ID, TunerConstants.kCANBus);
-
-    motor
-        .getConfigurator()
-        .apply(
-            new TalonFXConfiguration()
-                .withMotorOutput(
-                    new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)));
-
-    voltage = 0;
+    //TODO initialize the motor (NOTE: the CANBus is in TunerConstants, NOT Constants.java)
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
 
-  public void setMotorVoltage(double voltage) {
-    motor.setVoltage(voltage);
   }
-
-  public void setSpeed(double speed) {
-    motor.setControl(dutyCycleOut.withOutput(speed));
-  }
-
-  public double getPosition() {
-    return (motor.getPosition().getValueAsDouble() * 360 / Constants.TURRET_GEAR_RATIO) % 360;
-  }
+  //TODO add methods for setting speed and accessing the TURRET position
 }

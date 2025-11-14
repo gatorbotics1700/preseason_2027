@@ -42,6 +42,8 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.commands.TurretCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -53,39 +55,19 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
+  //TODO create your turret subsystem instance
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController codriver = new CommandXboxController(3);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser; // we chillin :D
 
-  private final GenericHID buttonBoard1A = new GenericHID(1);
-  private final GenericHID buttonBoard1B = new GenericHID(2);
-
-  private final GenericHID buttonBoard2A = new GenericHID(3);
-  private final GenericHID buttonBoard2B = new GenericHID(4);
-
-  private final Trigger Q1LeftLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(1));
-  private final Trigger Q1RightLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(2));
-
-  private final Trigger Q2LeftLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(2));
-  private final Trigger Q2RightLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(1));
-
-  private final Trigger Q3LeftLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(4));
-  private final Trigger Q3RightLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(3));
-
-  private final Trigger Q4LeftLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(6));
-  private final Trigger Q4RightLineup = new Trigger(() -> buttonBoard1B.getRawButtonPressed(5));
-
-  private final Trigger Q5LeftLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(5));
-  private final Trigger Q5RightLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(6));
-
-  private final Trigger Q6LeftLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(3));
-  private final Trigger Q6RightLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(4));
-
+  
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    //TODO instantiate the turret subsystem 
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -177,6 +159,11 @@ public class RobotContainer {
             () -> controller.getLeftX(),
             () -> -controller.getRightX()));
 
+    codriver
+    .b()
+    .onTrue(/*TODO make a new instance of the turret command with the relevant inputs */
+    );
+
     // Lock to 0° when A button is held
     controller
         .a()
@@ -214,78 +201,6 @@ public class RobotContainer {
 
     PathConstraints constraints =
         new PathConstraints(1, 2.0, Units.degreesToRadians(180), Units.degreesToRadians(360));
-
-    Q1LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q1, true));
-            }));
-
-    Q1RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q1, false));
-            }));
-
-    Q2LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q2, true));
-            }));
-
-    Q2RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q2, false));
-            }));
-
-    Q3LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q3, true));
-            }));
-
-    Q3RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q3, false));
-            }));
-
-    Q4LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q4, true));
-            }));
-
-    Q4RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q4, false));
-            }));
-
-    Q5LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q5, true));
-            }));
-
-    Q5RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q5, false));
-            }));
-
-    Q6LeftLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q6, true));
-            }));
-
-    Q6RightLineup.onTrue(
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(DriveCommands.Lineup(ReefSide.Q6, false));
-            }));
   }
 
   /**
