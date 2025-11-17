@@ -13,31 +13,38 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class CoralShooterSubsystem extends SubsystemBase {
-  private final TalonFX leftMotor;
-  private final TalonFX rightMotor;
-  private final DigitalInput limitSwitch;
+  // You need to have two TalonFX motors (left and right) and a DigitalInput limit switch
+  /* TODO: declare your motors and limit switch here */
 
   /** Creates a new CoralShooterSubsystem. */
   public CoralShooterSubsystem() {
-    leftMotor = new TalonFX(Constants.LEFT_SHOOTER_MOTOR_ID, Constants.CANIVORE_BUS_NAME);
-    rightMotor = new TalonFX(Constants.RIGHT_SHOOTER_MOTOR_ID, Constants.CANIVORE_BUS_NAME);
+    // To instantiate your motor, you want to create a new TalonFX object
+      // Make sure to include both the CAN ID and the CANBus name from Constants.java
+    /* TODO: instantiate your motors here */
 
-    rightMotor
-        .getConfigurator()
-        .apply(
-            new TalonFXConfiguration()
-                .withMotorOutput(
-                    new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)));
+    // This part of the code is making it so if we give the motors the same voltage, they'll go in opposite directions
+      // Since the wheels have to spin the same direction but the motors are mounted on opposite sides
+    /* TODO: put your right motor name here and uncomment the next few lines */
+        // .getConfigurator()
+        // .apply(
+        //     new TalonFXConfiguration()
+        //         .withMotorOutput(
+        //             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)));
 
-    limitSwitch = new DigitalInput(Constants.LIMIT_SWITCH_PORT);
+    // You must also instantiate your limit switch by creating a new DigitalInput object
+      // Make sure to use the limit switch constant in Constants.java
+    /* TODO: instantiate your limit switch here */
   }
 
-  public void setMotorVoltage(double voltage) {
-    leftMotor.setVoltage(voltage);
-    rightMotor.setVoltage(voltage);
-  }
+  /* GETTER AND SETTER METHODS */
 
-  public boolean getLimitSwitch() {
-    return limitSwitch.get();
-  }
+  // We need methods to set the motor voltage and to get the value of the limit switch
+
+  /* TODO: write a method to set motor voltage 
+   * You can use the TalonFX method setVoltage() on each motor to give the motor the voltages
+  */
+
+  /* TODO: write a method to get the limit switch value
+   * You can use the DigitalInput method get()
+   */
 }

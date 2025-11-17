@@ -27,7 +27,7 @@ import frc.robot.subsystems.CoralShooterSubsystem;
  */
 public class RobotContainer {
   // Subsystems
-  CoralShooterSubsystem coralShooterSubsystem = new CoralShooterSubsystem();
+  /* TODO: Declare and instantiate a Coral Shooter Subsystem */
 
   // Controller
   private final CommandXboxController codriver = new CommandXboxController(1);
@@ -44,12 +44,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    codriver
-        .a()
-        .onTrue(new CoralShooterCommand(coralShooterSubsystem, Constants.L4_SHOOTING_VOLTAGE));
-    codriver.b().onTrue(new CoralShooterCommand(coralShooterSubsystem, 0));
-    codriver
-        .x()
-        .onTrue(new CoralShooterCommand(coralShooterSubsystem, Constants.TROUGH_SHOOTING_VOLTAGE));
+    // We need buttons for:
+      // 1. Shooting L4
+      // 2. Shooting Trough
+      // 3. Intaking
+      // 4. Stop
+
+    // How to set up an Xbox Controller button:
+      // controllerName.buttonName().onTrue(new CommandToRun(parameters));
+        // ex: codriver.rightBumper().onTrue(new ClimberCommand(climberSubsystem, Constants.CLIMBING_SPEED));
+
+    /* TODO: Assign buttons A, B, X, and Y on the Xbox Controller */
   }
 }
