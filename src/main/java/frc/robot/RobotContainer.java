@@ -27,7 +27,7 @@ import frc.robot.subsystems.CoralShooterSubsystem;
  */
 public class RobotContainer {
   // Subsystems
-  /* TODO: Declare and instantiate a Coral Shooter Subsystem */
+  CoralShooterSubsystem coralShooterSubsystem = new CoralShooterSubsystem();
 
   // Controller
   private final CommandXboxController codriver = new CommandXboxController(1);
@@ -51,9 +51,17 @@ public class RobotContainer {
       // 4. Stop
 
     // How to set up an Xbox Controller button:
+
+
+
       // controllerName.buttonName().onTrue(new CommandToRun(parameters));
         // ex: codriver.rightBumper().onTrue(new ClimberCommand(climberSubsystem, Constants.CLIMBING_SPEED));
 
-    /* TODO: Assign buttons A, B, X, and Y on the Xbox Controller */
+
+      codriver.a().onTrue(new CoralShooterCommand(coralShooterSubsystem, Constants.lFourShootingVoltage));
+      codriver.b().onTrue(new CoralShooterCommand(coralShooterSubsystem, Constants.troughShootingVoltage));
+      codriver.x().onTrue(new CoralShooterCommand(coralShooterSubsystem, Constants.intakeVoltage));
+      codriver.y().onTrue(new CoralShooterCommand(coralShooterSubsystem, 0));
+
   }
 }
