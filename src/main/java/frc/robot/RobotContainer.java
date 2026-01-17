@@ -42,7 +42,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
@@ -122,10 +122,9 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive,
-                new VisionIOLimelight(
-                    VisionConstants.LIMELIGHT_0_NAME,
-                    drive::getRotation,
-                    VisionConstants.ROBOT_TO_LIMELIGHT_0));
+                new VisionIOPhotonVision(
+                    VisionConstants.CAMERA_0_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_0));
         break;
 
       case SIM:
@@ -142,8 +141,8 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.LIMELIGHT_0_NAME,
-                    VisionConstants.ROBOT_TO_LIMELIGHT_0,
+                    VisionConstants.CAMERA_0_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_0,
                     drive::getPose));
         break;
 
