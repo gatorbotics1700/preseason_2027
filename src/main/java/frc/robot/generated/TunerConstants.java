@@ -82,11 +82,11 @@ public class TunerConstants {
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
-  public static final CANBus kCANBus =
+  public static final CANBus driveCANBus =
       new CANBus(
-          RobotConfigLoader.getString("tuner.canbus_name") == "null"
+          RobotConfigLoader.getString("tuner.drive_canbus_name") == "null"
               ? ""
-              : RobotConfigLoader.getString("tuner.canbus_name"),
+              : RobotConfigLoader.getString("tuner.drive_canbus_name"),
           "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
@@ -119,7 +119,7 @@ public class TunerConstants {
 
   public static final SwerveDrivetrainConstants DrivetrainConstants =
       new SwerveDrivetrainConstants()
-          .withCANBusName(kCANBus.getName())
+          .withCANBusName(driveCANBus.getName())
           .withPigeon2Id(kPigeonId)
           .withPigeon2Configs(pigeonConfigs);
 
