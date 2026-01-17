@@ -8,15 +8,18 @@ public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubsystem;
 
     private final double voltage;
+    private final boolean wantExtended;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, double voltage){
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, double voltage, boolean wantExtended){
         this.intakeSubsystem = intakeSubsystem;
         this.voltage = voltage;
+        this.wantExtended = wantExtended;
         addRequirements(intakeSubsystem);
     }
 
     @Override
     public void execute(){
+        intakeSubsystem.extendIntake(wantExtended);
         intakeSubsystem.setMotorVoltage(voltage);
     }
 
