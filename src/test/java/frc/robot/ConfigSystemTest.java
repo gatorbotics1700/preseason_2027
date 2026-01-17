@@ -28,8 +28,8 @@ public class ConfigSystemTest {
     // Test that the robot serial number is loaded
     assertNotNull(Constants.ROBOT_SERIAL_NUMBER, "Robot serial number should be loaded");
 
-    // Test that limelight constants are loaded
-    assertNotNull(VisionConstants.LIMELIGHT_0_NAME, "Limelight camera 0 name should be loaded");
+    // Test that PhotonVision constants are loaded
+    assertNotNull(VisionConstants.CAMERA_0_NAME, "PhotonVision camera 0 name should be loaded");
 
     // Test that tuner constants are loaded
     assertTrue(RobotConfigLoader.getDouble("tuner.steer_kp") > 0, "Steer KP should be positive");
