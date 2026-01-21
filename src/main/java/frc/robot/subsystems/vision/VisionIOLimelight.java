@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.photonvision.PhotonCamera;
 
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
@@ -165,4 +166,7 @@ public class VisionIOLimelight implements VisionIO {
             Units.degreesToRadians(rawLLArray[4]),
             Units.degreesToRadians(rawLLArray[5])));
   }
+  // public PhotonCamera getCamera(){
+  //   return new PhotonCamera();
+  // }
 }
