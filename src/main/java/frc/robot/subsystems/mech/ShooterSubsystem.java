@@ -22,12 +22,11 @@ public class ShooterSubsystem extends SubsystemBase{
     public ShooterSubsystem(){
         flywheelMotor = new TalonFX(Constants.FLYWHEEL_MOTOR_CAN_ID);
         hoodMotor = new TalonFX(Constants.HOOD_MOTOR_CAN_ID);
-        isTargetting = true;
         pidController = new PIDController(kP, kI, kD);
     }
 
     public void periodic(){
-        if(isTargetting){
+        if(isTargetting==true){
             turnToPosition(getTargetPosition());
         }
     }

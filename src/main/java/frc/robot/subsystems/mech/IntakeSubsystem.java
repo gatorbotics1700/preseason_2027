@@ -16,6 +16,8 @@ public class IntakeSubsystem extends SubsystemBase{
     private PIDController pidController;
     private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
 
+    private double error;
+    private double extensionVoltage;
 
     private final double kP = 0.0; //TODO: tune all of these
     private final double kI = 0.0;
@@ -23,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
     public final double EXTENDED_POSITION = 90; // TODO: change
     public final double RETRACTED_POSITION = 0; // TODO: change
-    
+    public final double DEADBAND = 2;    
 
     public IntakeSubsystem(){
         intakeMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID);
@@ -49,11 +51,21 @@ public class IntakeSubsystem extends SubsystemBase{
 
     public void extendIntake(boolean wantExtended) {
         if(wantExtended == true){
-            double extensionVoltage = pidController.calculate(EXTENDED_POSITION - getPosition());
-            setExtensionVoltage(extensionVoltage);
+            error = EXTENDED_POSITION - getPosition();
+            if(Math.abs(error)>DEADBAND){
+                extensionVoltage = pidController.calculate(error);
+                setExtensionVoltage(extensionVoltage);
+            } else{
+                setExtensionVoltage(0);
+            }
         } else { 
-            double extensionVoltage = pidController.calculate(RETRACTED_POSITION - getPosition());
-            setExtensionVoltage(extensionVoltage);
+            error = RETRACTED_POSITION - getPosition();
+            if(Math.abs(error)>DEADBAND){
+                extensionVoltage = pidController.calculate(error);
+                setExtensionVoltage(extensionVoltage);
+            } else{
+                setExtensionVoltage(0);
+            }
         }
     }
 

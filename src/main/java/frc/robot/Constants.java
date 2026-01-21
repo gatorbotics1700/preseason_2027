@@ -80,7 +80,6 @@ public final class Constants {
   public static final int MID_RUNG_ARM_LENGTH = 18;
   public static final int HIGH_RUNG_ARM_LENGTH = 18;
 
-  public static final int LOW_RUNG_ARM_RETRACTED = 10; //change these values
-  public static final int MID_RUNG_ARM_RETRACTED = 8;
-  public static final int HIGH_RUNG_ARM_RETRACTED = 8;
+  public static final double CLIMBER_EXTENDED_POSITION = 10; //change these values
+  public static final int CLIMBER_RETRACTED_POSITION = 0;
 }

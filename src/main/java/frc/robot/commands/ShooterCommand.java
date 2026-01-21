@@ -6,13 +6,11 @@ import frc.robot.subsystems.mech.ShooterSubsystem;
 public class ShooterCommand extends Command{
     private ShooterSubsystem shooterSubsystem;
     private double flywheelVoltage;
-    private double hoodVoltage;
     private boolean isTargetting;
 
-    public ShooterCommand(ShooterSubsystem shooterSubsystem, double flywheelVoltage, double hoodVoltage, boolean isTargetting){
+    public ShooterCommand(ShooterSubsystem shooterSubsystem, double flywheelVoltage, boolean isTargetting){
         this.shooterSubsystem = shooterSubsystem;
         this.flywheelVoltage = flywheelVoltage;
-        this.hoodVoltage = hoodVoltage;
         this.isTargetting = isTargetting;
         addRequirements(shooterSubsystem);
     }
