@@ -7,12 +7,12 @@ public class IntakeCommand extends Command {
 
     private final IntakeSubsystem intakeSubsystem;
 
-    private final double voltage;
+    private final double intakeVoltage;
     private final boolean wantExtended;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, double voltage, boolean wantExtended){
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, double intakeVoltage, boolean wantExtended){
         this.intakeSubsystem = intakeSubsystem;
-        this.voltage = voltage;
+        this.intakeVoltage = intakeVoltage;
         this.wantExtended = wantExtended;
         addRequirements(intakeSubsystem);
     }
@@ -20,12 +20,12 @@ public class IntakeCommand extends Command {
     @Override
     public void execute(){
         intakeSubsystem.extendIntake(wantExtended);
-        intakeSubsystem.setMotorVoltage(voltage);
+        intakeSubsystem.setIntakeVoltage(intakeVoltage);
     }
 
     @Override
     public boolean isFinished(){
-        if(voltage == 0){
+        if(intakeVoltage == 0){
             return true;
         }
         //potentially consider adding connection to vision, if we don't see any fuel

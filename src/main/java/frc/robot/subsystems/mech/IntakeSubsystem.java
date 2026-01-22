@@ -37,8 +37,8 @@ public class IntakeSubsystem extends SubsystemBase{
     public void periodic(){
     }
 
-    public void setMotorVoltage(double voltage){
-        intakeMotor.setVoltage(voltage);
+    public void setIntakeVoltage(double intakeVoltage){
+        intakeMotor.setVoltage(intakeVoltage);
     }
 
     public void setExtensionVoltage(double output){

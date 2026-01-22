@@ -1,11 +1,11 @@
 package frc.robot.subsystems.mech;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import frc.robot.Constants;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase{
     public final TalonFX flywheelMotor;
@@ -44,7 +44,7 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public double getTargetPosition(){
-        return 45; // replace with equation that calculates desired distance based off distance from shooter
+        return 45; // replace with InterpolatingDoubleTreeMap getter?
     }
 
     public void turnToPosition(double targetPosition){
