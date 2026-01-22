@@ -92,6 +92,6 @@ public class ConfigSystemTest {
         RobotConfigLoader.getDouble("tuner.steer_gear_ratio") > 0,
         "Steer gear ratio should be positive");
     assertTrue(
-        RobotConfigLoader.getDouble("tuner.wheel_radius") > 0, "Wheel radius should be positive");
+        RobotConfigLoader.getDouble("tuner.wheel_radius_inches") > 0, "Wheel radius should be positive");
   }
 }
