@@ -22,8 +22,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final double kI = 0.0;
     private final double kD = 0.0;
 
-    public final double EXTENDED_POSITION = 90; // all degrees, TODO: change
-    public final double RETRACTED_POSITION = 0; // TODO: change
+    public final double EXTENDED_POSITION = degreesToTicks(90); // ticks, TODO: change
+    public final double RETRACTED_POSITION = degreesToTicks(0); // ticks, TODO: change
     public final double DEADBAND = 2;
 
     public IntakeSubsystem() {
@@ -64,6 +64,9 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public double degreesToTicks(double degrees) {
+        return degrees * Constants.HOOD_GEAR_RATIO / 360;
+    }
     //TODO: position error needs to be in ticks, add degrees to ticks method
 
 }

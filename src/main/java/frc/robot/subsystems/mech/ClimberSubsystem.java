@@ -3,13 +3,14 @@ package frc.robot.subsystems.mech;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import frc.robot.Constants;
 
 
 
-public class ClimberSubsystem extends SubsystemBase { //TODO: add many a brake mode for climber
+public class ClimberSubsystem extends SubsystemBase { 
     
     public final TalonFX motor;
 
@@ -23,6 +24,7 @@ public class ClimberSubsystem extends SubsystemBase { //TODO: add many a brake m
 
     public ClimberSubsystem(){
         motor = new TalonFX(Constants.OUTER_ARM_MOTOR_CAN_ID);
+        motor.setNeutralMode(NeutralModeValue.Brake); 
         pidController = new PIDController(kP, kI, kD);
     }
 
@@ -50,5 +52,13 @@ public class ClimberSubsystem extends SubsystemBase { //TODO: add many a brake m
 
     public double getMotorOutput(){
         return motor.get();
+    }
+
+    public void setActiveMode() {
+        motor.setNeutralMode(NeutralModeValue.Coast);
+    }
+
+    public void setBrakeMode() {
+        motor.setNeutralMode(NeutralModeValue.Brake);
     }
 }

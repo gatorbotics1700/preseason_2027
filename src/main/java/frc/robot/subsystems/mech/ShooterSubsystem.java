@@ -18,6 +18,7 @@ public class ShooterSubsystem extends SubsystemBase{
     private static final double kP = 0.0; //TODO: tune all of these
     private static final double kI = 0.0;
     private static final double kD = 0.0;
+    private static final double POSITION_DEADBAND_DEGREES = 1.0; // TODO: tune this
 
     public ShooterSubsystem(){
         flywheelMotor = new TalonFX(Constants.FLYWHEEL_MOTOR_CAN_ID);
@@ -47,8 +48,21 @@ public class ShooterSubsystem extends SubsystemBase{
         return 45; // replace with InterpolatingDoubleTreeMap getter?
     }
 
-    public void turnToPosition(double targetPosition){ //TODO: add deadband, convert into ticks
-        hoodVoltage = pidController.calculate(targetPosition - getHoodPosition());
+    public void turnToPosition(double targetPositionDegrees){
+        double currentPositionDegrees = getHoodPosition();
+        double error = targetPositionDegrees - currentPositionDegrees;
+
+        // Deadband: stop motor when close enough to target
+        if (Math.abs(error) < POSITION_DEADBAND_DEGREES) {
+            setHoodSpeed(0);
+            return;
+        }
+
+        // Convert degrees to ticks (motor rotations) for PID
+        double targetTicks = targetPositionDegrees * Constants.HOOD_GEAR_RATIO / 360.0;
+        double currentTicks = hoodMotor.getPosition().getValueAsDouble();
+
+        hoodVoltage = pidController.calculate(currentTicks, targetTicks);
         setHoodSpeed(hoodVoltage);
     }
 
