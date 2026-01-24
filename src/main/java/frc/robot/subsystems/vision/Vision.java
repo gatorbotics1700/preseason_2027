@@ -30,7 +30,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
@@ -219,8 +218,8 @@ public class Vision extends SubsystemBase {
     return fieldRelativePose;
   }
 
-  public void takePicture(){
-    for(int i=0;i<io.length;i++){
+  public void takePicture() {
+    for (int i = 0; i < io.length; i++) {
       io[i].getCamera().takeInputSnapshot();
     }
   }

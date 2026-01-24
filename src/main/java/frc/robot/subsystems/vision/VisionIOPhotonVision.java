@@ -128,7 +128,7 @@ public class VisionIOPhotonVision implements VisionIO {
     }
   }
 
-  public PhotonCamera getCamera(){
+  public PhotonCamera getCamera() {
     return camera;
   }
 }

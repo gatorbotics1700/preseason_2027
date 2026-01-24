@@ -48,7 +48,7 @@ public interface VisionIO {
 
   default void updateInputs(VisionIOInputs inputs) {}
 
-  default PhotonCamera getCamera(){
+  default PhotonCamera getCamera() {
     return new PhotonCamera("");
   }
 }

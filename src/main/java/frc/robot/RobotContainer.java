@@ -123,8 +123,7 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_0_NAME,
-                    VisionConstants.ROBOT_TO_CAMERA_0));
+                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0));
         break;
 
       case SIM:
@@ -279,12 +278,10 @@ public class RobotContainer {
     controller_two
         .x()
         .onTrue(
-          Commands.runOnce(
-            ()->{
-              vision.takePicture();
-            }
-          )
-        );
+            Commands.runOnce(
+                () -> {
+                  vision.takePicture();
+                }));
 
     controller
         .rightBumper()
