@@ -4,11 +4,15 @@
   "holonomicMode": true,
   "pathFolders": [
     "Blue Center Starters",
+    "Blue Fuel Pile Starts",
     "Blue Left Starters",
+    "Blue Outpost & DC",
     "Blue Right Starters",
-    "Red Right Starters",
     "Red Center Starts",
-    "Red Left Starters"
+    "Red Fuel Pile Starts",
+    "Red Left Starters",
+    "Red Outpost & DC",
+    "Red Right Starters"
   ],
   "autoFolders": [
     "Leave Autos"
