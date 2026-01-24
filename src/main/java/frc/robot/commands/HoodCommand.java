@@ -7,30 +7,34 @@ public class HoodCommand extends Command {
   private HoodSubsystem hoodSubsystem;
   private double startTime;
   private double targetPosition;
-  private double hoodSpeed;
+  private boolean isTargetting;
 
-  public HoodCommand(
-      HoodSubsystem hoodSubsystem, boolean isTargetting, double targetPosition, double hoodSpeed) {
+  public HoodCommand(HoodSubsystem hoodSubsystem, boolean isTargetting, double targetPosition) {
     this.hoodSubsystem = hoodSubsystem;
     this.targetPosition = targetPosition;
-    this.hoodSpeed = hoodSpeed;
+    this.isTargetting = isTargetting;
     addRequirements(hoodSubsystem);
   }
 
   @Override
   public void initialize() {
     startTime = System.currentTimeMillis();
+    hoodSubsystem.setIsTargetting(isTargetting);
+    // hoodSubsystem.setShootingToPosition(shootingToPosition); this is for once we start testing
+    // targetting
   }
 
   @Override
   public void execute() {
-    hoodSubsystem.setHoodSpeed(hoodSpeed);
+    if (!isTargetting) {
+      hoodSubsystem.turnToPosition(hoodSubsystem.degreesToTicks(targetPosition));
+      System.out.println("USING HOOD COMMAND");
+    }
   }
 
   @Override
   public boolean isFinished() {
-    if (hoodSpeed == 0) {
-      hoodSubsystem.setHoodSpeed(0);
+    if (hoodSubsystem.getHoodOutput() == 0) {
       return true;
     }
     return false;

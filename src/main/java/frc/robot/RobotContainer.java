@@ -49,6 +49,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.RobotConfigLoader;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -63,7 +64,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
+  private final HoodSubsystem hoodSubsystem;
+  // private final TurretSubsystem turretSubsystem;
 
   // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -97,16 +99,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // mech
-
-    new Trigger(controller_two::getAButtonPressed)
-        .onTrue(new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE));
-    new Trigger(controller_two::getBButtonPressed).onTrue(new ShooterCommand(shooterSubsystem, 0));
-    new Trigger(controller_two::getXButtonPressed)
-        .onTrue(new HoodCommand(hoodSubsystem, false, 0, -0.1));
-    new Trigger(controller_two::getYButtonPressed)
-        .onTrue(new HoodCommand(hoodSubsystem, false, 0, 0));
-
     // Named Commands
 
     NamedCommands.registerCommand(
@@ -175,6 +167,23 @@ public class RobotContainer {
         vision = new Vision(drive);
         break;
     }
+
+    Supplier<Pose2d> robotPose =
+        () -> {
+          return drive.getPose();
+        };
+    // turretSubsystem = new TurretSubsystem(robotPose);
+
+    hoodSubsystem = new HoodSubsystem(robotPose);
+
+    // mech buttons
+
+    new Trigger(controller_two::getAButtonPressed)
+        .onTrue(new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE));
+    new Trigger(controller_two::getBButtonPressed).onTrue(new ShooterCommand(shooterSubsystem, 0));
+    new Trigger(controller_two::getXButtonPressed)
+        .onTrue(new HoodCommand(hoodSubsystem, false, 20));
+    new Trigger(controller_two::getYButtonPressed).onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

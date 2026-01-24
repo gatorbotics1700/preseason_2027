@@ -25,21 +25,11 @@ public class TurretCommand extends Command {
   }
 
   @Override
-  public void initialize() {
-    if (desiredAngle != null) {
-      turretSubsystem.setUseAngle(true);
-    } else {
-      turretSubsystem.setUseAngle(false);
-    }
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
-    if (turretSubsystem.getUseAngle()) {
-      turretSubsystem.turnToAngle(desiredAngle);
-    } else {
-      turretSubsystem.setTargetPoint(desiredPoint);
-    }
+    turretSubsystem.setTargetPoint(desiredPoint);
   }
 
   @Override
@@ -50,7 +40,6 @@ public class TurretCommand extends Command {
     if (Math.abs(error.getDegrees()) < Constants.TURRET_DEADBAND) {
       System.out.println("REACHED TARGET");
       turretSubsystem.setSpeed(0);
-      turretSubsystem.setUseAngle(false);
       return true;
     }
     return false;

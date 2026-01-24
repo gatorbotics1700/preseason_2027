@@ -44,11 +44,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double getPosition() {
-    return extensionMotor.getPosition().getValueAsDouble()
-        * 360
-        / Constants.HOOD_GEAR_RATIO; // TODO: check this
-    // conversion into
-    // degrees
+    return extensionMotor.getPosition().getValueAsDouble();
   }
 
   public void pivotIntake(boolean wantExtended) {
@@ -66,8 +62,6 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double degreesToTicks(double degrees) {
-    return degrees * Constants.HOOD_GEAR_RATIO / 360;
+    return degrees * Constants.HOOD_GEAR_RATIO / 360; // TODO: fix this when we know mech details
   }
-  // TODO: position error needs to be in ticks, add degrees to ticks method
-
 }

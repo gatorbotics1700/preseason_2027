@@ -25,27 +25,21 @@ public class TurretSubsystem
   private static final double kD = 0.0;
 
   private Translation2d target = new Translation2d(0, 0);
-  private boolean useAngle;
-  private double speed;
 
   private Supplier<Pose2d> robotPose;
 
-  public TurretSubsystem() {
+  public TurretSubsystem(Supplier<Pose2d> robotPose) {
     motor = new TalonFX(Constants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     pidController = new PIDController(kP, kI, kD);
     this.robotPose = robotPose;
-    useAngle = false; // not sure if we need this...
-    speed = 0.0;
+  }
+
+  public void periodic() {
+    turnToAngle(getTargetTurretAngle(target));
   }
 
   public void setTargetPoint(Translation2d targetPoint) {
     target = targetPoint;
-  }
-
-  public void periodic() {
-    if (useAngle = false) {
-      turnToAngle(getTargetTurretAngle(target));
-    }
   }
 
   public void turnToAngle(Rotation2d desiredAngle) {
@@ -83,13 +77,5 @@ public class TurretSubsystem
     Rotation2d angleToTarget = new Rotation2d(Math.atan2(deltaY, deltaX));
     Rotation2d turretAngle = angleToTarget.minus(currentRobotPose.getRotation());
     return turretAngle;
-  }
-
-  public void setUseAngle(boolean useAngle) {
-    this.useAngle = useAngle;
-  }
-
-  public boolean getUseAngle() {
-    return useAngle;
   }
 }

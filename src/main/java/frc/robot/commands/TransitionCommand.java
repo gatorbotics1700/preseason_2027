@@ -20,7 +20,8 @@ public class TransitionCommand extends Command {
 
   @Override
   public void execute() {
-    transitionSubsystem.setKickerVoltage(kickerVoltage);
+    transitionSubsystem.setLowKickerVoltage(kickerVoltage);
+    transitionSubsystem.setHighKickerVoltage(kickerVoltage);
     transitionSubsystem.setHopperVoltage(hopperVoltage);
   }
 

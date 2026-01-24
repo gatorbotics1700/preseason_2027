@@ -60,15 +60,16 @@ public final class Constants {
   public static final int EXTENSION_MOTOR_CAN_ID = 12; // needs changing
   public static final int FLYWHEEL_MOTOR_CAN_ID = 30;
   public static final int HOOD_MOTOR_CAN_ID = 17;
-  public static final int KICKER_MOTOR_CAN_ID = 15; // this and all below need changing
+  public static final int KICKER_MOTOR_LOW_CAN_ID = 15; // this and all below need changing
+  public static final int KICKER_MOTOR_HIGH_CAN_ID = 20;
   public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int TURRET_MOTOR_CAN_ID = 14;
   public static final int OUTER_ARM_MOTOR_CAN_ID = 18;
   public static final int INNER_ARM_MOTOR_CAN_ID = 19;
 
-  public static final int HOOD_GEAR_RATIO = 4; // TODO: change!!
-  public static final int TURRET_GEAR_RATIO = 42; // TODO: change!
-  public static final int KRAKEN_TICKS_PER_REV = 2048; // TODO: double check
+  public static final int HOOD_GEAR_RATIO = 9; // for prototype mechanism
+  public static final int TURRET_GEAR_RATIO = 50; // TODO: updated by katy and niva 1/24
+  public static final int KRAKEN_TICKS_PER_REV = 2048;
   public static final int CLIMBER_TICKS_PER_INCH = 40; // TODO: change!!
 
   public static final double TURRET_DEADBAND = 0.75;

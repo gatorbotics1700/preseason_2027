@@ -22,6 +22,7 @@ public class ShooterCommand extends Command {
   @Override
   public void execute() {
     shooterSubsystem.setFlywheelVoltage(flywheelVoltage);
+    shooterSubsystem.setKickerVoltage(flywheelVoltage);
     if (Math.abs(flywheelVoltage) > 0) {
       System.out.println("SHOOTING SHOOTING SHOOTING");
     } else {

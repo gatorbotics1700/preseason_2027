@@ -18,8 +18,7 @@ public class ClimberSubsystem extends SubsystemBase {
   private static final double kP = 0.0; // TODO: tune all of these
   private static final double kI = 0.0;
   private static final double kD = 0.0;
-  private static final double DEADBAND =
-      500; // TODO: in ticks, edit, get climberDeadband method to use in command
+  private final double DEADBAND = inchesToTicks(1);
 
   public ClimberSubsystem() {
     motor = new TalonFX(Constants.OUTER_ARM_MOTOR_CAN_ID, TunerConstants.mechCANBus);
@@ -28,10 +27,12 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void setMotorOutput(double output) {
+    motor.setNeutralMode(NeutralModeValue.Brake);
     motor.setControl(dutyCycleOut.withOutput(output));
   }
 
   public void moveArm(double desiredTicks) {
+    motor.setNeutralMode(NeutralModeValue.Brake);
     double error = desiredTicks - getCurrentTicks();
     if (Math.abs(error) > DEADBAND) {
       double output = pidController.calculate(error);
@@ -53,11 +54,7 @@ public class ClimberSubsystem extends SubsystemBase {
     return motor.get();
   }
 
-  public void setActiveMode() {
-    motor.setNeutralMode(NeutralModeValue.Coast);
-  }
-
-  public void setBrakeMode() {
-    motor.setNeutralMode(NeutralModeValue.Brake);
+  public double getClimberDeadband() {
+    return DEADBAND;
   }
 }
