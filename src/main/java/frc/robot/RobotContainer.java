@@ -201,7 +201,7 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
       driverControl
           .whileTrue(
-              DriveCommands.joystickDriveWithAutoRotation(
+              DriveCommands.joystickDrive(
                   drive,
                   () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
                   () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
@@ -210,7 +210,7 @@ public class RobotContainer {
     } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
       driverControl
           .whileTrue(
-              DriveCommands.joystickDriveWithAutoRotation(
+              DriveCommands.joystickDrive(
                   drive,
                   () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
                   () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
