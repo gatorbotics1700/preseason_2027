@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.mech.HoodSubsystem;
 
@@ -34,6 +35,7 @@ public class HoodCommand extends Command {
       hoodSubsystem.turnToPosition(hoodSubsystem.degreesToTicks(targetPosition));
       System.out.println("USING HOOD COMMAND");
     }
+    SmartDashboard.putNumber("Hood target position (ticks)", targetPosition);
   }
 
   @Override
@@ -43,4 +45,6 @@ public class HoodCommand extends Command {
     }
     return false;
   }
+
+
 }
