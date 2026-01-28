@@ -189,9 +189,9 @@ public class MultiStepAutoChooser {
   }
 
   /**
-   * Builds the auto filename from the current selections. Format: {Alliance} {StartPos} {Dest1}
-   * {Dest2} {Dest3} {Climb}.auto Example: R Center DC DL.auto or B LF Fuel Pile CF Outpost
-   * Climb.auto
+   * Builds the auto filename from the current selections. Format: {Alliance (initial)}
+   * {StartPos}-{Dest1} -{Dest2}-{Dest3}-{Tower}.auto Example: R Center-DC-Fuel Pile CM.auto or B
+   * LF-Fuel Pile-CF-Outpost-Tower.auto
    */
   // TODO: make sure this follows the right naming conventions we ultimately decide on
   private String buildAutoFileName(
@@ -214,20 +214,20 @@ public class MultiStepAutoChooser {
 
     // Destinations (only add if not None)
     if (dest1 != null && !dest1.equals("None")) {
-      fileName.append(" ").append(dest1);
+      fileName.append("-").append(dest1);
     }
 
     if (dest2 != null && !dest2.equals("None")) {
-      fileName.append(" ").append(dest2);
+      fileName.append("-").append(dest2);
     }
 
     if (dest3 != null && !dest3.equals("None")) {
-      fileName.append(" ").append(dest3);
+      fileName.append("-").append(dest3);
     }
 
     // Climb
     if (climb) {
-      fileName.append(" Climb");
+      fileName.append("-Tower");
     }
 
     fileName.append(".auto");
