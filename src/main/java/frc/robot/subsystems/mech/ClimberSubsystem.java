@@ -14,11 +14,12 @@ public class ClimberSubsystem extends SubsystemBase {
 
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private final PIDController pidController;
+  private double output;
 
   private static final double kP = 0.0; // TODO: tune all of these
   private static final double kI = 0.0;
   private static final double kD = 0.0;
-  private final double DEADBAND = inchesToTicks(1);
+  private final double DEADBAND = inchesToRevs(1);
 
   public ClimberSubsystem() {
     motor = new TalonFX(Constants.OUTER_ARM_MOTOR_CAN_ID, TunerConstants.mechCANBus);
@@ -26,35 +27,31 @@ public class ClimberSubsystem extends SubsystemBase {
     pidController = new PIDController(kP, kI, kD);
   }
 
-  public void setMotorOutput(double output) {
+  public void setMotorOutput(double speed) {
     motor.setNeutralMode(NeutralModeValue.Brake);
-    motor.setControl(dutyCycleOut.withOutput(output));
+    motor.setControl(dutyCycleOut.withOutput(speed));
   }
 
-  public void moveArm(double desiredTicks) {
+  public void moveArm(double desiredRevs) {
     motor.setNeutralMode(NeutralModeValue.Brake);
-    double error = desiredTicks - getCurrentTicks();
+    double error = desiredRevs - getCurrentMotorRevs();
     if (Math.abs(error) > DEADBAND) {
-      double output = pidController.calculate(error);
-      setMotorOutput(output);
+      output = pidController.calculate(error);
     } else {
-      setMotorOutput(0);
+      output = 0;
     }
+    setMotorOutput(0);
   }
 
-  public double getCurrentTicks() {
-    return motor.getPosition().getValueAsDouble() * Constants.KRAKEN_TICKS_PER_REV;
+  public double getCurrentMotorRevs() {
+    return motor.getPosition().getValueAsDouble();
   }
 
-  public double inchesToTicks(double desiredInches) {
+  public double inchesToRevs(double desiredInches) {
     return desiredInches * Constants.CLIMBER_TICKS_PER_INCH;
   }
 
   public double getMotorOutput() {
-    return motor.get();
-  }
-
-  public double getClimberDeadband() {
-    return DEADBAND;
+    return output;
   }
 }

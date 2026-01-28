@@ -28,9 +28,4 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelMotor.setVoltage(flywheelVoltage);
     System.out.println("SETTING FLYWHEEL VOLTAGE :)))");
   }
-
-  public void setKickerVoltage(double kickerVoltage) {
-    kickerMotor.setVoltage(kickerVoltage);
-    System.out.println("SETTING KICKER VOLTAGE");
-  }
 }

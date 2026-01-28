@@ -6,21 +6,15 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
 public class TransitionSubsystem extends SubsystemBase {
-  public final TalonFX kickerMotorLow;
   public final TalonFX kickerMotorHigh;
   public final TalonFX hopperMotor;
 
   public TransitionSubsystem() {
-    kickerMotorLow = new TalonFX(Constants.KICKER_MOTOR_LOW_CAN_ID, TunerConstants.mechCANBus);
     kickerMotorHigh = new TalonFX(Constants.KICKER_MOTOR_HIGH_CAN_ID, TunerConstants.mechCANBus);
     hopperMotor = new TalonFX(Constants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
   }
 
   public void periodic() {}
-
-  public void setLowKickerVoltage(double kickerVoltage) {
-    kickerMotorLow.setVoltage(kickerVoltage);
-  }
 
   public void setHighKickerVoltage(double kickerVoltage) {
     kickerMotorHigh.setVoltage(kickerVoltage);

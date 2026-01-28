@@ -18,10 +18,10 @@ public class ClimberCommand extends Command {
   @Override
   public void initialize() {
     if (extendingL1 == true) {
-      desiredPosition = climberSubsystem.inchesToTicks(Constants.CLIMBER_EXTENDED_POSITION);
+      desiredPosition = climberSubsystem.inchesToRevs(Constants.CLIMBER_EXTENDED_POSITION);
       System.out.println("EXTENDING CLIMBER");
     } else {
-      desiredPosition = climberSubsystem.inchesToTicks(Constants.CLIMBER_RETRACTED_POSITION);
+      desiredPosition = climberSubsystem.inchesToRevs(Constants.CLIMBER_RETRACTED_POSITION);
       System.out.println("RETRACTING CLIMBER");
     }
   }

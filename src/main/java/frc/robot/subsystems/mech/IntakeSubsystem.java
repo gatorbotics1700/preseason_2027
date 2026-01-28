@@ -22,8 +22,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double kI = 0.0;
   private final double kD = 0.0;
 
-  public final double EXTENDED_POSITION = degreesToTicks(90); // ticks, TODO: change
-  public final double RETRACTED_POSITION = degreesToTicks(0); // ticks, TODO: change
+  public final double EXTENDED_POSITION = degreesToRevs(90); // ticks, TODO: change
+  public final double RETRACTED_POSITION = degreesToRevs(0); // ticks, TODO: change
   public final double DEADBAND = 2;
 
   public IntakeSubsystem() {
@@ -43,25 +43,26 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionMotor.setControl(dutyCycleOut.withOutput(output));
   }
 
-  public double getPosition() {
+  public double getPositionMotorRevs() {
     return extensionMotor.getPosition().getValueAsDouble();
   }
 
   public void pivotIntake(boolean wantExtended) {
     if (wantExtended) {
-      positionError = EXTENDED_POSITION - getPosition();
+      positionError = EXTENDED_POSITION - getPositionMotorRevs();
     } else {
-      positionError = RETRACTED_POSITION - getPosition();
+      positionError = RETRACTED_POSITION - getPositionMotorRevs();
     }
     if (Math.abs(positionError) > DEADBAND) {
       extensionVoltage = pidController.calculate(positionError);
       setExtensionVoltage(extensionVoltage);
     } else {
-      setExtensionVoltage(0);
+      extensionVoltage = 0;
     }
+    setExtensionVoltage(extensionVoltage);
   }
 
-  public double degreesToTicks(double degrees) {
+  public double degreesToRevs(double degrees) {
     return degrees * Constants.HOOD_GEAR_RATIO / 360; // TODO: fix this when we know mech details
   }
 }

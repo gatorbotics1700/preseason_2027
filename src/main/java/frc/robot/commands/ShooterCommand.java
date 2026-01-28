@@ -9,11 +9,9 @@ public class ShooterCommand extends Command {
   private double kickerVoltage;
   private double startTime;
 
-  public ShooterCommand(
-      ShooterSubsystem shooterSubsystem, double flywheelVoltage, double kickerVoltage) {
+  public ShooterCommand(ShooterSubsystem shooterSubsystem, double flywheelVoltage) {
     this.shooterSubsystem = shooterSubsystem;
     this.flywheelVoltage = flywheelVoltage;
-    this.kickerVoltage = kickerVoltage;
     addRequirements(shooterSubsystem);
   }
 
@@ -25,7 +23,6 @@ public class ShooterCommand extends Command {
   @Override
   public void execute() {
     shooterSubsystem.setFlywheelVoltage(flywheelVoltage);
-    shooterSubsystem.setKickerVoltage(kickerVoltage);
     if (Math.abs(flywheelVoltage) > 0) {
       System.out.println("SHOOTING SHOOTING SHOOTING");
     } else {
@@ -38,12 +35,10 @@ public class ShooterCommand extends Command {
     double timePassed = System.currentTimeMillis() - startTime;
     if (flywheelVoltage == 0) {
       shooterSubsystem.setFlywheelVoltage(0);
-      shooterSubsystem.setKickerVoltage(0);
       return true;
     }
-    if (timePassed > 5000) {
+    if (timePassed > 8000) {
       shooterSubsystem.setFlywheelVoltage(0);
-      shooterSubsystem.setKickerVoltage(0);
       System.out.println("TIMING OUT");
       return true;
     }

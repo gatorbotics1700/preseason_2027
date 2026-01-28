@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,7 +39,7 @@ public class HoodSubsystem extends SubsystemBase {
             new TalonFXConfiguration()
                 .withMotorOutput(
                     new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)));
-    // hoodMotor.setNeutralMode(NeutralModeValue.Brake);
+    hoodMotor.setNeutralMode(NeutralModeValue.Brake);
     pidController = new PIDController(kP, kI, kD);
   }
 
@@ -100,13 +101,12 @@ public class HoodSubsystem extends SubsystemBase {
     // Deadband: stop motor when close enough to target
     if (Math.abs(errorTicks) < POSITION_DEADBAND_TICKS) {
       hoodOutput = 0;
-      setHoodSpeed(hoodOutput);
       System.out.println("HOOD AT POSITION. STOPPING");
     } else {
       hoodOutput = pidController.calculate(currentPositionTicks, targetPositionRevs);
-      setHoodSpeed(hoodOutput);
       System.out.println("MOVING HOOD!!");
     }
+    setHoodSpeed(hoodOutput);
   }
 
   public void setIsTargetting(boolean isTargetting) {

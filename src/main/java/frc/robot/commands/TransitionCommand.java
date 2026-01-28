@@ -9,6 +9,7 @@ public class TransitionCommand extends Command {
 
   private final double kickerVoltage;
   private final double hopperVoltage;
+  private double startTime;
 
   public TransitionCommand(
       TransitionSubsystem transitionSubsystem, double kickerVoltage, double hopperVoltage) {
@@ -19,15 +20,24 @@ public class TransitionCommand extends Command {
   }
 
   @Override
+  public void initialize() {
+    startTime = System.currentTimeMillis();
+  }
+
+  @Override
   public void execute() {
-    transitionSubsystem.setLowKickerVoltage(kickerVoltage);
     transitionSubsystem.setHighKickerVoltage(kickerVoltage);
-    transitionSubsystem.setHopperVoltage(hopperVoltage);
+    // transitionSubsystem.setHopperVoltage(hopperVoltage);
   }
 
   @Override
   public boolean isFinished() {
-    if (hopperVoltage == 0) {
+    // if (hopperVoltage == 0) {
+    //   return true;
+    // } else
+    if (System.currentTimeMillis() - startTime > 10000) {
+      transitionSubsystem.setHighKickerVoltage(0);
+      System.out.println("TIMING OUT");
       return true;
     }
     return false;

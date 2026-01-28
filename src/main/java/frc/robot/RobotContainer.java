@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -35,6 +36,7 @@ import frc.robot.commands.LineupCommand;
 import frc.robot.commands.LineupCommand.ReefSide;
 import frc.robot.commands.LineupCommand.YOffset;
 import frc.robot.commands.ShooterCommand;
+import frc.robot.commands.TransitionCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -44,6 +46,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
+import frc.robot.subsystems.mech.TransitionSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -65,6 +68,7 @@ public class RobotContainer {
   private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final HoodSubsystem hoodSubsystem;
+  private final TransitionSubsystem transitionSubsystem = new TransitionSubsystem();
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -101,12 +105,15 @@ public class RobotContainer {
   public RobotContainer() {
     new Trigger(controller_two::getAButtonPressed)
         .onTrue(
-            new ShooterCommand(
-                shooterSubsystem,
-                Constants.FLYWHEEL_SHOOTING_VOLTAGE,
-                Constants.KICKER_SHOOTING_VOLTAGE));
+            new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
+                .andThen(new WaitCommand(2.0))
+                .andThen(
+                    new TransitionCommand(
+                        transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
     new Trigger(controller_two::getBButtonPressed)
-        .onTrue(new ShooterCommand(shooterSubsystem, 0, 0));
+        .onTrue(
+            new TransitionCommand(transitionSubsystem, 0, 0)
+                .alongWith(new ShooterCommand(shooterSubsystem, 0)));
 
     // Named Commands
 

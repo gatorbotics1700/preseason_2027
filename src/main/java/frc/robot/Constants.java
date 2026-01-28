@@ -61,7 +61,7 @@ public final class Constants {
   public static final int FLYWHEEL_MOTOR_CAN_ID = 30;
   public static final int HOOD_MOTOR_CAN_ID = 17;
   public static final int KICKER_MOTOR_LOW_CAN_ID = 15; // this and all below need changing
-  public static final int KICKER_MOTOR_HIGH_CAN_ID = 20;
+  public static final int KICKER_MOTOR_HIGH_CAN_ID = 31;
   public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int TURRET_MOTOR_CAN_ID = 14;
   public static final int OUTER_ARM_MOTOR_CAN_ID = 18;
@@ -85,6 +85,6 @@ public final class Constants {
 
   public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
       208 / 15; // big gear teeth / little gear teeth
-  public static final double FLYWHEEL_SHOOTING_VOLTAGE = 10;
-  public static final double KICKER_SHOOTING_VOLTAGE = 6;
+  public static final double FLYWHEEL_SHOOTING_VOLTAGE = 12;
+  public static final double KICKER_SHOOTING_VOLTAGE = 12;
 }
