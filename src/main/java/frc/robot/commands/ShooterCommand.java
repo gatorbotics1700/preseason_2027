@@ -6,11 +6,14 @@ import frc.robot.subsystems.mech.ShooterSubsystem;
 public class ShooterCommand extends Command {
   private ShooterSubsystem shooterSubsystem;
   private double flywheelVoltage;
+  private double kickerVoltage;
   private double startTime;
 
-  public ShooterCommand(ShooterSubsystem shooterSubsystem, double flywheelVoltage) {
+  public ShooterCommand(
+      ShooterSubsystem shooterSubsystem, double flywheelVoltage, double kickerVoltage) {
     this.shooterSubsystem = shooterSubsystem;
     this.flywheelVoltage = flywheelVoltage;
+    this.kickerVoltage = kickerVoltage;
     addRequirements(shooterSubsystem);
   }
 
@@ -22,7 +25,7 @@ public class ShooterCommand extends Command {
   @Override
   public void execute() {
     shooterSubsystem.setFlywheelVoltage(flywheelVoltage);
-    shooterSubsystem.setKickerVoltage(flywheelVoltage);
+    shooterSubsystem.setKickerVoltage(kickerVoltage);
     if (Math.abs(flywheelVoltage) > 0) {
       System.out.println("SHOOTING SHOOTING SHOOTING");
     } else {

@@ -17,15 +17,15 @@ import java.util.function.Supplier;
 public class HoodSubsystem extends SubsystemBase {
   public final TalonFX hoodMotor;
   private boolean isTargetting;
-  private double hoodVoltage;
+  private double hoodOutput;
   private PIDController pidController;
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private Translation2d shootingToPosition;
 
-  private static final double kP = 0.00001; // TODO: tune all of these
+  private static final double kP = 0.05; // TODO: tune all of these
   private static final double kI = 0.0;
   private static final double kD = 0.0;
-  private final double POSITION_DEADBAND_TICKS = degreesToTicks(1.0); // TODO: tune
+  private final double POSITION_DEADBAND_TICKS = degreesToMotorRevs(1.0); // TODO: tune
   private static double currentPositionTicks;
 
   private Supplier<Pose2d> robotPose;
@@ -47,9 +47,10 @@ public class HoodSubsystem extends SubsystemBase {
     if (isTargetting) {
       turnToPosition(getHoodTargetPosition(shootingToPosition));
     }
-    currentPositionTicks = getHoodPositionTicks();
-    SmartDashboard.putNumber("Hood current position (ticks)", currentPositionTicks);
-
+    currentPositionTicks = getHoodPositionMotorRevs();
+    SmartDashboard.putNumber("Hood current position (revs)", currentPositionTicks);
+    SmartDashboard.putNumber(
+        "Hood current position (degrees)", motorRevsToDegrees(currentPositionTicks));
   }
 
   public void setShootingToPosition(
@@ -63,10 +64,10 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public double getHoodOutput() {
-    return hoodMotor.get();
+    return hoodOutput;
   }
 
-  public double getHoodPositionTicks() {
+  public double getHoodPositionMotorRevs() {
     return hoodMotor.getPosition().getValueAsDouble(); // TODO: check this conversion into degrees
   }
 
@@ -76,30 +77,34 @@ public class HoodSubsystem extends SubsystemBase {
     double deltaX = Math.abs(shootingToPosition.getX() - currentRobotPose.getX());
     double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     // replace with InterpolatingDoubleTreeMap getter to find degrees using distance
-    return degreesToTicks(45);
+    return degreesToMotorRevs(45);
   }
 
   public double getDistanceFromFuelTarget() {
     return 10;
   }
 
-  public void turnToPosition(double targetPositionTicks) {
-    System.out.println("TARGET HOOD POSITION TICKS: " + targetPositionTicks);
-    System.out.println("TARGET HOOD POSITION DEGREES: " + ticksToDegrees(targetPositionTicks));
-    currentPositionTicks = getHoodPositionTicks();
-    System.out.println("CURRENT HOOD POS TICKS: " + currentPositionTicks);
-    System.out.println("CURRENT HOOD POS DEGREES: " + ticksToDegrees(currentPositionTicks));
-    double errorTicks = targetPositionTicks - currentPositionTicks;
-    System.out.println("HOOD POSITION ERROR TICKS: " + errorTicks);
-    System.out.println("HOOD POSITION ERROR DEGREES: " + ticksToDegrees(errorTicks));
+  public void turnToPosition(double targetPositionRevs) {
+    // System.out.println("TARGET HOOD POSITION TICKS: " + targetPositionTicks);
+    System.out.println("TARGET HOOD POSITION DEGREES: " + motorRevsToDegrees(targetPositionRevs));
+    SmartDashboard.putNumber(
+        "Hood target position (degrees)",
+        motorRevsToDegrees(targetPositionRevs)); // things only show up in elastic when in periodic
+    // currentPositionTicks = getHoodPositionTicks();
+    // System.out.println("CURRENT HOOD POS TICKS: " + currentPositionTicks);
+    System.out.println("CURRENT HOOD POS DEGREES: " + motorRevsToDegrees(currentPositionTicks));
+    double errorTicks = targetPositionRevs - currentPositionTicks;
+    // System.out.println("HOOD POSITION ERROR TICKS: " + errorTicks);
+    System.out.println("HOOD POSITION ERROR DEGREES: " + motorRevsToDegrees(errorTicks));
 
     // Deadband: stop motor when close enough to target
     if (Math.abs(errorTicks) < POSITION_DEADBAND_TICKS) {
-      setHoodSpeed(0);
+      hoodOutput = 0;
+      setHoodSpeed(hoodOutput);
       System.out.println("HOOD AT POSITION. STOPPING");
     } else {
-      hoodVoltage = pidController.calculate(currentPositionTicks, targetPositionTicks);
-      setHoodSpeed(hoodVoltage);
+      hoodOutput = pidController.calculate(currentPositionTicks, targetPositionRevs);
+      setHoodSpeed(hoodOutput);
       System.out.println("MOVING HOOD!!");
     }
   }
@@ -108,19 +113,11 @@ public class HoodSubsystem extends SubsystemBase {
     this.isTargetting = isTargetting;
   }
 
-  public double degreesToTicks(double degrees) {
-    return degrees
-        / 360
-        * Constants.HOOD_SHAFT_REVS_PER_MECH_REV
-        * Constants.HOOD_GEAR_RATIO
-        * Constants.KRAKEN_TICKS_PER_REV;
+  public double degreesToMotorRevs(double degrees) {
+    return degrees / 360 * Constants.HOOD_SHAFT_REVS_PER_MECH_REV * Constants.HOOD_GEAR_RATIO;
   }
 
-  public double ticksToDegrees(double ticks) {
-    return ticks
-        / Constants.KRAKEN_TICKS_PER_REV
-        / Constants.HOOD_GEAR_RATIO
-        / Constants.HOOD_SHAFT_REVS_PER_MECH_REV
-        * 360;
+  public double motorRevsToDegrees(double revs) {
+    return revs / Constants.HOOD_GEAR_RATIO / Constants.HOOD_SHAFT_REVS_PER_MECH_REV * 360;
   }
 }

@@ -100,8 +100,13 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     new Trigger(controller_two::getAButtonPressed)
-        .onTrue(new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE));
-    new Trigger(controller_two::getBButtonPressed).onTrue(new ShooterCommand(shooterSubsystem, 0));
+        .onTrue(
+            new ShooterCommand(
+                shooterSubsystem,
+                Constants.FLYWHEEL_SHOOTING_VOLTAGE,
+                Constants.KICKER_SHOOTING_VOLTAGE));
+    new Trigger(controller_two::getBButtonPressed)
+        .onTrue(new ShooterCommand(shooterSubsystem, 0, 0));
 
     // Named Commands
 

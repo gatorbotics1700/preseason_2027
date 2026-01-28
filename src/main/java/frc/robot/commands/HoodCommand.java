@@ -23,19 +23,19 @@ public class HoodCommand extends Command {
     hoodSubsystem.setIsTargetting(isTargetting);
     // hoodSubsystem.setShootingToPosition(shootingToPosition); this is for once we start testing
     // targetting
-    System.out.println("HOOD STARTING POSITION TICKS:" + hoodSubsystem.getHoodPositionTicks());
+    System.out.println("HOOD STARTING POSITION REVS:" + hoodSubsystem.getHoodPositionMotorRevs());
     System.out.println(
         "HOOD STARTING DEGREES:"
-            + hoodSubsystem.ticksToDegrees(hoodSubsystem.getHoodPositionTicks()));
+            + hoodSubsystem.motorRevsToDegrees(hoodSubsystem.getHoodPositionMotorRevs()));
   }
 
   @Override
   public void execute() {
-    if (!isTargetting) {
-      hoodSubsystem.turnToPosition(hoodSubsystem.degreesToTicks(targetPosition));
-      System.out.println("USING HOOD COMMAND");
-    }
-    SmartDashboard.putNumber("Hood target position (ticks)", targetPosition);
+    // if (!isTargetting) {
+    hoodSubsystem.turnToPosition(hoodSubsystem.degreesToMotorRevs(targetPosition));
+    System.out.println("USING HOOD COMMAND");
+    // }
+    SmartDashboard.putNumber("Hood target position (degrees)", targetPosition);
   }
 
   @Override
@@ -45,6 +45,4 @@ public class HoodCommand extends Command {
     }
     return false;
   }
-
-
 }
