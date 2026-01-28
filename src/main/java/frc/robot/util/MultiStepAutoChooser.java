@@ -139,9 +139,9 @@ public class MultiStepAutoChooser {
 
     if (type.equals("Depot")) {
       if (side == null || side.equals("None")) {
-        return "None"; //TODO: do we want to default somewhere else?
+        return "None"; // TODO: do we want to default somewhere else?
       }
-      switch(side){
+      switch (side) {
         case "Center":
           return "DC";
         case "Left":
@@ -189,9 +189,9 @@ public class MultiStepAutoChooser {
   }
 
   /**
-   * Builds the auto filename from the current selections.
-   * Format: {Alliance} {StartPos} {Dest1} {Dest2} {Dest3} {Climb}.auto
-   * Example: R Center DC DL.auto or B LF Fuel Pile CF Outpost Climb.auto
+   * Builds the auto filename from the current selections. Format: {Alliance} {StartPos} {Dest1}
+   * {Dest2} {Dest3} {Climb}.auto Example: R Center DC DL.auto or B LF Fuel Pile CF Outpost
+   * Climb.auto
    */
   // TODO: make sure this follows the right naming conventions we ultimately decide on
   private String buildAutoFileName(
@@ -265,8 +265,8 @@ public class MultiStepAutoChooser {
   }
 
   /**
-   * Builds the auto filename from the current chooser selections.
-   * This is a helper method to avoid code duplication.
+   * Builds the auto filename from the current chooser selections. This is a helper method to avoid
+   * code duplication.
    */
   private String buildAutoFileNameFromChoosers() {
     String alliance = allianceChooser.get();
@@ -333,5 +333,4 @@ public class MultiStepAutoChooser {
       return Commands.none();
     }
   }
-
 }
