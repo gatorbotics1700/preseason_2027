@@ -78,7 +78,7 @@ public class MultiStepAutoChooser {
     firstDestinationSideChooser.addOption("Center", "Center");
 
     // Populate second destination type chooser
-    secondDestinationTypeChooser.addDefaultOption("None (End)", "None");
+    secondDestinationTypeChooser.addDefaultOption("None", "None");
     secondDestinationTypeChooser.addOption("Depot", "Depot");
     secondDestinationTypeChooser.addOption("Outpost", "Outpost");
     secondDestinationTypeChooser.addOption("Fuel Pile Near", "Fuel Pile Near");
@@ -92,7 +92,7 @@ public class MultiStepAutoChooser {
     secondDestinationSideChooser.addOption("Center", "Center");
 
     // Populate third destination type chooser
-    thirdDestinationTypeChooser.addDefaultOption("None (End)", "None");
+    thirdDestinationTypeChooser.addDefaultOption("None", "None");
     thirdDestinationTypeChooser.addOption("Depot", "Depot");
     thirdDestinationTypeChooser.addOption("Outpost", "Outpost");
     thirdDestinationTypeChooser.addOption("Fuel Pile Near", "Fuel Pile Near");
