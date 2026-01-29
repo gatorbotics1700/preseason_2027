@@ -85,6 +85,6 @@ public final class Constants {
 
   public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
       208 / 15; // big gear teeth / little gear teeth
-  public static final double FLYWHEEL_SHOOTING_VOLTAGE = 12;
-  public static final double KICKER_SHOOTING_VOLTAGE = 12;
+  public static final double FLYWHEEL_SHOOTING_VOLTAGE = 8.9;
+  public static final double KICKER_SHOOTING_VOLTAGE = 8;
 }

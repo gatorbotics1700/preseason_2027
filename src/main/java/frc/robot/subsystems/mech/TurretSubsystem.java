@@ -2,7 +2,6 @@ package frc.robot.subsystems.mech;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,10 +41,11 @@ public class TurretSubsystem
     target = targetPoint;
   }
 
-  public void turnToAngle(Rotation2d desiredAngle) {
+  public void turnToAngle(
+      Rotation2d desiredAngle) { // Make sure desiredAngle is always between 0 and 360 degrees
     Rotation2d currentAngle = getTurretAngle();
     Rotation2d error = desiredAngle.minus(currentAngle);
-    error = new Rotation2d(MathUtil.inputModulus(error.getRadians(), -Math.PI, Math.PI));
+    // error = new Rotation2d(MathUtil.inputModulus(error.getRadians(), -Math.PI, Math.PI));
 
     if (Math.abs(error.getDegrees()) > Constants.TURRET_DEADBAND) {
       double output = pidController.calculate(error.getDegrees());
@@ -57,7 +57,9 @@ public class TurretSubsystem
 
   public Rotation2d getTurretAngle() {
     double angleInDegrees =
-        -((motor.getPosition().getValueAsDouble() * 360 / Constants.TURRET_GEAR_RATIO) % 360);
+        -(motor.getPosition().getValueAsDouble()
+            * 360
+            / Constants.TURRET_GEAR_RATIO); // Deleted % 360
     return new Rotation2d(Math.toRadians(angleInDegrees));
   }
 

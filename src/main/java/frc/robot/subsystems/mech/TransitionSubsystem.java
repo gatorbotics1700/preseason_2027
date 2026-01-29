@@ -18,6 +18,7 @@ public class TransitionSubsystem extends SubsystemBase {
 
   public void setHighKickerVoltage(double kickerVoltage) {
     kickerMotorHigh.setVoltage(kickerVoltage);
+    System.out.println("Setting kicker voltage!!!");
   }
 
   public void setHopperVoltage(double hopperVoltage) {

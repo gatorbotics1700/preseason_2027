@@ -106,7 +106,7 @@ public class RobotContainer {
     new Trigger(controller_two::getAButtonPressed)
         .onTrue(
             new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
-                .andThen(new WaitCommand(2.0))
+                .alongWith(new WaitCommand(3.0))
                 .andThen(
                     new TransitionCommand(
                         transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));

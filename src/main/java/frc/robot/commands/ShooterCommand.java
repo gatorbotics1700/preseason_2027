@@ -42,6 +42,6 @@ public class ShooterCommand extends Command {
       System.out.println("TIMING OUT");
       return true;
     }
-    return false;
+    return true;
   }
 }
