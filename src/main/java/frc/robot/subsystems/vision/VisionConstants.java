@@ -74,8 +74,11 @@ public class VisionConstants {
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
 
-  public static double PHOTONVISION_0_STD_DEV_FACTOR =
+  public static double CAMERA_0_STD_DEV_FACTOR =
       RobotConfigLoader.getDouble("photonvision.camera0_std_dev_factor");
+
+  public static double CAMERA_1_STD_DEV_FACTOR =
+      RobotConfigLoader.getDouble("photonvision.camera1_std_dev_factor");
 
   public static double[] CAMERA_STD_DEV_FACTORS = createCameraStdDevFactors();
 
@@ -111,6 +114,6 @@ public class VisionConstants {
   /** Creates array of camera std dev factors from config values. */
   public static double[]
       createCameraStdDevFactors() { // can add more constants if we have more cameras
-    return new double[] {PHOTONVISION_0_STD_DEV_FACTOR};
+    return new double[] {CAMERA_0_STD_DEV_FACTOR, CAMERA_1_STD_DEV_FACTOR};
   }
 }

@@ -219,8 +219,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void takePicture() {
-    for (int i = 0; i < io.length; i++) {
-      io[i].getCamera().takeInputSnapshot();
-    }
+    System.out.println("taking picture for camera ");
+    io[0].getCamera().takeInputSnapshot();
   }
 }
