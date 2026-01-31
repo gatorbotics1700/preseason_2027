@@ -29,8 +29,9 @@ public class MultiStepAutoChooser {
   private final LoggedDashboardChooser<Boolean> shouldClimbChooser;
 
   public MultiStepAutoChooser() {
-    //TODO: is it possible to have elastic give some angry error message if a certain combo isn't a real auto?
-    
+    // TODO: is it possible to have elastic give some angry error message if a certain combo isn't a
+    // real auto?
+
     // Initialize choosers
     allianceChooser = new LoggedDashboardChooser<>("Auto/Alliance");
     startPosChooser = new LoggedDashboardChooser<>("Auto/Start Position");
@@ -53,7 +54,8 @@ public class MultiStepAutoChooser {
     shouldClimbChooser = new LoggedDashboardChooser<>("Auto/Climb?");
 
     // Populate alliance chooser with hardcoded values
-    allianceChooser.addDefaultOption("None", "None");//TODO: default it as red or blue for safety???
+    allianceChooser.addDefaultOption(
+        "None", "None"); // TODO: default it as red or blue for safety???
     allianceChooser.addOption("Red", "R");
     allianceChooser.addOption("Blue", "B");
 

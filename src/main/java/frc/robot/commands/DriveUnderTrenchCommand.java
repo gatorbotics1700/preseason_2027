@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,21 +19,14 @@ public class DriveUnderTrenchCommand {
     return new ConditionalCommand(
         // y < BUMP_Y (bottom half) — go to top me thinks
         new ConditionalCommand(
-           
             AutoBuilder.followPath(PathPlannerPath.fromPathFile("TODO")),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile("TODO")),
-         
             () -> drive.getPose().getX() < TRENCH_X),
         // Y >= BUMP_Y (top half) — go to bottom me thinks
         new ConditionalCommand(
-
             AutoBuilder.followPath(PathPlannerPath.fromPathFile("")),
             AutoBuilder.followPath(PathPlannerPath.fromPathFile("")),
-        
             () -> drive.getPose().getX() < TRENCH_X),
         () -> drive.getPose().getY() < TRENCH_Y);
-
-
-        
   }
 }
