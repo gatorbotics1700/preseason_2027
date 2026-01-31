@@ -17,36 +17,43 @@ public class DriveOverBumpCommand {
 
   public static Command driveOverBump(Drive drive) throws IOException, ParseException {
     Pose2d pose = drive.getPose();
+    System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
 
     if (pose.getX() < CENTER.getX()) {
       if (pose.getX() > BLUE_BUMP_X && pose.getY() < CENTER.getY()) {
         // B BR N to A
+        System.out.println("B BR N to A");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("B BR N to A"));
       } else if (pose.getX() > BLUE_BUMP_X && pose.getY() > CENTER.getY()) {
         // B BL N to A
+        System.out.println("B BL N to A");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("B BL N to A"));
       } else if (pose.getX() < BLUE_BUMP_X && pose.getY() < CENTER.getY()) {
         // B BR A to N
+        System.out.println("B BR A to N");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("B BR A to N"));
       } else if (pose.getX() < BLUE_BUMP_X && pose.getY() > CENTER.getY()) {
         // B BL A to N
+        System.out.println("B BL A to N");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("B BL A to N"));
       }
-
-      
 
     } else {
       if (pose.getX() < RED_BUMP_X && pose.getY() < CENTER.getY()) {
         // R BL N to A
+        System.out.println("R BL N to A");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("R BL N to A"));
       } else if (pose.getX() < RED_BUMP_X && pose.getY() > CENTER.getY()) {
         // R BR N to A
+        System.out.println("R BR N to A");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("R BR N to A"));
       } else if (pose.getX() > RED_BUMP_X && pose.getY() < CENTER.getY()) {
         // R BL A to N
+        System.out.println("R BL A to N");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("R BL A to N"));
       } else if (pose.getX() > RED_BUMP_X && pose.getY() > CENTER.getY()) {
         // R BR A to N
+        System.out.println("R BR A to N");
         return AutoBuilder.followPath(PathPlannerPath.fromPathFile("R BR A to N"));
       }
     }
