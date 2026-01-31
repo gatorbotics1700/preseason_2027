@@ -285,9 +285,10 @@ public class RobotContainer {
         .x()
         .onTrue(
             Commands.runOnce(
-                () -> {
-                  vision.takePicture();
-                }));
+                    () -> {
+                      vision.takePicture();
+                    })
+                .ignoringDisable(true));
 
     controller
         .rightBumper()
