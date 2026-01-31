@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveOverBumpCommand;
 import frc.robot.commands.LineupCommand;
 import frc.robot.commands.LineupCommand.ReefSide;
 import frc.robot.commands.LineupCommand.YOffset;
@@ -221,7 +222,7 @@ public class RobotContainer {
 
     // Lock to 0° when A button is held
     controller
-        .a()
+        .leftBumper()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -265,6 +266,18 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   drive.disableTargetPointFacing();
+                }));
+    controller
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
                 }));
 
     controller_two
