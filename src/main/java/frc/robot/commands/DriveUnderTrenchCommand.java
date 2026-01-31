@@ -1,32 +1,59 @@
 package frc.robot.commands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class DriveUnderTrenchCommand {
 
-  // y value to split top vs bottom half of field
-  private static final double TRENCH_Y = 4.0;
-  // x value to split left vs right half of field
-  private static final double TRENCH_X = 4.0;
-
   public static Command driveUnderTrench(Drive drive) throws IOException, ParseException {
-    return new ConditionalCommand(
-        // y < BUMP_Y (bottom half) — go to top me thinks
-        new ConditionalCommand(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile("TODO")),
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile("TODO")),
-            () -> drive.getPose().getX() < TRENCH_X),
-        // Y >= BUMP_Y (top half) — go to bottom me thinks
-        new ConditionalCommand(
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile("")),
-            AutoBuilder.followPath(PathPlannerPath.fromPathFile("")),
-            () -> drive.getPose().getX() < TRENCH_X),
-        () -> drive.getPose().getY() < TRENCH_Y);
+    PathConstraints constraints =
+        new PathConstraints(8, 8, Units.degreesToRadians(700), Units.degreesToRadians(1000));
+
+    Pose2d pose = drive.getPose();
+    System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
+
+    if (pose.getX() <= Constants.FIELD_CENTER.getX()) { // BLUE
+      if (pose.getY() < Constants.FIELD_CENTER.getY()
+          && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("B TR N to A"), constraints);
+      } else if (pose.getY() > Constants.FIELD_CENTER.getY()
+          && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("B TL N to A"), constraints);
+      } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
+          && (pose.getX() > Constants.BLUE_BUMP_AND_TRENCH_X)) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("B TL A to N"), constraints);
+      } else {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("B TR A to N"), constraints);
+      }
+    } else { // RED
+      if (pose.getY() < Constants.FIELD_CENTER.getY()
+          && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("R TL A to N"), constraints);
+      } else if (pose.getY() > Constants.FIELD_CENTER.getY()
+          && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("R TR A to N"), constraints);
+      } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
+          && (pose.getX() > Constants.RED_BUMP_AND_TRENCH_X)) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("R TR N to A"), constraints);
+      } else {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("R TL N to A"), constraints);
+      }
+    }
   }
 }

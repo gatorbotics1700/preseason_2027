@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveOverBumpCommand;
+import frc.robot.commands.DriveUnderTrenchCommand;
 import frc.robot.commands.LineupCommand;
 import frc.robot.commands.LineupCommand.ReefSide;
 import frc.robot.commands.LineupCommand.YOffset;
@@ -220,8 +221,6 @@ public class RobotContainer {
           .onFalse(DriveCommands.stopDriveCommand(drive));
     }
 
-    // Lock to 0° when A button is held
-
     controller
         .a()
         .onTrue(
@@ -235,17 +234,7 @@ public class RobotContainer {
                     e.printStackTrace();
                   }
                 }));
-    //
-    /*
-        controller
-            .a()
-            .whileTrue(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    () -> -controller.getLeftY(),
-                    () -> -controller.getLeftX(),
-                    () -> new Rotation2d()));
-    */
+
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
@@ -267,13 +256,18 @@ public class RobotContainer {
                     },
                     drive)
                 .ignoringDisable(true));
-
-    // controller
-    //     .x()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             AutoBuilder.followPath(PathPlannerPath.fromPathFile("B BR A to N")), drive
-    //         ));
+    controller
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
+                }));
 
     controller
         .y()
