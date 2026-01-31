@@ -1,0 +1,19 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B BR N to A"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Over Bump Commands (8)",
+  "choreoAuto": false
+}

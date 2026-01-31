@@ -15,6 +15,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Centimeters;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.RobotConfigLoader;
@@ -49,6 +50,10 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final Translation2d FIELD_CENTER = new Translation2d(8.270494, 4.034663);
+  public static final double BLUE_BUMP_AND_TRENCH_X = 4.626;
+  public static final double RED_BUMP_AND_TRENCH_X = 11.915;
 
   public static final int KRAKEN_TICKS_PER_REV = 2048;
 

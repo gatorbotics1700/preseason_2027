@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveOverBumpCommand;
+import frc.robot.commands.DriveUnderTrenchCommand;
+import frc.robot.commands.DriveOverBumpCommand;
 import frc.robot.commands.LineupCommand;
 import frc.robot.commands.LineupCommand.ReefSide;
 import frc.robot.commands.LineupCommand.YOffset;
@@ -203,7 +205,7 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
       driverControl
           .whileTrue(
-              DriveCommands.joystickDriveWithAutoRotation(
+              DriveCommands.joystickDrive(
                   drive,
                   () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
                   () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
@@ -212,7 +214,7 @@ public class RobotContainer {
     } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
       driverControl
           .whileTrue(
-              DriveCommands.joystickDriveWithAutoRotation(
+              DriveCommands.joystickDrive(
                   drive,
                   () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
                   () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
@@ -220,15 +222,19 @@ public class RobotContainer {
           .onFalse(DriveCommands.stopDriveCommand(drive));
     }
 
-    // Lock to 0° when A button is held
     controller
-        .leftBumper()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                  } catch (Exception e) {
+                    // System.out.println("CATCHING EXCEPTION DAHHHHHHHHHHHHHHHHHH");
+                    e.printStackTrace();
+                  }
+                }));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -251,13 +257,17 @@ public class RobotContainer {
                     },
                     drive)
                 .ignoringDisable(true));
-
     controller
         .x()
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  drive.enableTargetPointFacing();
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
                 }));
 
     controller
