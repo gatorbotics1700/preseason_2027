@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.833952401620371,
+        "y": 5.710430555555556
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.874267144097223,
+        "y": 7.39727734375
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.609594,
+        "y": 4.034
+      },
+      "prevControl": {
+        "x": 0.873462239583334,
+        "y": 8.997911892361113
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 179.716224430162
+  },
+  "reversed": false,
+  "folder": "Blue Fuel Pile Starts",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -178.60496319558024
+  },
+  "useDefaultConstraints": true
+}

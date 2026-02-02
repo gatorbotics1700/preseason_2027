@@ -15,7 +15,6 @@ package frc.robot;
 
 // import frc.robot.commands.AutoDriveCommand;
 // import frc.robot.commands.TeleopDriveCommand;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveOverBumpCommand;
+import frc.robot.commands.DriveUnderTrenchCommand;
 import frc.robot.commands.LineupCommand;
 import frc.robot.commands.LineupCommand.ReefSide;
 import frc.robot.commands.LineupCommand.YOffset;
@@ -44,9 +45,9 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -67,7 +68,7 @@ public class RobotContainer {
   private final GenericHID buttonBoard1B = new GenericHID(2);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final MultiStepAutoChooser multiStepAutoChooser;
 
   // Button Bindings
   private final Trigger Q1LeftLineup = new Trigger(() -> buttonBoard1A.getRawButtonPressed(1));
@@ -91,6 +92,32 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Named Commands
+    NamedCommands.registerCommand(
+        "Shooter Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
+    NamedCommands.registerCommand(
+        "Climb Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
+
+    NamedCommands.registerCommand(
+        "Intake Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
+
+    NamedCommands.registerCommand(
+        "Stop Kicker Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
 
     NamedCommands.registerCommand(
         "Q1 Left Lineup",
@@ -165,8 +192,8 @@ public class RobotContainer {
         break;
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    // Set up auto routines with multi-step chooser
+    multiStepAutoChooser = new MultiStepAutoChooser();
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -224,15 +251,19 @@ public class RobotContainer {
           .onFalse(DriveCommands.stopDriveCommand(drive));
     }
 
-    // Lock to 0° when A button is held
     controller
         .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                  } catch (Exception e) {
+                    // System.out.println("CATCHING EXCEPTION DAHHHHHHHHHHHHHHHHHH");
+                    e.printStackTrace();
+                  }
+                }));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -255,13 +286,17 @@ public class RobotContainer {
                     },
                     drive)
                 .ignoringDisable(true));
-
     controller
         .x()
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  drive.enableTargetPointFacing();
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
                 }));
 
     controller
@@ -270,6 +305,18 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   drive.disableTargetPointFacing();
+                }));
+    controller
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  try {
+                    CommandScheduler.getInstance()
+                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
                 }));
 
     controller_two
@@ -507,7 +554,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     try {
-      return autoChooser.get();
+      return multiStepAutoChooser.getAutonomousCommand();
     } catch (Exception ioe) {
       System.out.println("bad io error");
       return Commands.none();
@@ -559,6 +606,15 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
+    // Update multi-step auto chooser options (reads choosers to keep them active)
+    multiStepAutoChooser.updateChooserOptions();
+
+    // Print selected path name to console
+    String selectedPathName = multiStepAutoChooser.getSelectedPathName();
+    System.out.println(
+        "Selected Auto Path: " + (selectedPathName != null ? selectedPathName : "None"));
+    System.out.flush(); // Ensure output appears immediately
+
     // Log button states directly - much simpler!
     Logger.recordOutput("Buttons/Controller1/A", controller.a().getAsBoolean());
     Logger.recordOutput("Buttons/Controller1/B", controller.b().getAsBoolean());
