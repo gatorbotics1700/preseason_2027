@@ -43,7 +43,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
@@ -155,10 +155,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive,
-                new VisionIOLimelight(
-                    VisionConstants.LIMELIGHT_0_NAME,
-                    drive::getRotation,
-                    VisionConstants.ROBOT_TO_LIMELIGHT_0));
+                new VisionIOPhotonVision(
+                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0));
         break;
 
       case SIM:
@@ -175,8 +173,8 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.LIMELIGHT_0_NAME,
-                    VisionConstants.ROBOT_TO_LIMELIGHT_0,
+                    VisionConstants.CAMERA_0_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_0,
                     drive::getPose));
         break;
 
@@ -329,6 +327,14 @@ public class RobotContainer {
                   drive.setPose(new Pose2d(4, 2, new Rotation2d(Math.toRadians(0))));
                 },
                 drive));
+
+    controller_two
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  vision.takePicture();
+                }));
 
     controller
         .rightBumper()

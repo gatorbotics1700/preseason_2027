@@ -127,4 +127,8 @@ public class VisionIOPhotonVision implements VisionIO {
       inputs.tagIds[i++] = id;
     }
   }
+
+  public PhotonCamera getCamera() {
+    return camera;
+  }
 }

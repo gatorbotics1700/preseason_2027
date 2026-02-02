@@ -30,7 +30,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionConstants.*;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,9 +137,12 @@ public class Vision extends SubsystemBase {
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE * stdDevFactor;
         double angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= VisionConstants.LINEAR_STD_DEV_MEGATGAG_2_FACTOR;
-          angularStdDev *= VisionConstants.ANGULAR_STD_DEV_MEGATAG_2_FACTOR;
+        // Apply multitag factors for MEGATAG_2 (Limelight) or PHOTONVISION with multiple tags
+        if (observation.type() == PoseObservationType.MEGATAG_2
+            || (observation.type() == PoseObservationType.PHOTONVISION
+                && observation.tagCount() > 1)) {
+          linearStdDev *= VisionConstants.LINEAR_STD_DEV_MULTITAG_FACTOR;
+          angularStdDev *= VisionConstants.ANGULAR_STD_DEV_MULTITAG_FACTOR;
         }
         if (cameraIndex < VisionConstants.CAMERA_STD_DEV_FACTORS.length) {
           linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex];
@@ -214,5 +216,11 @@ public class Vision extends SubsystemBase {
             .toPose2d()
             .transformBy(new Transform2d(0, 0, new Rotation2d(Degrees.of(90))));
     return fieldRelativePose;
+  }
+
+  public void takePicture() {
+    for (int i = 0; i < io.length; i++) {
+      io[i].getCamera().takeInputSnapshot();
+    }
   }
 }
