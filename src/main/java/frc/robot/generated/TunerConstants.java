@@ -89,6 +89,24 @@ public class TunerConstants {
               : RobotConfigLoader.getString("tuner.drive_canbus_name"),
           "./logs/example.hoot");
 
+  // Mechanism CAN bus - reuses driveCANBus if they're the same physical bus
+  public static final CANBus mechCANBus;
+
+  static {
+    String driveBusName = driveCANBus.getName();
+    String mechBusName =
+        RobotConfigLoader.getString("tuner.mech_canbus_name") == "null"
+            ? ""
+            : RobotConfigLoader.getString("tuner.mech_canbus_name");
+
+    // If both buses have the same name, reuse the same object
+    if (driveBusName.equals(mechBusName)) {
+      mechCANBus = driveCANBus;
+    } else {
+      mechCANBus = new CANBus(mechBusName, "./logs/example.hoot");
+    }
+  }
+
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
   public static final LinearVelocity kSpeedAt12Volts =
