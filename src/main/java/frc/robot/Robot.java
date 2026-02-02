@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -157,6 +158,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     CommandScheduler.getInstance().cancelAll();
+    Elastic.selectTab("Teleoperated");
     robotContainer.teleopInit();
     // robotContainer.configureButtonBindings();
 

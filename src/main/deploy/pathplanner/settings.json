@@ -3,10 +3,23 @@
   "robotLength": 0.78,
   "holonomicMode": true,
   "pathFolders": [
-    "Leave Paths"
+    "Blue Center Starters",
+    "Blue Fuel Pile Starts",
+    "Blue Left Starters",
+    "Blue Outpost & DC",
+    "Blue Right Starters",
+    "Red Center Starts",
+    "Red Fuel Pile Starts",
+    "Red Left Starters",
+    "Red Outpost & DC",
+    "Red Right Starters",
+    "under DA trench ",
+    "over DA bump"
   ],
   "autoFolders": [
-    "Leave Autos"
+    "Leave Autos",
+    "New Folder",
+    "Over Bump Commands (8)"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 16.122,
+        "y": 3.056
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 13.722216021990741,
+        "y": 3.1106770109953703
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 16.122,
+        "y": 7.403
+      },
+      "prevControl": {
+        "x": 14.212608362274022,
+        "y": 4.96214243344238
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 178.91335798734582
+  },
+  "reversed": false,
+  "folder": "Red Outpost & DC",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 89.80218125883623
+  },
+  "useDefaultConstraints": true
+}
