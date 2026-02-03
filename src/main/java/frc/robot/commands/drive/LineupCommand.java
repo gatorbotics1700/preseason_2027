@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;

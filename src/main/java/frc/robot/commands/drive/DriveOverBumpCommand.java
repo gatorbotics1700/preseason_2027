@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
@@ -19,42 +19,43 @@ public class DriveOverBumpCommand {
 
     Pose2d pose = drive.getPose();
     System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
+    Command pathToFollow;
 
     if (pose.getX() <= Constants.FIELD_CENTER.getX()) { // BLUE
       if (pose.getY() < Constants.FIELD_CENTER.getY()
           && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("B BR N to A"), constraints);
       } else if (pose.getY() > Constants.FIELD_CENTER.getY()
           && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("B BL N to A"), constraints);
       } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
           && (pose.getX() > Constants.BLUE_BUMP_AND_TRENCH_X)) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("B BL A to N"), constraints);
       } else {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("B BR A to N"), constraints);
       }
     } else { // RED
       if (pose.getY() < Constants.FIELD_CENTER.getY()
           && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("R BL A to N"), constraints);
       } else if (pose.getY() > Constants.FIELD_CENTER.getY()
           && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("R BR A to N"), constraints);
       } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
           && (pose.getX() > Constants.RED_BUMP_AND_TRENCH_X)) {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("R BR N to A"), constraints);
       } else {
-        return AutoBuilder.pathfindThenFollowPath(
+        pathToFollow = AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathFile("R BL N to A"), constraints);
       }
     }
-    // return Commands.none();
+    return pathToFollow; //TODO: stop shooting and then path to follow -- need to add part to stop shooting
   }
 }

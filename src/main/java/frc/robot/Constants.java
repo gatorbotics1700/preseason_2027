@@ -69,13 +69,10 @@ public final class Constants {
   public static final int KICKER_MOTOR_HIGH_CAN_ID = 31;
   public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int TURRET_MOTOR_CAN_ID = 14;
-  public static final int OUTER_ARM_MOTOR_CAN_ID = 18;
-  public static final int INNER_ARM_MOTOR_CAN_ID = 19;
+  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 9;
+  public static final int CLIMBER_MOTOR_CAN_ID = 36;
 
-  public static final int HOOD_GEAR_RATIO = 9; // for prototype mechanism
-  public static final int TURRET_GEAR_RATIO = 50; // TODO: updated by katy and niva 1/24
   public static final int KRAKEN_TICKS_PER_REV = 2048;
-  public static final int CLIMBER_TICKS_PER_INCH = 40; // TODO: change!!
 
   public static final double TURRET_DEADBAND = 0.75;
 
@@ -84,12 +81,5 @@ public final class Constants {
   // will likely differ
   public static final int MID_RUNG_ARM_LENGTH = 18;
   public static final int HIGH_RUNG_ARM_LENGTH = 18;
-
-  public static final double CLIMBER_EXTENDED_POSITION = 10; // change these values
-  public static final int CLIMBER_RETRACTED_POSITION = 0;
-
-  public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
-      208 / 15; // big gear teeth / little gear teeth
-  public static final double FLYWHEEL_SHOOTING_VOLTAGE = 8.9;
-  public static final double KICKER_SHOOTING_VOLTAGE = 8;
+  public static final double HOPPER_FLOOR_SPEED = 9; // TODO find a real number
 }
