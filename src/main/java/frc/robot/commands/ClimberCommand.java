@@ -5,13 +5,10 @@ import frc.robot.subsystems.mech.ClimberSubsystem;
 
 public class ClimberCommand extends Command {
   private final ClimberSubsystem climberSubsystem;
-  private boolean extendingL1;
-  private double desiredPosition;
   private final double L1_EXTENSION_INCHES = 20; // TODO get a real number
 
-  public ClimberCommand(ClimberSubsystem climberSubsystem, boolean extendingL1) {
+  public ClimberCommand(ClimberSubsystem climberSubsystem) {
     this.climberSubsystem = climberSubsystem;
-    this.extendingL1 = extendingL1;
     addRequirements(climberSubsystem);
   }
 
@@ -22,6 +19,8 @@ public class ClimberCommand extends Command {
   public void execute() {
     climberSubsystem.setDesiredPositionInches(L1_EXTENSION_INCHES);
     // drive to align with tower using path planner command stuff
+    // TODO decide if we want to split out the driving into a separate command and make the set
+    // extension ones instant commands
     climberSubsystem.setDesiredPositionInches(0); // retracts the climber to its zero position
   }
 

@@ -3,11 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 
-public class IntakeCommand extends Command {
+public class ManualIntakeCommand extends Command {
   private final double INTAKING_SPEED = 9; // TODO get a real number (I just picked my favorite)
   private final IntakeSubsystem intakeSubsystem;
 
-  public IntakeCommand(IntakeSubsystem intakeSubsystem) {
+  public ManualIntakeCommand(IntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
   }
@@ -19,7 +19,7 @@ public class IntakeCommand extends Command {
 
   @Override
   public void execute() {
-    // drive around to the balls automatically with our super cool object detection code
+    // nothing, because gemma is going to do a super awesome job driving us to the balls
   }
 
   // TODO figure out how we want to end this command
