@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-//this is what we will use in constant tracking command!
+// this is what we will use in constant tracking command!
 
 // @AutoLog
 public class ShotCalculator {

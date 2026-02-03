@@ -7,6 +7,7 @@ public class ClimberCommand extends Command {
   private final ClimberSubsystem climberSubsystem;
   private boolean extendingL1;
   private double desiredPosition;
+  private final double L1_EXTENSION_INCHES = 20; // TODO get a real number
 
   public ClimberCommand(ClimberSubsystem climberSubsystem, boolean extendingL1) {
     this.climberSubsystem = climberSubsystem;
@@ -15,26 +16,20 @@ public class ClimberCommand extends Command {
   }
 
   @Override
-  public void initialize() {
-    // if (extendingL1 == true) {
-    //   desiredPosition = climberSubsystem.inchesToRevs(Constants.CLIMBER_EXTENDED_POSITION);
-    //   System.out.println("EXTENDING CLIMBER");
-    // } else {
-    //   desiredPosition = climberSubsystem.inchesToRevs(Constants.CLIMBER_RETRACTED_POSITION);
-    //   System.out.println("RETRACTING CLIMBER");
-    // }
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
-    // climberSubsystem.moveArm(desiredPosition);
+    climberSubsystem.setDesiredPositionInches(L1_EXTENSION_INCHES);
+    // drive to align with tower using path planner command stuff
+    climberSubsystem.setDesiredPositionInches(0); // retracts the climber to its zero position
   }
 
   @Override
   public boolean isFinished() {
-    // if (climberSubsystem.getMotorOutput() == 0) {
-    return true;
-    // }
-    // return false;
+    if (climberSubsystem.currentPositionInches() == 0) { // TODO probably add a deadband here?
+      return true;
+    }
+    return false;
   }
 }

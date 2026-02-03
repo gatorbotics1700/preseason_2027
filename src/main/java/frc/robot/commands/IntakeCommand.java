@@ -4,32 +4,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 
 public class IntakeCommand extends Command {
-
+  private final double INTAKING_SPEED = 9; // TODO get a real number (I just picked my favorite)
   private final IntakeSubsystem intakeSubsystem;
 
-  private final double intakeVoltage;
-  private final boolean wantExtended;
-
-  public IntakeCommand(
-      IntakeSubsystem intakeSubsystem, double intakeVoltage, boolean wantExtended) {
+  public IntakeCommand(IntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
-    this.intakeVoltage = intakeVoltage;
-    this.wantExtended = wantExtended;
     addRequirements(intakeSubsystem);
   }
 
   @Override
-  public void execute() {
-    // intakeSubsystem.pivotIntake(wantExtended);
-    // intakeSubsystem.setIntakeVoltage(intakeVoltage);
+  public void initialize() {
+    intakeSubsystem.setIntakeSpeed(INTAKING_SPEED);
   }
 
   @Override
+  public void execute() {
+    // drive around to the balls automatically with our super cool object detection code
+  }
+
+  // TODO figure out how we want to end this command
+  @Override
   public boolean isFinished() {
-    if (intakeVoltage == 0) {
-      return true;
-    }
-    // potentially consider adding connection to vision, if we don't see any fuel
     return false;
   }
 }

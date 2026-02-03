@@ -43,7 +43,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
   }
 
-  public void setDesiredangle(
+  public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     this.desiredAngle = desiredAngle;
   }

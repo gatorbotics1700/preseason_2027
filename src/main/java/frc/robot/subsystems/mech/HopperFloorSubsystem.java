@@ -7,6 +7,7 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
 public class HopperFloorSubsystem extends SubsystemBase {
+  public static final double HOPPER_FLOOR_SPEED = 0;
   public final TalonFX hopperMotor;
   private double hopperSpeed;
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);

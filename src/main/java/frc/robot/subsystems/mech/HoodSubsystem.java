@@ -12,6 +12,8 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
 public class HoodSubsystem extends SubsystemBase {
+  public static final Rotation2d RETRACTED_POSITION =
+      new Rotation2d(Math.toRadians(20)); // TODO find a real number for this
   public final TalonFX hoodMotor;
   // some motion magic stuff here
   private Rotation2d desiredAngle;
@@ -42,7 +44,7 @@ public class HoodSubsystem extends SubsystemBase {
     }
   }
 
-  public void setDesiredangle(
+  public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     this.desiredAngle = desiredAngle;
   }

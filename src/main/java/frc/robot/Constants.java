@@ -81,4 +81,5 @@ public final class Constants {
   // will likely differ
   public static final int MID_RUNG_ARM_LENGTH = 18;
   public static final int HIGH_RUNG_ARM_LENGTH = 18;
+  public static final double HOPPER_FLOOR_SPEED = 9; // TODO find a real number
 }

@@ -33,7 +33,7 @@ public class ClimberSubsystem extends SubsystemBase {
     }
   }
 
-  public void setMotorOutput(double speed) {
+  private void setMotorOutput(double speed) {
     motor.setNeutralMode(NeutralModeValue.Brake); // do we really need this here?
     motor.setControl(dutyCycleOut.withOutput(speed));
   }
@@ -43,5 +43,9 @@ public class ClimberSubsystem extends SubsystemBase {
         / Constants.KRAKEN_TICKS_PER_REV
         * CLIMBER_GEAR_RATIO
         * WINCH_INCHES_PER_REV; // TODO majorly check this math
+  }
+
+  public void setDesiredPositionInches(double desiredPositionInches) {
+    this.desiredPositionInches = desiredPositionInches;
   }
 }
