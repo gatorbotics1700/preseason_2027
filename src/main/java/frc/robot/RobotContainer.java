@@ -381,14 +381,6 @@ public class RobotContainer {
                 },
                 drive));
 
-    controller_two
-        .a()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
-                }));
-
     Q1LeftLineup.onTrue(
         new InstantCommand(
                 () -> {
@@ -557,6 +549,70 @@ public class RobotContainer {
                       .schedule(LineupCommand.Lineup(ReefSide.Q6, YOffset.Right));
                 })
             .withName("Q6RightLineup"));
+
+    controller_two
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
+                }));
+
+    controller_two
+        .b()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(30.0)));
+                }));
+
+    controller_two
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
+                }));
+
+    controller_two
+        .y()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
+                }));
+
+    // controller_two
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               hoodSubsystem.setHoodVoltage(0);
+    //             }));
+
+    // controller_two
+    //     .b()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               hoodSubsystem.setHoodVoltage(1);
+    //             }));
+
+    // controller_two
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               hoodSubsystem.setHoodVoltage(2);
+    //             }));
+
+    // controller_two
+    //     .y()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               hoodSubsystem.setHoodVoltage(-1);
+    //             }));
 
     // controller_two
     //     .leftBumper()
