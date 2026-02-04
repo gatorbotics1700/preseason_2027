@@ -41,7 +41,7 @@ public class ClimbCommands {
       } else if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
           && pose.getY() > Constants.FIELD_CENTER.getY()) {
         return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone top
+            PathPlannerPath.fromPathFile("B AL to Tower Left"), constraints); // TODO: alliance zone top
       } else if (pose.getX() >= Constants.BLUE_BUMP_AND_TRENCH_X
           && pose.getY() <= Constants.FIELD_CENTER.getY()) {
         return AutoBuilder.pathfindThenFollowPath(
@@ -49,7 +49,7 @@ public class ClimbCommands {
 
       } else {
         return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: neutral zone top
+            PathPlannerPath.fromPathFile("B NL to Tower Left"), constraints); // TODO: neutral zone top
       }
 
     } else { // red
@@ -57,7 +57,7 @@ public class ClimbCommands {
       if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
           && pose.getY() <= Constants.FIELD_CENTER.getY()) {
         return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathFile("NAME"), constraints); // neutral zone bottem
+            PathPlannerPath.fromPathFile("R NL to Tower Left"), constraints); // neutral zone bottem
       } else if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
           && pose.getY() > Constants.FIELD_CENTER.getY()) {
         return AutoBuilder.pathfindThenFollowPath(
@@ -65,7 +65,7 @@ public class ClimbCommands {
       } else if (pose.getX() >= Constants.RED_BUMP_AND_TRENCH_X
           && pose.getY() <= Constants.FIELD_CENTER.getY()) {
         return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone bottem
+            PathPlannerPath.fromPathFile("R AL to Tower Left"), constraints); // TODO: alliance zone bottem
 
       } else {
         return AutoBuilder.pathfindThenFollowPath(
