@@ -18,25 +18,15 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
-    public double angleDeg = 0.0;
-    public double velocityDegPerSec = 0.0;
-    public double appliedVolts = 0.0;
-    public double currentAmps = 0.0;
-    public double tempCelsius = 0.0;
+    /** Motor position in revolutions. */
+    public double positionRevs = 0.0;
+    /** Motor velocity in revolutions per second. */
+    public double velocityRevsPerSec = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(HoodIOInputs inputs) {}
 
-  /** Run open loop at the specified voltage. */
-  public default void setVoltage(double volts) {}
-
-  /** Run closed loop at the specified angle. */
-  public default void setAngle(double angleDeg) {}
-
-  /** Stop the hood. */
-  public default void stop() {}
-
-  /** Set the brake mode. */
-  public default void setBrakeMode(boolean enable) {}
+  /** Run open loop at the specified speed (duty cycle, typically -1 to 1). */
+  public default void setSpeed(double speed) {}
 }

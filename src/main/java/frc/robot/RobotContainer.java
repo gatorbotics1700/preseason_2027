@@ -41,6 +41,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.mech.HoodIO;
+import frc.robot.subsystems.mech.HoodIOSim;
+import frc.robot.subsystems.mech.HoodIOTalonFX;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
@@ -100,6 +103,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new Trigger(controller_two::getAButtonPressed)
+         .onTrue(new InstantCommand(hoodSubsystem::setHoodSpeed, 1));
     // new Trigger(controller_two::getAButtonPressed)
     //     .onTrue(
     //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
@@ -174,6 +179,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
                 new VisionIOPhotonVision(
                     VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
+        hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
         break;
 
       case SIM:
@@ -197,6 +203,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_1_NAME,
                     VisionConstants.ROBOT_TO_CAMERA_1,
                     drive::getPose));
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
         break;
 
       default: // TODO: should the default be real as a safety for matches? to be discussed
@@ -210,6 +217,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 (pose) -> {});
         vision = new Vision(drive);
+        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
         break;
     }
 
@@ -218,8 +226,6 @@ public class RobotContainer {
           return drive.getPose();
         };
     // turretSubsystem = new TurretSubsystem(robotPose);
-
-    hoodSubsystem = new HoodSubsystem();
 
     // mech buttons
     // new Trigger(controller_two::getXButtonPressed)
