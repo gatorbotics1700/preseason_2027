@@ -66,7 +66,7 @@ public class HoodSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // I used a fake pid as a placeholeder, but we should turn to position using motion magic
-    double angleError = getCurrentAngle().getDegrees() - desiredAngle.getDegrees();
+    // double angleError = getCurrentAngle().getDegrees() - desiredAngle.getDegrees();
     // if (Math.abs(angleError) > POSITION_DEADBAND_DEGREES) {
     hoodMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
 
