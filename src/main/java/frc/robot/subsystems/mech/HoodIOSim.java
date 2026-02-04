@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 /** Simulated hood IO: integrates speed to get position in revs. */
 public class HoodIOSim implements HoodIO {
-  private static final double MAX_REVS_PER_SEC = 0.5; // rev/s at full duty cycle
 
   private double positionRevs = 0.0;
   private double speed = 0.0;
@@ -29,14 +28,14 @@ public class HoodIOSim implements HoodIO {
     double dt = now - lastTime;
     lastTime = now;
 
-    positionRevs += speed * MAX_REVS_PER_SEC * dt;
+    positionRevs += speed * dt;
 
     inputs.positionRevs = positionRevs;
-    inputs.velocityRevsPerSec = speed * MAX_REVS_PER_SEC;
+    inputs.velocityRevsPerSec = speed;
   }
 
   @Override
   public void setSpeed(double speed) {
-    this.speed = Math.max(-1.0, Math.min(1.0, speed));
+    this.speed = speed;
   }
 }

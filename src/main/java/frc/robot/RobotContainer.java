@@ -481,7 +481,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  hoodSubsystem.setHoodSpeed(1.0);
+                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.PI));
                 }));
   }
 }
