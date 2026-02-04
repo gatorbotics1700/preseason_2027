@@ -19,7 +19,6 @@ public class HoodSubsystem extends SubsystemBase {
   private Rotation2d desiredAngle;
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
   private final int HOOD_GEAR_RATIO = 3; // TODO find the real value
-  private static double currentPositionTicks;
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
 
   public HoodSubsystem() {
