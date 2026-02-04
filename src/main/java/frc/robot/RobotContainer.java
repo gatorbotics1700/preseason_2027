@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ClimbCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
@@ -41,8 +43,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
+import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -65,7 +69,9 @@ public class RobotContainer {
   private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final HoodSubsystem hoodSubsystem;
+  private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -112,33 +118,7 @@ public class RobotContainer {
     //         new TransitionCommand(transitionSubsystem, 0, 0)
     //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
 
-    // Named Commands
-    NamedCommands.registerCommand(
-        "Shooter Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
-    NamedCommands.registerCommand(
-        "Climb Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
 
-    NamedCommands.registerCommand(
-        "Intake Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
-
-    NamedCommands.registerCommand(
-        "Stop Kicker Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
 
     NamedCommands.registerCommand(
         "Q1 Left Lineup",
@@ -220,6 +200,56 @@ public class RobotContainer {
     // turretSubsystem = new TurretSubsystem(robotPose);
 
     hoodSubsystem = new HoodSubsystem();
+
+   // Named Commands
+    NamedCommands.registerCommand(
+        "Shooter Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
+   
+   
+   
+   
+   //intake commands 
+
+    NamedCommands.registerCommand(
+        "Intake Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance()
+                  .schedule(
+                      IntakeCommands.DeployIntake(intakeSubsystem)
+                          .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
+            }));
+
+
+
+ 
+    NamedCommands.registerCommand(
+        "Stop Kicker Command",
+        new InstantCommand(
+            () -> {
+              CommandScheduler.getInstance().schedule(Commands.none());
+            }));
+   
+   
+   
+   
+   //CLIMB COMMAND 
+   
+    NamedCommands.registerCommand(
+        "Climb Command",
+        new InstantCommand(
+            () -> {
+              try {
+                CommandScheduler.getInstance()
+                    .schedule(ClimbCommands.Climb(drive, climberSubsystem));
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }));
 
     // mech buttons
     // new Trigger(controller_two::getXButtonPressed)

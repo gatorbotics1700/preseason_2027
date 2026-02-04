@@ -6,32 +6,32 @@ import frc.robot.subsystems.mech.IntakeSubsystem;
 
 public class IntakeCommands {
 
-  private final double INTAKING_SPEED = 9; // TODO get a real number (I just picked my favorite)
+  private static final double INTAKING_SPEED = 9; // TODO get a real number (I just picked my favorite)
 
   private IntakeCommands() {}
 
-  public Command RetractIntake(IntakeSubsystem intakeSubsystem) {
+  public static Command RetractIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
           intakeSubsystem.setDesiredangle(intakeSubsystem.RETRACTED_POSITION);
         });
   }
 
-  public Command DeployIntake(IntakeSubsystem intakeSubsystem) {
+  public static Command DeployIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
           intakeSubsystem.setDesiredangle(intakeSubsystem.EXTENDED_POSITION);
         });
   }
 
-  public Command RunIntake(IntakeSubsystem intakeSubsystem) {
+  public static Command RunIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
           intakeSubsystem.setIntakeSpeed(INTAKING_SPEED);
         });
   }
 
-  public Command StopIntake(IntakeSubsystem intakeSubsystem) {
+  public static Command StopIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
           intakeSubsystem.setIntakeSpeed(0);
