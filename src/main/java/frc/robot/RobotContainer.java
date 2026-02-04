@@ -358,7 +358,7 @@ public class RobotContainer {
                 () -> {
                   try {
                     CommandScheduler.getInstance()
-                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive, hoodSubsystem));
+                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
                   } catch (Exception e) {
                     e.printStackTrace();
                   }

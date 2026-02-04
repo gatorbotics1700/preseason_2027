@@ -216,17 +216,24 @@ public class MultiStepAutoChooser {
       return null; // Need start position
     }
 
-    // Destinations (only add if not None)
+    // Require at least one destination or climb; otherwise run no auto
+    boolean hasDestination = dest1 != null && !dest1.equals("None");
+    if (!hasDestination && !climb) {
+      return null;
+    }
+
+    // Destinations: only add in order, no gaps (location 2 only if 1 is set, location 3 only if 2
+    // is set)
     if (dest1 != null && !dest1.equals("None")) {
       fileName.append("-").append(dest1);
-    }
 
-    if (dest2 != null && !dest2.equals("None")) {
-      fileName.append("-").append(dest2);
-    }
+      if (dest2 != null && !dest2.equals("None")) {
+        fileName.append("-").append(dest2);
 
-    if (dest3 != null && !dest3.equals("None")) {
-      fileName.append("-").append(dest3);
+        if (dest3 != null && !dest3.equals("None")) {
+          fileName.append("-").append(dest3);
+        }
+      }
     }
 
     // Climb
