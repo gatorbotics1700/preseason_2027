@@ -396,15 +396,54 @@ public class RobotContainer {
       //     .y()
       //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
-      // controller_two
-      //     .x()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //                 () -> {
-      //                   vision.takePicture();
-      //                 })
-      //             .ignoringDisable(true));
-    }
+    // controller_two
+    //     .x()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () -> {
+    //                   vision.takePicture();
+    //                 })
+    //             .ignoringDisable(true));
+
+    controller
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  drive.setSlowDrive();
+                },
+                drive));
+
+    // controller_two
+    //     .leftBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               Logger.recordOutput(
+    //                   "Robot/TargetPose",
+    //                   LineupCommand.getLineupTagPose(
+    //                       DriverStation.getAlliance().orElse(Alliance.Blue),
+    //                       ReefSide.LeftSubstation));
+    //               Logger.recordOutput("Robot/LineupSide", "LeftSubstation");
+    //               Logger.recordOutput("Robot/IsLeftSide", false);
+    //               CommandScheduler.getInstance()
+    //                   .schedule(LineupCommand.Lineup(ReefSide.LeftSubstation, YOffset.Center));
+    //             }));
+    // controller_two
+    //     .rightBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               Logger.recordOutput(
+    //                   "Robot/TargetPose",
+    //                   LineupCommand.getLineupTagPose(
+    //                       DriverStation.getAlliance().orElse(Alliance.Blue),
+    //                       ReefSide.RightSubstation));
+    //               Logger.recordOutput("Robot/LineupSide", "RightSubstation");
+    //               Logger.recordOutput("Robot/IsLeftSide", false);
+    //               CommandScheduler.getInstance()
+    //                   .schedule(LineupCommand.Lineup(ReefSide.RightSubstation, YOffset.Center));
+    //             }));
   }
 
   /**
