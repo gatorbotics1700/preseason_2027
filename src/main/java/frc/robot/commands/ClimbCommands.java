@@ -1,7 +1,16 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.ClimberSubsystem;
+import java.io.IOException;
+import org.json.simple.parser.ParseException;
 
 public class ClimbCommands {
 
@@ -9,19 +18,66 @@ public class ClimbCommands {
 
   private ClimbCommands() {}
 
-  public Command ExtendClimber(ClimberSubsystem climberSubsystem) {
+  public static Command ExtendClimber(ClimberSubsystem climberSubsystem) {
     return new ClimberCommand(climberSubsystem, L1_EXTENSION_INCHES);
   }
 
-  public Command RetractClimber(ClimberSubsystem climberSubsystem) {
+  public static Command RetractClimber(ClimberSubsystem climberSubsystem) {
     return new ClimberCommand(climberSubsystem, 0.0);
   }
 
-  public Command Climb(ClimberSubsystem climberSubsystem) {
+  public static Command DriveToTower(Drive drive) throws IOException, ParseException {
+    PathConstraints constraints =
+        new PathConstraints(4, 4, Units.degreesToRadians(500), Units.degreesToRadians(800));
+
+    Pose2d pose = drive.getPose();
+
+    // alliance selections
+    if (pose.getX() <= Constants.FIELD_CENTER.getX()) { // blue
+      if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
+          && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone bottem
+      } else if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
+          && pose.getY() > Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone top
+      } else if (pose.getX() >= Constants.BLUE_BUMP_AND_TRENCH_X
+          && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: neutral zone bottem
+
+      } else {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: neutral zone top
+      }
+
+    } else { // red
+
+      if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
+          && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // neutral zone bottem
+      } else if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
+          && pose.getY() > Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: neutral zone top
+      } else if (pose.getX() >= Constants.RED_BUMP_AND_TRENCH_X
+          && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone bottem
+
+      } else {
+        return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathFile("NAME"), constraints); // TODO: alliance zone top
+      }
+    }
+  }
+
+  public static Command Climb(Drive drive, ClimberSubsystem climberSubsystem)
+      throws IOException, ParseException {
     return ExtendClimber(climberSubsystem)
-        .alongWith(
-            null) // TODO: add the align to tower (may add another command in this file to handle
-        // driving to the tower)
+        .alongWith(DriveToTower(drive))
         .andThen(RetractClimber(climberSubsystem));
   }
 

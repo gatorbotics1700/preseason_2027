@@ -68,9 +68,11 @@ public class ShootingCommand extends Command {
 
     // if we're actually trying to shoot, and the flywheel is up to speed, kick the balls into the
     // shooter!
-    //TODO: add a way to indicate whether we're actually shooting, if we are, run kicker, but otherwise always be running flywheel
-        //TODO: actually shooting should be based on robotPose in the alliance zone, so it doesnt have to be a button
-    //TODO: add funnel command (separate command) & instant command to stop running the flywheel
+    // TODO: add a way to indicate whether we're actually shooting, if we are, run kicker, but
+    // otherwise always be running flywheel
+    // TODO: actually shooting should be based on robotPose in the alliance zone, so it doesnt have
+    // to be a button
+    // TODO: add funnel command (separate command) & instant command to stop running the flywheel
     if (flywheelSpeed != 0
         && shooterSubsystem.getFlywheelSpeed() == flywheelSpeed) { // TODO add a deadband probably
       shooterSubsystem.setTransitionSpeed(ShooterSubsystem.TRANSITION_SPEED);
