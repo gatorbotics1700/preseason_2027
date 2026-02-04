@@ -41,7 +41,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.vision.Vision;
@@ -64,7 +63,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final HoodSubsystem hoodSubsystem;
+  // private final HoodSubsystem hoodSubsystem;
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   // private final TurretSubsystem turretSubsystem;
 
@@ -219,7 +218,7 @@ public class RobotContainer {
         };
     // turretSubsystem = new TurretSubsystem(robotPose);
 
-    hoodSubsystem = new HoodSubsystem();
+    // hoodSubsystem = new HoodSubsystem();
 
     // mech buttons
     // new Trigger(controller_two::getXButtonPressed)
@@ -328,7 +327,7 @@ public class RobotContainer {
                 () -> {
                   try {
                     CommandScheduler.getInstance()
-                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive, hoodSubsystem));
+                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
                   } catch (Exception e) {
                     e.printStackTrace();
                   }
