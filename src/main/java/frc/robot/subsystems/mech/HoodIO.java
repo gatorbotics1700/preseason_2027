@@ -20,6 +20,7 @@ public interface HoodIO {
   public static class HoodIOInputs {
     /** Motor position in revolutions. */
     public double positionRevs = 0.0;
+
     /** Motor velocity in revolutions per second. */
     public double velocityRevsPerSec = 0.0;
   }

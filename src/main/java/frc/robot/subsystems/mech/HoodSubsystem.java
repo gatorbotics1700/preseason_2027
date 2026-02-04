@@ -2,14 +2,13 @@ package frc.robot.subsystems.mech;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
   public static final Rotation2d RETRACTED_POSITION =
       new Rotation2d(Math.toRadians(20)); // TODO find a real number for this
 
   private final HoodIO io;
-  private final HoodIOInputs inputs = new HoodIOInputs();
+  private final HoodIO.HoodIOInputs inputs = new HoodIO.HoodIOInputs();
 
   private Rotation2d desiredAngle = RETRACTED_POSITION;
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
@@ -22,7 +21,7 @@ public class HoodSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Hood", inputs);
+    //  Logger.processInputs("Hood", inputs);
 
     double angleError = currentAngle().getDegrees() - desiredAngle.getDegrees();
     if (Math.abs(angleError) > POSITION_DEADBAND_DEGREES) {

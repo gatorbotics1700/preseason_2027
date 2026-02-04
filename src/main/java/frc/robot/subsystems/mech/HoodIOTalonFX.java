@@ -39,8 +39,8 @@ public class HoodIOTalonFX implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.positionRevs = motor.getPosition().getValue();
-    inputs.velocityRevsPerSec = motor.getVelocity().getValue();
+    inputs.positionRevs = motor.getPosition().getValueAsDouble();
+    inputs.velocityRevsPerSec = motor.getVelocity().getValueAsDouble();
   }
 
   @Override
