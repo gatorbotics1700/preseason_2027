@@ -18,6 +18,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -45,6 +46,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
 import java.util.function.Supplier;
@@ -63,6 +65,7 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final HoodSubsystem hoodSubsystem;
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
+  private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -438,13 +441,12 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
+    gamePieceSimulation.updateBalls();
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
     // Print selected path name to console
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
-    System.out.println(
-        "Selected Auto Path: " + (selectedPathName != null ? selectedPathName : "None"));
     System.out.flush(); // Ensure output appears immediately
 
     // Log button states directly - much simpler!
@@ -481,7 +483,11 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.PI));
+                  gamePieceSimulation.launchFuelBall(
+                      new Translation3d(0, 0, 0),
+                      10,
+                      new Rotation2d(Math.toRadians(45)),
+                      new Rotation2d(0));
                 }));
   }
 }
