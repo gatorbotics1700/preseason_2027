@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.3497014307166
+    "rotation": -2.514404438201425
   },
   "reversed": false,
   "folder": "Blue Center Starters",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.9502839487501
+    "rotation": 1.5677658288821854
   },
   "useDefaultConstraints": true
 }
