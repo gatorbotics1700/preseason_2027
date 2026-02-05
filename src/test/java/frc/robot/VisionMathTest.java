@@ -74,7 +74,7 @@ class VisionMathTest {
    * Optional override for getCameraToTargetDistance: camera pitch (degrees). Set to -999 to use
    * config.
    */
-  private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = 0;
+  private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = 15;
 
   /** Robot pose (field coordinates) when the measurement was taken. Units: meters, degrees. */
   private static final double TEMPLATE_ROBOT_POSE_X_METERS = 0;
@@ -84,7 +84,7 @@ class VisionMathTest {
   private static final double TEMPLATE_ROBOT_POSE_ROTATION_DEGREES = 0.0;
 
   /** Target pitch from PhotonVision (degrees). Positive = target above camera center. */
-  private static final double TEMPLATE_TARGET_PITCH_DEGREES = -30;
+  private static final double TEMPLATE_TARGET_PITCH_DEGREES = -15;
 
   /** Target yaw from PhotonVision (degrees). Positive = target left of camera center. */
   private static final double TEMPLATE_TARGET_YAW_DEGREES = 0.0;
