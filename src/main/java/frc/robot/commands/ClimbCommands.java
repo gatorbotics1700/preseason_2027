@@ -32,7 +32,7 @@ public class ClimbCommands {
 
     Pose2d pose = drive.getPose();
 
-    //TODO: can we just pathfindtopose
+    // TODO: can we just pathfindtopose
     // alliance selections
     if (pose.getX() <= Constants.FIELD_CENTER.getX()) { // blue
       if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X

@@ -3,7 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.mech.HoodSubsystem;
 
-//TODO: periodic independent of shooter to determine desired position of the hood -- use pose tracking
+// TODO: periodic independent of shooter to determine desired position of the hood -- use pose
+// tracking
 public class HoodRetractCommand extends Command {
   private final HoodSubsystem hoodSubsystem;
 
