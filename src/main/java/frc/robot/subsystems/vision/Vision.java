@@ -75,10 +75,10 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getFuelPose(Pose3d robotPose) {
     Pose2d fuelPose = new Pose2d();
+    double maxArea = 0;
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
-      double maxArea = 0;
       if (target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
         if (target.getArea() > maxArea) {
           maxArea = target.getArea();
