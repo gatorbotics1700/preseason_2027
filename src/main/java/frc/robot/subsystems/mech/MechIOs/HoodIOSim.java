@@ -11,33 +11,31 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-// NOT COMPLETE
-package frc.robot.subsystems.mech;
+package frc.robot.subsystems.mech.MechIOs;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.subsystems.mech.ShooterIO.ShooterIOInputs;
 
 /** Simulated hood IO: integrates speed to get position in revs. */
-public class ShooterIOSim implements ShooterIO {
+public class HoodIOSim implements HoodIO {
 
   private double positionRevs = 0.0;
-  private double flywheelSpeed = 0.0;
-  private double transitionSpeed = 0.0;
+  private double speed = 0.0;
   private double lastTime = Timer.getFPGATimestamp();
 
   @Override
-  public void updateInputs(ShooterIOInputs inputs) {
+  public void updateInputs(HoodIOInputs inputs) {
     double now = Timer.getFPGATimestamp();
     double dt = now - lastTime;
     lastTime = now;
 
-    inputs.flywheelVelocityRevsPerSec = flywheelSpeed;
-    inputs.transitionVelocityRevsPerSec = transitionSpeed;
+    positionRevs += speed * dt;
+
+    inputs.positionRevs = positionRevs;
+    inputs.velocityRevsPerSec = speed;
   }
 
   @Override
   public void setSpeed(double speed) {
-    this.flywheelSpeed = speed;
-    this.transitionSpeed = speed;
+    this.speed = speed;
   }
 }

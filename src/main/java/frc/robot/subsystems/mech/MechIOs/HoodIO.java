@@ -11,22 +11,22 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-// NOT COMPLETE
-package frc.robot.subsystems.mech;
+package frc.robot.subsystems.mech.MechIOs;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ShooterIO {
+public interface HoodIO {
   @AutoLog
-  public static class ShooterIOInputs {
-    /** Motor velocity in revolutions per second. */
-    public double flywheelVelocityRevsPerSec = 0.0;
+  public static class HoodIOInputs {
+    /** Motor position in revolutions. */
+    public double positionRevs = 0.0;
 
-    public double transitionVelocityRevsPerSec = 0.0;
+    /** Motor velocity in revolutions per second. */
+    public double velocityRevsPerSec = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ShooterIOInputs inputs) {}
+  public default void updateInputs(HoodIOInputs inputs) {}
 
   /** Run open loop at the specified speed (duty cycle, typically -1 to 1). */
   public default void setSpeed(double speed) {}
