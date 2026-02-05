@@ -47,6 +47,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
 import java.util.function.Supplier;
@@ -98,6 +99,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
                 new VisionIOPhotonVision(
                     VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
+        hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
         break;
 
       case SIM:
@@ -121,6 +123,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_1_NAME,
                     VisionConstants.ROBOT_TO_CAMERA_1,
                     drive::getPose));
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
         break;
 
       default: // TODO: should the default be real as a safety for matches? to be discussed
@@ -134,6 +137,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 (pose) -> {});
         vision = new Vision(drive);
+        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
         break;
     }
 
@@ -401,13 +405,12 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
+    gamePieceSimulation.updateBalls();
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
     // Print selected path name to console
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
-    System.out.println(
-        "Selected Auto Path: " + (selectedPathName != null ? selectedPathName : "None"));
     System.out.flush(); // Ensure output appears immediately
 
     // Log button states directly - much simpler!
@@ -432,5 +435,17 @@ public class RobotContainer {
 
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
+
+    // controller_two
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               gamePieceSimulation.launchFuelBall(
+    //                   new Translation3d(0, 0, 0),
+    //                   10,
+    //                   new Rotation2d(Math.toRadians(45)),
+    //                   new Rotation2d(0));
+    //             }));
   }
 }
