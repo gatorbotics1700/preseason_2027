@@ -18,6 +18,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -72,6 +73,7 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem;
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -434,7 +436,7 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
-    // gamePieceSimulation.updateBalls();
+    gamePieceSimulation.updateBalls();
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
@@ -459,16 +461,16 @@ public class RobotContainer {
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
-    // controller_two
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               gamePieceSimulation.launchFuelBall(
-    //                   new Translation3d(0, 0, 0),
-    //                   10,
-    //                   new Rotation2d(Math.toRadians(45)),
-    //                   new Rotation2d(0));
-    //             }));
+    controller_two
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  gamePieceSimulation.launchFuelBall(
+                      new Translation3d(0, 0, 0),
+                      10,
+                      new Rotation2d(Math.toRadians(45)),
+                      new Rotation2d(0));
+                }));
   }
 }
