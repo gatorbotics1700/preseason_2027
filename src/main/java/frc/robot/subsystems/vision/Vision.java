@@ -35,6 +35,7 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
@@ -75,7 +76,7 @@ public class Vision extends SubsystemBase {
   public Pose2d getFuelPose(Pose3d robotPose) {
     Pose2d fuelPose = new Pose2d();
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-      var result = io[cameraIndex].getCamera().getLatestResult();
+      PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
       double maxArea = 0;
       if (target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
@@ -90,6 +91,17 @@ public class Vision extends SubsystemBase {
                   target.getPitch(),
                   robotToCamera.getRotation().getY(),
                   robotToCamera.getMeasureZ());
+          // Transform3d cameraToFuel =
+              
+          //             new Transform3d(
+          //                 new Translation3d(),
+          //                 new Rotation3d(0, target.getPitch(), target.getYaw()))
+          //         .transformBy(
+          //             new Transform3d(
+          //                 new Translation3d(
+          //                     cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
+          //                 new Rotation3d()));
+          // System.out.println("****HELLO printing cameratofuel pose" + cameraToFuel);
           fuelPose =
               robotPose
                   .transformBy(robotToCamera)
@@ -112,9 +124,16 @@ public class Vision extends SubsystemBase {
   private Distance getCameraToTargetDistance(
       double pitchInDegrees, double cameraAngleInRadians, Distance height) {
     // TODO: this logic assumes that roll of the camera is 0
-    return height
-        .minus(Centimeters.of(15))
-        .div(Math.cos(Math.abs(cameraAngleInRadians) + Math.toRadians(pitchInDegrees)));
+    System.out.println(
+        "***hi i'm in the method imma print out some information: "
+            + pitchInDegrees
+            + " "
+            + cameraAngleInRadians
+            + " "
+            + height.in(Centimeters));
+    return (height.minus(Centimeters.of(7.5)))
+        .div(Math.sin(cameraAngleInRadians + Math.toRadians(pitchInDegrees)));
+    // return Centimeters.of(22.5);
   }
 
   @Override
