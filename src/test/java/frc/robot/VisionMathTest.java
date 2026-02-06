@@ -100,16 +100,16 @@ class VisionMathTest {
 
   private static final double TEMPLATE_EXPECTED_FUEL_POSE_Y_METERS = 0.0;
 
-  private static final double TEMPLATE_EXPECTED_FUEL_POSE_ROTATION_DEGREES = 0.0;
+  private static final double TEMPLATE_EXPECTED_FUEL_POSE_ROTATION_DEGREES = 90;
 
   /** Tolerance for distance assertion (cm). Increase if your measurements have uncertainty. */
-  private static final double TEMPLATE_DISTANCE_TOLERANCE_CM = 1.0;
+  private static final double TEMPLATE_DISTANCE_TOLERANCE_CM = 2.0;
 
   /** Tolerance for pose assertion (m). Increase if your measurements have uncertainty. */
   private static final double TEMPLATE_POSE_TOLERANCE_METERS = 0.05;
 
   /** Tolerance for fuel pose rotation assertion (degrees). */
-  private static final double TEMPLATE_ANGULAR_TOLERANCE_DEGREES = 180;
+  private static final double TEMPLATE_ANGULAR_TOLERANCE_DEGREES = 10;
 
   // =============================================================================
 

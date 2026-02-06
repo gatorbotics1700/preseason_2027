@@ -15,6 +15,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.util.RobotConfigLoader;
@@ -33,9 +34,9 @@ public class VisionConstants {
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.y_meters");
   public static final double ROBOT_TO_CAMERA_0_Z_METERS =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.z_meters");
-  public static final double ROBOT_TO_CAMERA_0_ROLL_DEGREES =
+  public static final double CAMERA_0_ROLL_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.roll_degrees");
-  public static final double ROBOT_TO_CAMERA_0_PITCH_DEGREES =
+  public static final double CAMERA_0_PITCH_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.pitch_degrees");
   public static final double ROBOT_TO_CAMERA_0_YAW_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.yaw_degrees");
@@ -51,9 +52,9 @@ public class VisionConstants {
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.y_meters");
   public static final double ROBOT_TO_CAMERA_1_Z_METERS =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.z_meters");
-  public static final double ROBOT_TO_CAMERA_1_ROLL_DEGREES =
+  public static final double CAMERA_1_ROLL_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.roll_degrees");
-  public static final double ROBOT_TO_CAMERA_1_PITCH_DEGREES =
+  public static final double CAMERA_1_PITCH_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.pitch_degrees");
   public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.yaw_degrees");
@@ -61,6 +62,8 @@ public class VisionConstants {
   public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera0Transform();
 
   public static Transform3d[] ROBOT_TO_CAMERA_TRANSFORMS_ARRAY = createCameraTransformsArray();
+
+  public static double[] UNANGLED_CAMERA_SPACE_PITCH_ARRAY = createUnangledCameraSpacePitchArray();
 
   // Basic filtering thresholds
   public static double MAX_AMBIGUITY = RobotConfigLoader.getDouble("photonvision.max_ambiguity");
@@ -94,29 +97,58 @@ public class VisionConstants {
   public static int FUEL_CLASS_ID = 0;
 
   public static Transform3d createRobotToCamera0Transform() {
+    Pose3d unangledCameraSpace =
+        new Pose3d(
+                ROBOT_TO_CAMERA_0_X_METERS,
+                ROBOT_TO_CAMERA_0_Y_METERS,
+                ROBOT_TO_CAMERA_0_Z_METERS,
+                new Rotation3d(0, 0, Math.toRadians(ROBOT_TO_CAMERA_0_YAW_DEGREES)))
+            .rotateBy(
+                new Rotation3d(
+                    Math.toRadians(CAMERA_0_ROLL_DEGREES),
+                    Math.toRadians(CAMERA_0_PITCH_DEGREES),
+                    0));
+    double robotSpaceRoll = unangledCameraSpace.getX();
+    double robotSpacePitch = unangledCameraSpace.getY();
     return new Transform3d(
         ROBOT_TO_CAMERA_0_X_METERS,
         ROBOT_TO_CAMERA_0_Y_METERS,
         ROBOT_TO_CAMERA_0_Z_METERS,
         new Rotation3d(
-            Math.toRadians(ROBOT_TO_CAMERA_0_ROLL_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_0_PITCH_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_0_YAW_DEGREES)));
+            robotSpaceRoll, robotSpacePitch, Math.toRadians(ROBOT_TO_CAMERA_0_YAW_DEGREES)));
   }
 
   public static Transform3d createRobotToCamera1Transform() {
+    Pose3d unangledCameraSpace =
+        new Pose3d(
+                ROBOT_TO_CAMERA_1_X_METERS,
+                ROBOT_TO_CAMERA_1_Y_METERS,
+                ROBOT_TO_CAMERA_1_Z_METERS,
+                new Rotation3d(0, 0, Math.toRadians(ROBOT_TO_CAMERA_1_YAW_DEGREES)))
+            .rotateBy(
+                new Rotation3d(
+                    Math.toRadians(CAMERA_1_ROLL_DEGREES),
+                    Math.toRadians(CAMERA_1_PITCH_DEGREES),
+                    0));
+    double robotSpaceRoll = unangledCameraSpace.getX();
+    double robotSpacePitch = unangledCameraSpace.getY();
     return new Transform3d(
         ROBOT_TO_CAMERA_1_X_METERS,
         ROBOT_TO_CAMERA_1_Y_METERS,
         ROBOT_TO_CAMERA_1_Z_METERS,
         new Rotation3d(
-            Math.toRadians(ROBOT_TO_CAMERA_1_ROLL_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_1_PITCH_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_1_YAW_DEGREES)));
+            robotSpaceRoll, robotSpacePitch, Math.toRadians(ROBOT_TO_CAMERA_1_YAW_DEGREES)));
   }
 
   public static Transform3d[] createCameraTransformsArray() {
     Transform3d[] array = {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
+    return array;
+  }
+
+  public static double[] createUnangledCameraSpacePitchArray() {
+    double[] array = {
+      Math.toRadians(CAMERA_0_PITCH_DEGREES), Math.toRadians(CAMERA_1_PITCH_DEGREES)
+    };
     return array;
   }
 
