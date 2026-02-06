@@ -16,7 +16,7 @@ import frc.robot.generated.TunerConstants;
 public class ClimberSubsystem extends SubsystemBase {
 
   private static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
-  private static final double WINCH_INCHES_PER_REV = 1; // TODO get a real number
+  private static final double WINCH_INCHES_PER_REV = (3/4) * Math.PI; // TODO get a real number
   public final TalonFX motor;
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private double desiredPositionInches;
@@ -68,12 +68,9 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    double error = desiredPositionInches - currentPositionInches();
-    if (Math.abs(error) > DEADBAND_INCHES) {
-      setMotorOutput(0.2 * error);
-    } else {
-      setMotorOutput(0);
-    }
+    motor.setControl(m_request.withPosition(inchesToRevs(desiredPositionInches)));
+    motor.setNeutralMode(NeutralModeValue.Brake); // do we really need this here?
+    
   }
 
   private void setMotorOutput(double speed) {
@@ -89,5 +86,9 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void setDesiredPositionInches(double desiredPositionInches) {
     this.desiredPositionInches = desiredPositionInches;
+  }
+
+  public double inchesToRevs(double positionInches) {
+    return positionInches / WINCH_INCHES_PER_REV * CLIMBER_GEAR_RATIO;
   }
 }

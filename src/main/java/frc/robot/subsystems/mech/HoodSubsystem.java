@@ -27,7 +27,7 @@ public class HoodSubsystem extends SubsystemBase {
   private final int HOOD_SHAFT_REVS_PER_MECH_REV = 155 / 15; // TODO find real value
   private static double currentPositionTicks;
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
-  final MotionMagicExpoVoltage m_request;
+  private static MotionMagicExpoVoltage m_request;
 
   public HoodSubsystem() {
     hoodMotor = new TalonFX(Constants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
