@@ -466,7 +466,7 @@ public class RobotContainer {
 
     ShotParameters shotParameters =
         ShotCalculator.calculateShot(
-            drive.getPose(), new ChassisSpeeds(0, 0, 0), new Translation3d(3, 2, 0.5), 10);
+            drive.getPose(), new ChassisSpeeds(0, 0, 0), Constants.BLUE_HUB, 10);
 
     controller_two
         .a()
