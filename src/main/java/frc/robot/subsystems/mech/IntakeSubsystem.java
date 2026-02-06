@@ -17,7 +17,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // motion magic stuff for deploy NOTE: we will need to figure out some sort of current limit thing
   // so that something can push the intake back in
-  private Rotation2d desiredAngle;
+  private Rotation2d desiredAngle = new Rotation2d();
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
   private final int DEPLOY_GEAR_RATIO = 9; // TODO find the real value
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);

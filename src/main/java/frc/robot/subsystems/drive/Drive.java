@@ -54,6 +54,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.Calculations;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -465,10 +466,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return targetPose;
   }
 
-  public Rotation2d angleToPoint(double deltaX, double deltaY) {
-    return new Rotation2d(Math.atan2(deltaY, deltaX));
-  }
-
   public void enableTargetPointFacing() {
     Translation2d allianceTargetPoint = getAllianceTargetPoint();
     if (allianceTargetPoint != null) {
@@ -505,7 +502,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
           Pose2d currentPose = getPose();
           double deltaX = targetPoint.getX() - currentPose.getX();
           double deltaY = targetPoint.getY() - currentPose.getY();
-          return angleToPoint(deltaX, deltaY);
+          return Calculations.angleToPoint(deltaX, deltaY);
         };
   }
 

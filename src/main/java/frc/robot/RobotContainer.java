@@ -331,15 +331,7 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
-    // controller_two
-    //     .x()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () -> {
-    //                   vision.takePicture();
-    //                 })
-    //             .ignoringDisable(true));
-
+    controller_two.x().onTrue(IntakeCommands.DriveToFuel(drive, vision));
   }
 
   /**
@@ -432,5 +424,7 @@ public class RobotContainer {
 
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
+
+    Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
   }
 }

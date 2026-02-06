@@ -32,8 +32,10 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.Calculations;
 import java.util.LinkedList;
 import java.util.List;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -73,13 +75,15 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  public Pose2d getFuelPose(Pose3d robotPose) {
-    Pose2d fuelPose = new Pose2d();
+  @AutoLogOutput(key = "Odometry/Fuel")
+  public Pose2d getFuelPose(Pose2d robotPose) {
+    Pose3d robotPose3d = new Pose3d(robotPose);
+    Pose2d fuelPose = null;
     double maxArea = 0;
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
-      if (target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
+      if (target != null && target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
         if (target.getArea() > maxArea) {
           maxArea = target.getArea();
 
@@ -108,7 +112,7 @@ public class Vision extends SubsystemBase {
                   + " "
                   + cameraToFuel);
           fuelPose =
-              robotPose
+              robotPose3d
                   .transformBy(robotToCamera)
                   .transformBy(
                       new Transform3d(
@@ -126,7 +130,18 @@ public class Vision extends SubsystemBase {
         }
       }
     }
-    return fuelPose;
+
+    if (fuelPose == null) {
+      return null;
+    }
+    double deltaX = fuelPose.getX() - robotPose.getX();
+    double deltaY = fuelPose.getY() - robotPose.getY();
+    fuelPose =
+        new Pose2d(
+            fuelPose.getMeasureX(),
+            fuelPose.getMeasureY(),
+            Calculations.angleToPoint(deltaX, deltaY));
+    return fuelPose.rotateBy(new Rotation2d(Math.toRadians(-90))); //TODO: make the -90 a constant based on where the intake is which is 180
   }
 
   private Distance getCameraToTargetDistance(
@@ -141,7 +156,6 @@ public class Vision extends SubsystemBase {
             + " "
             + height.in(Centimeters));
     return (height.minus(Centimeters.of(7.5))).div(Math.sin(cameraAngleInRadians + pitchInRadians));
-    // return Centimeters.of(22.5);
   }
 
   @Override

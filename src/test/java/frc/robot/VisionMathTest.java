@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -184,12 +183,11 @@ class VisionMathTest {
                   originalCameraRotation.getZ()));
     }
     try {
-      Pose3d robotPose =
-          new Pose3d(
+      Pose2d robotPose =
+          new Pose2d(
               TEMPLATE_ROBOT_POSE_X_METERS,
               TEMPLATE_ROBOT_POSE_Y_METERS,
-              0,
-              new Rotation3d(0, 0, Math.toRadians(TEMPLATE_ROBOT_POSE_ROTATION_DEGREES)));
+              new Rotation2d(Math.toRadians(TEMPLATE_ROBOT_POSE_ROTATION_DEGREES)));
 
       Pose2d expectedFuelPose =
           new Pose2d(
@@ -237,7 +235,7 @@ class VisionMathTest {
 
   /** Calls Vision.getFuelPose with mocked target. Uses VisionConstants from config. */
   private Pose2d getFuelPoseFromMockedVision(
-      Pose3d robotPose, double pitchDegrees, double yawDegrees) {
+      Pose2d robotPose, double pitchDegrees, double yawDegrees) {
     VisionIO cameraUnderTest = createMockedVisionIO(pitchDegrees, yawDegrees);
 
     if (TEMPLATE_CAMERA_INDEX == 0) {
