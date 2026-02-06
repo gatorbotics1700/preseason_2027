@@ -74,8 +74,8 @@ public class RobotContainer {
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController controller_two = new CommandXboxController(3);
+  private CommandXboxController controller = null;
+  private CommandXboxController controller_two = null;
 
   // Dashboard inputs
   private final MultiStepAutoChooser multiStepAutoChooser;
@@ -219,7 +219,6 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
-    configureButtonBindings();
   }
 
   /**
@@ -228,130 +227,135 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  public void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    Trigger driverControl =
-        new Trigger(
-            () ->
-                Math.abs(controller.getLeftY()) > 0.1
-                    || Math.abs(controller.getLeftX()) > 0.1
-                    || Math.abs(controller.getRightX()) > 0.1);
-    // When alliance is not present (e.g. in sim with no DS alliance selected), default to Blue
-    // so drive still works.
-    var alliance = DriverStation.getAlliance();
-    boolean isRed = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+  public void configureDriverButtonBindings() {
+    if (DriverStation.isJoystickConnected(0)) {
+      controller = new CommandXboxController(0);
 
-    if (isRed) {
-      driverControl
-          .whileTrue(
-              DriveCommands.joystickDrive(
-                  drive,
-                  () -> modifyJoystickAxis(controller.getLeftY()),
-                  () -> modifyJoystickAxis(controller.getLeftX()),
-                  () -> modifyJoystickAxis(-controller.getRightX())))
-          .onFalse(DriveCommands.stopDriveCommand(drive));
-    } else {
-      // Blue, or no alliance (e.g. sim) — use Blue convention
-      driverControl
-          .whileTrue(
-              DriveCommands.joystickDrive(
-                  drive,
-                  () -> modifyJoystickAxis(-controller.getLeftY()),
-                  () -> modifyJoystickAxis(-controller.getLeftX()),
-                  () -> modifyJoystickAxis(-controller.getRightX())))
-          .onFalse(DriveCommands.stopDriveCommand(drive));
+      // Default command, normal field-relative drive
+      Trigger driverControl =
+          new Trigger(
+              () ->
+                  Math.abs(controller.getLeftY()) > 0.1
+                      || Math.abs(controller.getLeftX()) > 0.1
+                      || Math.abs(controller.getRightX()) > 0.1);
+      var alliance = DriverStation.getAlliance();
+      boolean isRed = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+      if (isRed) {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      } else {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      }
+
+      // drive over bump
+      controller
+          .a()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+
+      // Reset gyro to 0° when B button is pressed
+      controller
+          .b()
+          .onTrue(
+              Commands.runOnce(
+                      () -> {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        } else {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        }
+                      },
+                      drive)
+                  .ignoringDisable(true));
+
+      // drive under trench
+      controller
+          .x()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+
+      controller
+          .rightBumper()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    drive.setSlowDrive();
+                  },
+                  drive));
     }
+  }
 
-    // drive over bump
-    controller
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  try {
-                    CommandScheduler.getInstance()
-                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                }));
+  public void configureCodriverButtonBindings() {
+    if (DriverStation.isJoystickConnected(3)) {
+      controller_two = new CommandXboxController(3);
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () -> {
-                      if (DriverStation.getAlliance().isPresent()
-                          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-                        drive.setPose(
-                            new Pose2d(
-                                drive.getPose().getTranslation(),
-                                new Rotation2d(Math.toRadians(0))));
-                      } else {
-                        drive.setPose(
-                            new Pose2d(
-                                drive.getPose().getTranslation(),
-                                new Rotation2d(Math.toRadians(0))));
-                      }
-                    },
-                    drive)
-                .ignoringDisable(true));
+      // controller_two
+      //     .a()
+      //     .onTrue(
+      //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
+      //             .alongWith(new WaitCommand(3.0))
+      //             .andThen(
+      //                 new HopperFloorCommand(
+      //                     transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
+      // controller_two
+      //   .b()
+      //     .onTrue(
+      //         new TransitionCommand(transitionSubsystem, 0, 0)
+      //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
 
-    // drive under trench
-    controller
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  try {
-                    CommandScheduler.getInstance()
-                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                }));
+      // mech buttons
+      // controller_two
+      //     .x()
+      //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
+      // controller_two
+      //     .y()
+      //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
-    controller
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  drive.setSlowDrive();
-                },
-                drive));
-
-    // controller_two
-    //     .a()
-    //     .onTrue(
-    //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
-    //             .alongWith(new WaitCommand(3.0))
-    //             .andThen(
-    //                 new HopperFloorCommand(
-    //                     transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
-    // controller_two
-    //   .b()
-    //     .onTrue(
-    //         new TransitionCommand(transitionSubsystem, 0, 0)
-    //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
-
-    // mech buttons
-    // controller_two
-    //     .x()
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-    // controller_two
-    //     .y()
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
-
-    // controller_two
-    //     .x()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () -> {
-    //                   vision.takePicture();
-    //                 })
-    //             .ignoringDisable(true));
-
+      // controller_two
+      //     .x()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //                 () -> {
+      //                   vision.takePicture();
+      //                 })
+      //             .ignoringDisable(true));
+    }
   }
 
   /**
@@ -420,12 +424,6 @@ public class RobotContainer {
     // Print selected path name to console
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
     System.out.flush(); // Ensure output appears immediately
-
-    // Log button states directly - much simpler!
-    Logger.recordOutput("Buttons/Controller1/A", controller.a().getAsBoolean());
-    Logger.recordOutput("Buttons/Controller1/B", controller.b().getAsBoolean());
-    Logger.recordOutput("Buttons/Controller1/X", controller.x().getAsBoolean());
-    Logger.recordOutput("Buttons/Controller1/Y", controller.y().getAsBoolean());
 
     // Logger.recordOutput("Buttons/Controller2/A", controller_two.a().getAsBoolean());
     // Logger.recordOutput("Buttons/Controller2/B", controller_two.b().getAsBoolean());
