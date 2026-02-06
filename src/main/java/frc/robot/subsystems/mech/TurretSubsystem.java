@@ -19,8 +19,8 @@ public class TurretSubsystem extends SubsystemBase {
   // some motion magic stuff here
   private Rotation2d desiredAngle;
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
-  private final int TURRET_GEARBOX_RATIO = 5; 
-  private final int GEAR_REVS_PER_TURRET_REV = 1; //TODO: change value to real value 
+  private final int TURRET_GEARBOX_RATIO = 9; 
+  private final int GEAR_REVS_PER_TURRET_REV = 6; 
   private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private static TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
