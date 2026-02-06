@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class HoodSubsystem extends SubsystemBase {
   public static final Rotation2d RETRACTED_POSITION =
@@ -44,55 +43,29 @@ public class HoodSubsystem extends SubsystemBase {
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
-    LoggedNetworkNumber tunekG =
-        new LoggedNetworkNumber(
-            "/Tuning/kG",
-            0.2128); // Add 0.2128 V output to overcome gravity (tuned in early feedforward
+    // Add 0.2128 V output to overcome gravity (tuned in early feedforward
     // testing)
+    slot0Configs.kG = 0.2128;
 
-    LoggedNetworkNumber tunekS =
-        new LoggedNetworkNumber(
-            "/Tuning/kS",
-            0.25); // 0.01; // Add 0.01 V output to overcome static friction (just a guesstimate,
-    // but
-    // this value
-    // might just be 0)
-    LoggedNetworkNumber tunekV = new LoggedNetworkNumber("/Tuning/kV", 0.16);
+    // Add 0.01 V output to overcome static friction (just a guesstimate, but this might just be 0
+    slot0Configs.kS = 0.25;
 
-    // A velocity target of 1 rps results in 0.12 V output
-    LoggedNetworkNumber tunekA = new LoggedNetworkNumber("/Tuning/kA", 0.01);
+    slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
 
-    // An acceleration of 1 rps/s requires 0.01 V output
-    LoggedNetworkNumber tunekP = new LoggedNetworkNumber("/Tuning/kP", 4.8);
+    slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    // A position error of 2.5 rotations results in 12 V output
-    LoggedNetworkNumber tunekI = new LoggedNetworkNumber("/Tuning/kI", 0);
+    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12V output
 
-    // no output for integrated error
-    LoggedNetworkNumber tunekD = new LoggedNetworkNumber("/Tuning/kD", 0.1);
-    // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kI = 0; // no output for integrated error
 
-    slot0Configs.kG = tunekG.get();
-    slot0Configs.kS = tunekS.get();
-    slot0Configs.kV = tunekV.get();
-    slot0Configs.kA = tunekA.get();
-    slot0Configs.kP = tunekP.get();
-    slot0Configs.kI = tunekI.get();
-    slot0Configs.kD = tunekD.get();
+    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-    // motionMagicConfigs.MotionMagicCruiseVelocity = 0; // Unlimited cruise velocity
-    // motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
-    // motionMagicConfigs.MotionMagicExpo_kA = 0.1; // 0.015; // Use a slower kA of 0.1 V/(rps/s)
 
-    LoggedNetworkNumber tuneCruiseVelocity = new LoggedNetworkNumber("/Tuning/CruiseVelocity", 0);
-    LoggedNetworkNumber tuneExpo_kV = new LoggedNetworkNumber("/Tuning/Expo_kV", 0.16);
-    LoggedNetworkNumber tuneExpo_kA = new LoggedNetworkNumber("/Tuning/Expo_kA", 0.1);
-
-    motionMagicConfigs.MotionMagicCruiseVelocity = tuneCruiseVelocity.get();
-    motionMagicConfigs.MotionMagicExpo_kV = tuneExpo_kV.get();
-    motionMagicConfigs.MotionMagicExpo_kA = tuneExpo_kA.get();
+    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // unlimited cruise velocity
+    motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
+    motionMagicConfigs.MotionMagicExpo_kA = 0.1; // Use a slower kA of 0.1 V/(rps/s)
 
     hoodMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -101,10 +74,6 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // I used a fake pid as a placeholeder, but we should turn to position using motion magic
-    // double angleError = getCurrentAngle().getDegrees() - desiredAngle.getDegrees();
-    // if (Math.abs(angleError) > POSITION_DEADBAND_DEGREES) {
-    configMotor();
     hoodMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
 
     Logger.recordOutput("hood desired angle", desiredAngle.getDegrees());
@@ -139,69 +108,5 @@ public class HoodSubsystem extends SubsystemBase {
 
   public void setHoodVoltage(double voltage) {
     hoodMotor.setVoltage(voltage);
-  }
-
-  private void configMotor() {
-    TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
-
-    talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-
-    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
-
-    LoggedNetworkNumber tunekG =
-        new LoggedNetworkNumber(
-            "/Tuning/kG",
-            0.2128); // Add 0.2128 V output to overcome gravity (tuned in early feedforward
-    // testing)
-
-    LoggedNetworkNumber tunekS =
-        new LoggedNetworkNumber(
-            "/Tuning/kS",
-            0.25); // 0.01; // Add 0.01 V output to overcome static friction (just a guesstimate,
-    // but
-    // this value
-    // might just be 0)
-    LoggedNetworkNumber tunekV = new LoggedNetworkNumber("/Tuning/kV", 0.16);
-
-    // A velocity target of 1 rps results in 0.12 V output
-    LoggedNetworkNumber tunekA = new LoggedNetworkNumber("/Tuning/kA", 0.01);
-
-    // An acceleration of 1 rps/s requires 0.01 V output
-    LoggedNetworkNumber tunekP = new LoggedNetworkNumber("/Tuning/kP", 4.8);
-
-    // A position error of 2.5 rotations results in 12 V output
-    LoggedNetworkNumber tunekI = new LoggedNetworkNumber("/Tuning/kI", 0);
-
-    // no output for integrated error
-    LoggedNetworkNumber tunekD = new LoggedNetworkNumber("/Tuning/kD", 0.1);
-    // A velocity error of 1 rps results in 0.1 V output
-
-    slot0Configs.kG = tunekG.get();
-    slot0Configs.kS = tunekS.get();
-    slot0Configs.kV = tunekV.get();
-    slot0Configs.kA = tunekA.get();
-    slot0Configs.kP = tunekP.get();
-    slot0Configs.kI = tunekI.get();
-    slot0Configs.kD = tunekD.get();
-
-    // MOTION MAGIC EXPO
-    MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-    // motionMagicConfigs.MotionMagicCruiseVelocity = 0; // Unlimited cruise velocity
-    // motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
-    // motionMagicConfigs.MotionMagicExpo_kA = 0.1; // 0.015; // Use a slower kA of 0.1 V/(rps/s)
-
-    LoggedNetworkNumber tuneCruiseVelocity = new LoggedNetworkNumber("/Tuning/CruiseVelocity", 0);
-    LoggedNetworkNumber tuneExpo_kV = new LoggedNetworkNumber("/Tuning/Expo_kV", 0.16);
-    LoggedNetworkNumber tuneExpo_kA = new LoggedNetworkNumber("/Tuning/Expo_kA", 0.1);
-
-    motionMagicConfigs.MotionMagicCruiseVelocity = tuneCruiseVelocity.get();
-    motionMagicConfigs.MotionMagicExpo_kV = tuneExpo_kV.get();
-    motionMagicConfigs.MotionMagicExpo_kA = tuneExpo_kA.get();
-
-    if (talonFXConfigs != this.talonFXConfigs) {
-      hoodMotor.getConfigurator().apply(talonFXConfigs);
-      this.talonFXConfigs = talonFXConfigs;
-    }
   }
 }
