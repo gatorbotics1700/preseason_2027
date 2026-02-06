@@ -19,8 +19,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -213,140 +211,140 @@ public class RobotContainer {
   public void configureDriverButtonBindings() {
     if (DriverStation.isJoystickConnected(0)) {
       controller = new CommandXboxController(0);
-    // Default command, normal field-relative drive
-    Trigger driverControl =
-        new Trigger(
-            () ->
-                Math.abs(controller.getLeftY()) > 0.1
-                    || Math.abs(controller.getLeftX()) > 0.1
-                    || Math.abs(controller.getRightX()) > 0.1);
-    var alliance = DriverStation.getAlliance();
-    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-      driverControl
-          .whileTrue(
-              DriveCommands.joystickDrive(
-                  drive,
-                  () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
-                  () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
-                  () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
-          .onFalse(DriveCommands.stopDriveCommand(drive));
-    } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
-      driverControl
-          .whileTrue(
-              DriveCommands.joystickDrive(
-                  drive,
-                  () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
-                  () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
-                  () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
-          .onFalse(DriveCommands.stopDriveCommand(drive));
+      // Default command, normal field-relative drive
+      Trigger driverControl =
+          new Trigger(
+              () ->
+                  Math.abs(controller.getLeftY()) > 0.1
+                      || Math.abs(controller.getLeftX()) > 0.1
+                      || Math.abs(controller.getRightX()) > 0.1);
+      var alliance = DriverStation.getAlliance();
+      if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      }
+
+      // drive over bump
+      controller
+          .a()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+
+      // Reset gyro to 0° when B button is pressed
+      controller
+          .b()
+          .onTrue(
+              Commands.runOnce(
+                      () -> {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        } else {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        }
+                      },
+                      drive)
+                  .ignoringDisable(true));
+
+      // drive under trench
+      controller
+          .x()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+
+      controller
+          .rightBumper()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    drive.setSlowDrive();
+                  },
+                  drive));
+
+      controller
+          .leftBumper()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance().schedule(ClimbCommands.DriveToTower(drive));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
     }
-
-    // drive over bump
-    controller
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  try {
-                    CommandScheduler.getInstance()
-                        .schedule(DriveOverBumpCommand.driveOverBump(drive));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                }));
-
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () -> {
-                      if (DriverStation.getAlliance().isPresent()
-                          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-                        drive.setPose(
-                            new Pose2d(
-                                drive.getPose().getTranslation(),
-                                new Rotation2d(Math.toRadians(0))));
-                      } else {
-                        drive.setPose(
-                            new Pose2d(
-                                drive.getPose().getTranslation(),
-                                new Rotation2d(Math.toRadians(0))));
-                      }
-                    },
-                    drive)
-                .ignoringDisable(true));
-
-    // drive under trench
-    controller
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  try {
-                    CommandScheduler.getInstance()
-                        .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                }));
-
-    controller
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  drive.setSlowDrive();
-                },
-                drive));
-
-    controller
-        .leftBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  try {
-                    CommandScheduler.getInstance().schedule(ClimbCommands.DriveToTower(drive));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                }));
-              }
   }
 
   public void configureCodriverButtonBindings() {
     if (DriverStation.isJoystickConnected(3)) {
       controller_two = new CommandXboxController(3);
-    // controller_two
-    //     .a()
-    //     .onTrue(
-    //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
-    //             .alongWith(new WaitCommand(3.0))
-    //             .andThen(
-    //                 new HopperFloorCommand(
-    //                     transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
-    // controller_two
-    //   .b()
-    //     .onTrue(
-    //         new TransitionCommand(transitionSubsystem, 0, 0)
-    //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
+      // controller_two
+      //     .a()
+      //     .onTrue(
+      //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
+      //             .alongWith(new WaitCommand(3.0))
+      //             .andThen(
+      //                 new HopperFloorCommand(
+      //                     transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
+      // controller_two
+      //   .b()
+      //     .onTrue(
+      //         new TransitionCommand(transitionSubsystem, 0, 0)
+      //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
 
-    // mech buttons
-    // controller_two
-    //     .x()
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-    // controller_two
-    //     .y()
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
+      // mech buttons
+      // controller_two
+      //     .x()
+      //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
+      // controller_two
+      //     .y()
+      //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
-    // controller_two
-    //     .x()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () -> {
-    //                   vision.takePicture();
-    //                 })
-    //             .ignoringDisable(true));
+      // controller_two
+      //     .x()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //                 () -> {
+      //                   vision.takePicture();
+      //                 })
+      //             .ignoringDisable(true));
     }
   }
 
