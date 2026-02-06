@@ -1,18 +1,15 @@
 package frc.robot.util;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.mech.ClimberSubsystem;
+import frc.robot.subsystems.mech.IntakeSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-/**
- * Multi-step auto chooser that allows drivers to select alliance, starting position, and path
- * segments step-by-step. The chooser automatically builds the auto command from standardized path
- * names.
- */
 public class MultiStepAutoChooser {
   private final LoggedDashboardChooser<String> allianceChooser;
   private final LoggedDashboardChooser<String> startPosChooser;
+  private final DynamicAutoBuilder dynamicAutoBuilder;
 
   // First destination choosers (location type + side)
   private final LoggedDashboardChooser<String> firstDestinationTypeChooser;
@@ -28,9 +25,10 @@ public class MultiStepAutoChooser {
 
   private final LoggedDashboardChooser<Boolean> shouldClimbChooser;
 
-  public MultiStepAutoChooser() {
-    // TODO: is it possible to have elastic give some angry error message if a certain combo isn't a
-    // real auto?
+  public MultiStepAutoChooser(
+      IntakeSubsystem intakeSubsystem, Drive drive, ClimberSubsystem climberSubsystem) {
+    // Create the dynamic auto builder
+    this.dynamicAutoBuilder = new DynamicAutoBuilder(intakeSubsystem, drive, climberSubsystem);
 
     // Initialize choosers
     allianceChooser = new LoggedDashboardChooser<>("Auto/Alliance");
@@ -113,7 +111,6 @@ public class MultiStepAutoChooser {
     shouldClimbChooser.addDefaultOption("No", false);
     shouldClimbChooser.addOption("Yes", true);
 
-    // Force initialization by reading each chooser once
     // This ensures they publish to NetworkTables
     allianceChooser.get();
     startPosChooser.get();
@@ -192,11 +189,6 @@ public class MultiStepAutoChooser {
     return "None";
   }
 
-  /**
-   * Builds the auto filename from the current selections. Format: {Alliance (initial)}
-   * {StartPos}-{Dest1} -{Dest2}-{Dest3}-{Tower}.auto Example: R Center-DC-Fuel Pile CM.auto or B
-   * LF-Fuel Pile-CF-Outpost-Tower.auto
-   */
   // TODO: make sure this follows the right naming conventions we ultimately decide on
   private String buildAutoFileName(
       String alliance, String startPos, String dest1, String dest2, String dest3, boolean climb) {
@@ -245,16 +237,8 @@ public class MultiStepAutoChooser {
     return fileName.toString();
   }
 
-  /**
-   * Updates chooser options based on current selections. Should be called periodically. Note: Since
-   * LoggedDashboardChooser doesn't support dynamic option clearing, all options are populated
-   * upfront. This method is kept for potential future enhancements.
-   *
-   * <p>Reading the choosers here ensures they stay published to NetworkTables.
-   */
   public void updateChooserOptions() {
-    // Read choosers to ensure they stay published to NetworkTables
-    // This is necessary for LoggedDashboardChooser to maintain NetworkTables entries
+
     allianceChooser.get();
     startPosChooser.get();
     firstDestinationTypeChooser.get();
@@ -266,19 +250,11 @@ public class MultiStepAutoChooser {
     shouldClimbChooser.get();
   }
 
-  /**
-   * Gets the currently selected auto file name for display. Returns the auto filename based on
-   * current selections. This method reads chooser values fresh each time it's called.
-   */
   public String getSelectedPathName() {
     String autoFileName = buildAutoFileNameFromChoosers();
     return autoFileName != null ? autoFileName : "None";
   }
 
-  /**
-   * Builds the auto filename from the current chooser selections. This is a helper method to avoid
-   * code duplication.
-   */
   private String buildAutoFileNameFromChoosers() {
     String alliance = allianceChooser.get();
     String startPos = startPosChooser.get();
@@ -298,50 +274,28 @@ public class MultiStepAutoChooser {
   }
 
   /**
-   * Gets the autonomous command based on the current selections.
-   *
    * @return The command to run in autonomous, or Commands.none() if no valid selection
    */
   public Command getAutonomousCommand() {
-    try {
-      // Update chooser options first
-      updateChooserOptions();
+    // Update chooser options first
+    updateChooserOptions();
 
-      // Build auto filename from selections
-      String autoFileName = buildAutoFileNameFromChoosers();
+    // Get all selections
+    String alliance = allianceChooser.get();
+    String startPos = startPosChooser.get();
 
-      if (autoFileName == null) {
-        System.out.println("Selected Auto: None (missing alliance or start position)");
-        return Commands.none();
-      }
+    String firstDestination =
+        combineDestination(firstDestinationTypeChooser.get(), firstDestinationSideChooser.get());
+    String secondDestination =
+        combineDestination(secondDestinationTypeChooser.get(), secondDestinationSideChooser.get());
+    String thirdDestination =
+        combineDestination(thirdDestinationTypeChooser.get(), thirdDestinationSideChooser.get());
 
-      // Print selected auto file name to console
-      System.out.println("Selected Auto: " + autoFileName);
-      System.out.flush();
+    Boolean shouldClimb = shouldClimbChooser.get();
+    boolean climb = shouldClimb != null && shouldClimb;
 
-      // Load the auto file using AutoBuilder
-      try {
-        Command autoCommand = AutoBuilder.buildAuto(autoFileName);
-        if (autoCommand != null) {
-          return autoCommand;
-        } else {
-          System.err.println(
-              "MultiStepAutoChooser: Auto file not found or could not be loaded: " + autoFileName);
-          return Commands.none();
-        }
-      } catch (Exception e) {
-        System.err.println(
-            "MultiStepAutoChooser: Error loading auto file "
-                + autoFileName
-                + ": "
-                + e.getMessage());
-        e.printStackTrace();
-        return Commands.none();
-      }
-    } catch (Exception e) {
-      System.err.println("MultiStepAutoChooser: Error building auto command: " + e.getMessage());
-      e.printStackTrace();
-      return Commands.none();
-    }
+    // Use DynamicAutoBuilder to chain paths together
+    return dynamicAutoBuilder.buildAuto(
+        alliance, startPos, firstDestination, secondDestination, thirdDestination, climb);
   }
 }

@@ -52,12 +52,6 @@ import frc.robot.util.RobotConfigLoader;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
@@ -193,7 +187,7 @@ public class RobotContainer {
     // 0));
 
     // Set up auto routines with multi-step chooser
-    multiStepAutoChooser = new MultiStepAutoChooser();
+    multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -354,11 +348,6 @@ public class RobotContainer {
 
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     try {
       return multiStepAutoChooser.getAutonomousCommand();
@@ -408,21 +397,14 @@ public class RobotContainer {
     drive.enableTargetPointFacing();
   }
 
-  /**
-   * Periodic method to log button states and other robot information. Call this from
-   * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
-   */
   public void periodic() {
-    // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
-    // Print selected path name to console
+    // Print  path name to console me thinks
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
     System.out.println(
         "Selected Auto Path: " + (selectedPathName != null ? selectedPathName : "None"));
-    System.out.flush(); // Ensure output appears immediately
 
-    // Log button states directly - much simpler!
     Logger.recordOutput("Buttons/Controller1/A", controller.a().getAsBoolean());
     Logger.recordOutput("Buttons/Controller1/B", controller.b().getAsBoolean());
     Logger.recordOutput("Buttons/Controller1/X", controller.x().getAsBoolean());
