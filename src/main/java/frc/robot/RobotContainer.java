@@ -373,7 +373,7 @@ public class RobotContainer {
                               drive.getChassisSpeeds().vyMetersPerSecond,
                               0),
                           shotParameters.hoodAngle,
-                          shotParameters.turretAngle);
+                          shotParameters.turretAngle.plus(drive.getPose().getRotation()));
                     }));
       }
 
