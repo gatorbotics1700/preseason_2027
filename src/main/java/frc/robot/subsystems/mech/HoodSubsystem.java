@@ -57,37 +57,28 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    hoodMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    setHoodSpeed(desiredAngle);
 
     Logger.recordOutput("hood desired angle", desiredAngle.getDegrees());
-    Logger.recordOutput("hood motor output", hoodMotor.get());
-    Logger.recordOutput("hood current angle", getCurrentAngle().getDegrees());
-    Logger.recordOutput("hood current velocity", hoodMotor.getVelocity().getValueAsDouble());
+    // Logger.recordOutput("hood motor output", hoodMotor.get());
+    // Logger.recordOutput("hood current angle", getCurrentAngle().getDegrees());
+    // Logger.recordOutput("hood current velocity", hoodMotor.getVelocity().getValueAsDouble());
+    io.updateInputs(inputs);
+    //  Logger.processInputs("Hood", inputs);
+    Logger.recordOutput("Hood/Velocity", inputs.velocityRevsPerSec);
+    Logger.recordOutput("Hood/position", inputs.positionRevs);
+    Logger.recordOutput("Hood/DesiredSpeed", desiredSpeed);
   }
 
   public void setDesiredAngle(Rotation2d desiredAngle) {
     this.desiredAngle = desiredAngle;
   }
 
-  public void setHoodSpeed(double speed) {
-    io.setSpeed(speed);
-  }
-
-  public Rotation2d getCurrentAngle() {
-    double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
-    double hoodAngleDegrees =
-        motorPositionRevs / HOOD_GEARBOX_RATIO / HOOD_SHAFT_REVS_PER_MECH_REV * 360 % 360;
-    return new Rotation2d(
-        Math.toRadians(
-            hoodAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
-    // seems nicer :/
+  public void setHoodSpeed(Rotation2d desiredAngle) {
+    io.setSpeed(desiredAngle);
   }
 
   public double degreesToRevs(double hoodAngleDegrees) {
     return hoodAngleDegrees / 360.0 * HOOD_SHAFT_REVS_PER_MECH_REV * HOOD_GEARBOX_RATIO;
-  }
-
-  public void setHoodVoltage(double voltage) {
-    hoodMotor.setVoltage(voltage);
   }
 }
