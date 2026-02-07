@@ -38,8 +38,6 @@ public class ShotCalculator {
             Math.atan2(
                 target.getY() - fieldToShooter.getY(), target.getX() - fieldToShooter.getX()));
 
-    Logger.recordOutput("shotCalculator/uncompYaw", uncompYaw);
-
     Translation2d botVelo =
         new Translation2d(
             drivetrainVelocity.vxMetersPerSecond, drivetrainVelocity.vxMetersPerSecond);
@@ -60,7 +58,7 @@ public class ShotCalculator {
     double radialVelo = trajectoryRelativeShooterVelo.getX();
     Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, shotSpeed));
     Rotation2d compYaw = uncompYaw.plus(turretAdjust);
-    Logger.recordOutput("shotCalculator/turretAdjust", turretAdjust);
+    Logger.recordOutput("shotCalculator/turretAdjust", turretAdjust.getDegrees());
     Rotation2d turretAngle =
         compYaw; // if we don't want shoot on the move then just switch this to uncomp yaw!
 
@@ -79,6 +77,11 @@ public class ShotCalculator {
     Logger.recordOutput("shotCalculator/compRangeAdjust", compRange - uncompRange);
     // Amelia uses ballistics equation here to calculate the angle using compRange and
     // shooterToHubHeight!
+
+    Translation2d compBotToTarget = new Translation2d(compRange, compYaw);
+    Pose2d compFieldToTarget =
+        drivetrainPose.transformBy(new Transform2d(compBotToTarget, new Rotation2d()));
+    Logger.recordOutput("shotCalculator/compFieldToTarget", compFieldToTarget);
 
     Rotation2d hoodAngle =
         new Rotation2d(
