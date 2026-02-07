@@ -351,28 +351,28 @@ public class RobotContainer {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
         controller_two = new CommandSimMacXboxController(3);
+        // putting this here because it should only run when we're in sim!
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      gamePieceSimulation.launchFuelBall(
+                          new Translation3d(
+                              drive.getPose().getX(),
+                              drive.getPose().getY(),
+                              Constants.BOT_TO_SHOOTER
+                                  .getZ()), // TODO make this shooter pose instead of drive pose
+                          10,
+                          new Translation2d(
+                              drive.getChassisSpeeds().vxMetersPerSecond,
+                              drive.getChassisSpeeds().vyMetersPerSecond),
+                          shotParameters.hoodAngle,
+                          shotParameters.turretAngle);
+                    }));
       } else {
         controller_two = new CommandXboxController(3);
       }
-
-      controller_two
-          .a()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    gamePieceSimulation.launchFuelBall(
-                        new Translation3d(
-                            drive.getPose().getX(),
-                            drive.getPose().getY(),
-                            Constants.BOT_TO_SHOOTER
-                                .getZ()), // TODO make this shooter pose instead of drive pose
-                        10,
-                        new Translation2d(
-                            drive.getChassisSpeeds().vxMetersPerSecond,
-                            drive.getChassisSpeeds().vyMetersPerSecond),
-                        shotParameters.hoodAngle,
-                        shotParameters.turretAngle);
-                  }));
 
       // controller_two
       //     .a()
@@ -472,7 +472,10 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
-    gamePieceSimulation.updateBalls();
+    if (Constants.currentMode == Constants.simMode) {
+      gamePieceSimulation.updateBalls();
+    }
+
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
