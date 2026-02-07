@@ -18,6 +18,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -53,6 +54,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
+import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
 import frc.robot.util.ShotCalculator;
@@ -353,6 +355,25 @@ public class RobotContainer {
         controller_two = new CommandXboxController(3);
       }
 
+      controller_two
+          .a()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    gamePieceSimulation.launchFuelBall(
+                        new Translation3d(
+                            drive.getPose().getX(),
+                            drive.getPose().getY(),
+                            Constants.BOT_TO_SHOOTER
+                                .getZ()), // TODO make this shooter pose instead of drive pose
+                        10,
+                        new Translation2d(
+                            drive.getChassisSpeeds().vxMetersPerSecond,
+                            drive.getChassisSpeeds().vyMetersPerSecond),
+                        shotParameters.hoodAngle,
+                        shotParameters.turretAngle);
+                  }));
+
       // controller_two
       //     .a()
       //     .onTrue(
@@ -451,7 +472,7 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
-    // gamePieceSimulation.updateBalls();
+    gamePieceSimulation.updateBalls();
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
