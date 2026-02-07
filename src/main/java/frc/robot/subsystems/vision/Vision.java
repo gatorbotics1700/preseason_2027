@@ -80,7 +80,7 @@ public class Vision extends SubsystemBase {
     Pose3d robotPose3d = new Pose3d(robotPose);
     Pose2d fuelPose = null;
     double maxArea = 0;
-    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+    for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
       if (target != null && target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
@@ -168,18 +168,22 @@ public class Vision extends SubsystemBase {
     return fuelPose;
   }
 
-  private Distance getCameraToTargetDistance(
-      double pitchInRadians, double cameraAngleInRadians, Distance height) {
+  public Distance getCameraToTargetDistance( // TODO: make this private
+      double pitchInRadians, double cameraPitchInRadians, double yawInRadians, Distance height) {
     // TODO: this logic assumes that roll of the camera is 0
     // TODO: photonvision pitch is backwards
     System.out.println(
         "***hi i'm in the method imma print out some information: "
             + pitchInRadians
             + " "
-            + cameraAngleInRadians
+            + cameraPitchInRadians
             + " "
             + height.in(Centimeters));
-    return (height.minus(Centimeters.of(7.5))).div(Math.sin(cameraAngleInRadians + pitchInRadians));
+    Distance verticalOffset=height.minus(Centimeters.of(7.5));
+    Distance horizontalDistanceToOffset=height.div(Math.tan(Math.abs(cameraPitchInRadians + pitchInRadians))).div(Math.cos(yawInRadians));
+    return Math.sqrt(verticalOffset)
+    return (height.minus(Centimeters.of(7.5)))
+        .div(Math.sin(Math.abs(cameraPitchInRadians + pitchInRadians)));
   }
 
   @Override
