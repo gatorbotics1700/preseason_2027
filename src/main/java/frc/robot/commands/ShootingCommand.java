@@ -51,7 +51,7 @@ public class ShootingCommand extends Command {
   public void initialize() {
     // only want to run hopper if we're actively trying to shoot
     if (flywheelSpeed != 0) {
-      hopperFloorSubsystem.setHopperFloorSpeed(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
+      hopperFloorSubsystem.setHopperFloorVelocity(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
     }
   }
 
@@ -64,7 +64,7 @@ public class ShootingCommand extends Command {
     turretSubsystem.setDesiredAngle(params.turretAngle);
 
     // set the flywheel desired speed
-    shooterSubsystem.setFlywheelSpeed(flywheelSpeed);
+    shooterSubsystem.setFlywheelVelocity(flywheelSpeed);
 
     // if we're actually trying to shoot, and the flywheel is up to speed, kick the balls into the
     // shooter!
@@ -74,7 +74,7 @@ public class ShootingCommand extends Command {
     // to be a button
     // TODO: add funnel command (separate command) & instant command to stop running the flywheel
     if (flywheelSpeed != 0
-        && shooterSubsystem.getFlywheelSpeed() == flywheelSpeed) { // TODO add a deadband probably
+        && shooterSubsystem.getFlywheelVelocity() == flywheelSpeed) { // TODO add a deadband probably
       shooterSubsystem.setTransitionSpeed(ShooterSubsystem.TRANSITION_SPEED);
     } else {
       shooterSubsystem.setTransitionSpeed(0);

@@ -27,10 +27,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   public TurretSubsystem() {
     turretMotor = new TalonFX(Constants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-    // TODO check if we really want it inverted because I kinda think we want clockwise to be
-    // negative...
-      turretMotor.setNeutralMode(NeutralModeValue.Brake);
-    // some motion magic stuff
+    turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
@@ -41,12 +38,9 @@ public class TurretSubsystem extends SubsystemBase {
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
-    // Add 0.2128 V output to overcome gravity (tuned in early feedforward
-    // testing)
-    slot0Configs.kG = 0.2128;
+    slot0Configs.kG = 0.2128; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
 
-    // Add 0.01 V output to overcome static friction (just a guesstimate, but this might just be 0
-    slot0Configs.kS = 0.25;
+    slot0Configs.kS = 0.25; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might just be 0
 
     slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
 
