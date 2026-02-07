@@ -16,6 +16,7 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
@@ -75,6 +76,7 @@ public class GamePieceSimulation {
   public void launchFuelBall(
       Translation3d shooterPosition,
       double exitVelocityMps,
+      Translation2d shooterVelocity,
       Rotation2d launchAngle,
       Rotation2d turretAngle) {
 
@@ -88,6 +90,8 @@ public class GamePieceSimulation {
     double vx = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getCos();
     double vy = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getSin();
     double vz = exitVelocityMps * Math.sin(launchAngle.getRadians());
+    vx += shooterVelocity.getX();
+    vy += shooterVelocity.getY();
 
     Translation3d initialVelocity = new Translation3d(vx, vy, vz);
 

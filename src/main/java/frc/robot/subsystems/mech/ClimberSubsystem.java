@@ -69,7 +69,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void periodic() {
     motor.setControl(m_request.withPosition(inchesToRevs(desiredPositionInches)));
-    motor.setNeutralMode(NeutralModeValue.Brake); // do we really need this here?
   }
 
   private void setMotorOutput(double speed) {

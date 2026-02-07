@@ -18,6 +18,9 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -30,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -52,8 +54,11 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
+import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ShotCalculator;
+import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -72,6 +77,8 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem;
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
+  private ShotParameters shotParameters = null;
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -266,19 +273,31 @@ public class RobotContainer {
             .onFalse(DriveCommands.stopDriveCommand(drive));
       }
 
-      // drive over bump
-      controller
-          .a()
-          .onTrue(
-              Commands.runOnce(
-                  () -> {
-                    try {
-                      CommandScheduler.getInstance()
-                          .schedule(DriveOverBumpCommand.driveOverBump(drive));
-                    } catch (Exception e) {
-                      e.printStackTrace();
-                    }
-                  }));
+      // // drive over bump
+      // controller
+      //     .a()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //             () -> {
+      //               try {
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(DriveOverBumpCommand.driveOverBump(drive));
+      //               } catch (Exception e) {
+      //                 e.printStackTrace();
+      //               }
+      //             }));
+      // gamepiece sim
+      // controller
+      //     .a()
+      //     .onTrue(
+      //         new InstantCommand(
+      //             () -> {
+      //               gamePieceSimulation.launchFuelBall(
+      //                   new Translation3d(0, 0, 0),
+      //                   10,
+      //                   shotParameters.hoodAngle,
+      //                   shotParameters.turretAngle);
+      //             }));
 
       // Reset gyro to 0° when B button is pressed
       controller
@@ -332,6 +351,25 @@ public class RobotContainer {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
         controller_two = new CommandSimMacXboxController(3);
+        // putting this here because it should only run when we're in sim!
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      gamePieceSimulation.launchFuelBall(
+                          new Translation3d(
+                              drive.getPose().getX(),
+                              drive.getPose().getY(),
+                              Constants.BOT_TO_SHOOTER
+                                  .getZ()), // TODO make this shooter pose instead of drive pose
+                          10,
+                          new Translation2d(
+                              drive.getChassisSpeeds().vxMetersPerSecond,
+                              drive.getChassisSpeeds().vyMetersPerSecond),
+                          shotParameters.hoodAngle,
+                          shotParameters.turretAngle);
+                    }));
       } else {
         controller_two = new CommandXboxController(3);
       }
@@ -435,7 +473,10 @@ public class RobotContainer {
    * Robot.teleopPeriodic() and Robot.autonomousPeriodic().
    */
   public void periodic() {
-    // gamePieceSimulation.updateBalls();
+    if (Constants.currentMode == Constants.simMode) {
+      gamePieceSimulation.updateBalls();
+    }
+
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
@@ -460,16 +501,8 @@ public class RobotContainer {
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
-    // controller_two
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               gamePieceSimulation.launchFuelBall(
-    //                   new Translation3d(0, 0, 0),
-    //                   10,
-    //                   new Rotation2d(Math.toRadians(45)),
-    //                   new Rotation2d(0));
-    //             }));
+    shotParameters =
+        ShotCalculator.calculateShot(
+            drive.getPose(), new ChassisSpeeds(0, 0, 0), Constants.BLUE_HUB, 10);
   }
 }

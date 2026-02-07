@@ -159,6 +159,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    robotContainer.configureDriverButtonBindings();
+    robotContainer.configureCodriverButtonBindings();
+
     CommandScheduler.getInstance().cancelAll();
     Elastic.selectTab("Teleoperated");
     robotContainer.teleopInit();

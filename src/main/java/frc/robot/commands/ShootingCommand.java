@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,7 +9,6 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
-import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
 
@@ -58,8 +58,8 @@ public class ShootingCommand extends Command {
   @Override
   public void execute() {
     // calculate angles and get the hood and turret to track
-    ShotParameters params =
-        ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+    ShotParameters params = new ShotParameters(new Rotation2d(), new Rotation2d());
+    // ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
     hoodSubsystem.setDesiredAngle(params.hoodAngle);
     turretSubsystem.setDesiredAngle(params.turretAngle);
 
