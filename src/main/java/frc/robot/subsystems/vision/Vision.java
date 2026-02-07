@@ -103,7 +103,8 @@ public class Vision extends SubsystemBase {
               getCameraToTargetDistance(
                   Math.toRadians(-target.getPitch()),
                   cameraPitchRadians,
-                  robotToCamera.getMeasureZ());
+                  Math.toRadians(target.getYaw()),
+                  robotToCamera.getMeasureZ().in(Centimeters));
 
           System.out.println(
               "testing revolutionary math 2 "
@@ -168,22 +169,31 @@ public class Vision extends SubsystemBase {
     return fuelPose;
   }
 
-  public Distance getCameraToTargetDistance( // TODO: make this private
-      double pitchInRadians, double cameraPitchInRadians, double yawInRadians, Distance height) {
+  private Distance getCameraToTargetDistance(
+      double pitchInRadians,
+      double cameraPitchInRadians,
+      double yawInRadians,
+      double heightInCentimeters) {
     // TODO: this logic assumes that roll of the camera is 0
     // TODO: photonvision pitch is backwards
+    double verticalOffset = heightInCentimeters - 7.5;
+    double horizontalDistanceToOffset =
+        Math.abs(
+            heightInCentimeters
+                / Math.tan(cameraPitchInRadians + pitchInRadians)
+                / Math.cos(yawInRadians));
+    double distanceToTarget =
+        Math.sqrt(
+            verticalOffset * verticalOffset
+                + horizontalDistanceToOffset * horizontalDistanceToOffset);
     System.out.println(
         "***hi i'm in the method imma print out some information: "
-            + pitchInRadians
+            + verticalOffset
             + " "
-            + cameraPitchInRadians
+            + horizontalDistanceToOffset
             + " "
-            + height.in(Centimeters));
-    Distance verticalOffset=height.minus(Centimeters.of(7.5));
-    Distance horizontalDistanceToOffset=height.div(Math.tan(Math.abs(cameraPitchInRadians + pitchInRadians))).div(Math.cos(yawInRadians));
-    return Math.sqrt(verticalOffset)
-    return (height.minus(Centimeters.of(7.5)))
-        .div(Math.sin(Math.abs(cameraPitchInRadians + pitchInRadians)));
+            + heightInCentimeters);
+    return Centimeters.of(distanceToTarget);
   }
 
   @Override
