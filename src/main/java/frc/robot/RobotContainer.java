@@ -332,6 +332,13 @@ public class RobotContainer {
     //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
     controller_two.x().onTrue(IntakeCommands.DriveToFuel(drive, vision));
+    controller_two
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.setPose(new Pose2d(3, 4, new Rotation2d()));
+                }));
   }
 
   /**
@@ -385,7 +392,7 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    drive.enableTargetPointFacing();
+    // drive.enableTargetPointFacing();
   }
 
   /**
