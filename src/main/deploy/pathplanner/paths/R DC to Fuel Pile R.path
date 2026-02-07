@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 15.436088,
+        "y": 2.104
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 11.49790697337963,
+        "y": -1.1718518518518506
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.752040581597221,
+        "y": 5.913495153356482
+      },
+      "prevControl": {
+        "x": 8.816470124421295,
+        "y": 1.3123597366898148
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 89.58130933505542
+  },
+  "reversed": false,
+  "folder": "R Depot to Fuel Pile",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 179.17011456194268
+  },
+  "useDefaultConstraints": true
+}

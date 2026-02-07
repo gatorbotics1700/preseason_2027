@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.4191,
+        "y": 0.665861
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2800864438657413,
+        "y": 1.0887590422453706
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.797013671875,
+        "y": 2.1563080150462963
+      },
+      "prevControl": {
+        "x": 7.861115162037038,
+        "y": -0.35296679687499966
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -92.32322133092208
+  },
+  "reversed": false,
+  "folder": "Outpost to Fuel Pile",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -178.97021570671328
+  },
+  "useDefaultConstraints": true
+}
