@@ -33,9 +33,8 @@ public class DynamicAutoBuilder {
   }
 
   private String convertFromLocation(String location) {
-    if (location.startsWith("Fuel Pile ") && location.length() == 12) {
-      return location.substring(0, 11);
-    }
+    // No conversion needed - the chooser already outputs the correct format
+    // (e.g., "Fuel Pile L", "DC", "Outpost")
     return location;
   }
 
@@ -123,30 +122,32 @@ public class DynamicAutoBuilder {
     List<Command> commandSequence = new ArrayList<>();
     String currentLocation = startPos;
 
+    // Only add paths in sequence - if a destination is None, skip it and all subsequent
+    // destinations
     if (dest1 != null && !dest1.equals("None")) {
       Command firstPath = loadPathCommand(alliance, currentLocation, dest1);
       commandSequence.add(firstPath);
       commandSequence.add(getActionForDestination(dest1));
       currentLocation = dest1;
-    }
 
-    if (dest2 != null && !dest2.equals("None")) {
-      Command secondPath = loadPathCommand(alliance, currentLocation, dest2);
-      commandSequence.add(secondPath);
-      commandSequence.add(getActionForDestination(dest2));
-      currentLocation = dest2;
-    }
+      if (dest2 != null && !dest2.equals("None")) {
+        Command secondPath = loadPathCommand(alliance, currentLocation, dest2);
+        commandSequence.add(secondPath);
+        commandSequence.add(getActionForDestination(dest2));
+        currentLocation = dest2;
 
-    if (dest3 != null && !dest3.equals("None")) {
-      Command thirdPath = loadPathCommand(alliance, currentLocation, dest3);
-      commandSequence.add(thirdPath);
-      commandSequence.add(getActionForDestination(dest3));
-      currentLocation = dest3;
+        if (dest3 != null && !dest3.equals("None")) {
+          Command thirdPath = loadPathCommand(alliance, currentLocation, dest3);
+          commandSequence.add(thirdPath);
+          commandSequence.add(getActionForDestination(dest3));
+          currentLocation = dest3;
+        }
+      }
     }
 
     if (climb) {
       try {
-        commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem));
+        commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem, alliance));
       } catch (Exception e) {
         System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
       }

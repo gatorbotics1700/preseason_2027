@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.73032349537037,
+        "y": 2.1671993634259263
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.811418113425928,
+        "y": 5.357577112268521
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 16.121888,
+        "y": 7.403
+      },
+      "prevControl": {
+        "x": 8.889888310185185,
+        "y": 8.373234013310185
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 178.73039532062796
+  },
+  "reversed": false,
+  "folder": "Red Fuel Pile Starts",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -91.66174113987142
+  },
+  "useDefaultConstraints": true
+}

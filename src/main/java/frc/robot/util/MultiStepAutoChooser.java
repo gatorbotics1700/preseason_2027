@@ -72,9 +72,9 @@ public class MultiStepAutoChooser {
     firstDestinationTypeChooser.addDefaultOption("None", "None");
     firstDestinationTypeChooser.addOption("Depot", "Depot");
     firstDestinationTypeChooser.addOption("Outpost", "Outpost");
-    firstDestinationTypeChooser.addOption("Fuel Pile Near", "Fuel Pile Near");
-    firstDestinationTypeChooser.addOption("Fuel Pile Far", "Fuel Pile Far");
-    firstDestinationTypeChooser.addOption("Fuel Pile Middle", "Fuel Pile Middle");
+    firstDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
+    // firstDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
+    // firstDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
 
     // Populate first destination side chooser
     firstDestinationSideChooser.addDefaultOption("None", "None");
@@ -86,9 +86,9 @@ public class MultiStepAutoChooser {
     secondDestinationTypeChooser.addDefaultOption("None", "None");
     secondDestinationTypeChooser.addOption("Depot", "Depot");
     secondDestinationTypeChooser.addOption("Outpost", "Outpost");
-    secondDestinationTypeChooser.addOption("Fuel Pile Near", "Fuel Pile Near");
-    secondDestinationTypeChooser.addOption("Fuel Pile Far", "Fuel Pile Far");
-    secondDestinationTypeChooser.addOption("Fuel Pile Middle", "Fuel Pile Middle");
+    secondDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
+    // secondDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
+    // secondDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
 
     // Populate second destination side chooser
     secondDestinationSideChooser.addDefaultOption("None", "None");
@@ -100,9 +100,9 @@ public class MultiStepAutoChooser {
     thirdDestinationTypeChooser.addDefaultOption("None", "None");
     thirdDestinationTypeChooser.addOption("Depot", "Depot");
     thirdDestinationTypeChooser.addOption("Outpost", "Outpost");
-    thirdDestinationTypeChooser.addOption("Fuel Pile Near", "Fuel Pile Near");
-    thirdDestinationTypeChooser.addOption("Fuel Pile Far", "Fuel Pile Far");
-    thirdDestinationTypeChooser.addOption("Fuel Pile Middle", "Fuel Pile Middle");
+    thirdDestinationTypeChooser.addOption("Fuel Pile", "Fuel Pile");
+    // thirdDestinationTypeChooser.addOption("Fuel Pile Far", "Fuel Pile Far");
+    // thirdDestinationTypeChooser.addOption("Fuel Pile Middle", "Fuel Pile Middle");
 
     // Populate third destination side chooser
     thirdDestinationSideChooser.addDefaultOption("None", "None");
@@ -161,15 +161,15 @@ public class MultiStepAutoChooser {
       }
       // Extract distance: "Fuel Pile Near" -> "N", "Fuel Pile Far" -> "F", "Fuel Pile Middle" ->
       // "M"
-      String distance = "";
-      if (type.contains("Near")) {
-        distance = "N";
-      } else if (type.contains("Far")) {
-        distance = "F";
-      } else if (type.contains("Middle")) {
-        distance = "M";
-      }
-
+      /*String distance = "";
+            if (type.contains("Near")) {
+              distance = "N";
+            } else if (type.contains("Far")) {
+              distance = "F";
+            } else if (type.contains("Middle")) {
+              distance = "M";
+            }
+      */
       // Map side to letter
       String sideLetter = "";
       switch (side) {
@@ -184,8 +184,8 @@ public class MultiStepAutoChooser {
           break;
       }
 
-      if (!distance.isEmpty() && !sideLetter.isEmpty()) {
-        return "Fuel Pile " + sideLetter + distance;
+      if (!sideLetter.isEmpty()) {
+        return "Fuel Pile " + sideLetter;
       }
     }
 
