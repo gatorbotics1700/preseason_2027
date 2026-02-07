@@ -145,7 +145,8 @@ class VisionMathTest {
         invokeGetCameraToTargetDistance(
             Math.toRadians(-TEMPLATE_TARGET_PITCH_DEGREES),
             cameraPitchRad,
-            Centimeters.of(cameraHeightCm));
+            Math.toRadians(TEMPLATE_TARGET_YAW_DEGREES),
+            cameraHeightCm);
     System.out.println("actual distance from camera to target:" + result.in(Centimeters));
     assertEquals(
         TEMPLATE_EXPECTED_DISTANCE_CM,
@@ -219,15 +220,20 @@ class VisionMathTest {
 
   /** Invokes private getCameraToTargetDistance via reflection. */
   private Distance invokeGetCameraToTargetDistance(
-      double pitchInDegrees, double cameraAngleInRadians, Distance height) {
+      double pitchInDegrees,
+      double cameraAngleInRadians,
+      double yawInDegrees,
+      double heightInCentimeters) {
     try {
       Method method =
           Vision.class.getDeclaredMethod(
-              "getCameraToTargetDistance", double.class, double.class, Distance.class);
+              "getCameraToTargetDistance", double.class, double.class, double.class, double.class);
       method.setAccessible(true);
 
       Vision vision = new Vision((pose, timestamp, stdDevs) -> {}, mock(VisionIO.class));
-      return (Distance) method.invoke(vision, pitchInDegrees, cameraAngleInRadians, height);
+      return (Distance)
+          method.invoke(
+              vision, pitchInDegrees, cameraAngleInRadians, yawInDegrees, heightInCentimeters);
     } catch (Exception e) {
       throw new AssertionError("Failed to invoke getCameraToTargetDistance", e);
     }

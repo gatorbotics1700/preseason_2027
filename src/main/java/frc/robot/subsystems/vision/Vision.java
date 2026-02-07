@@ -177,9 +177,12 @@ public class Vision extends SubsystemBase {
     // TODO: this logic assumes that roll of the camera is 0
     // TODO: photonvision pitch is backwards
     double verticalOffset = heightInCentimeters - 7.5;
+    System.out.println(
+        "straight out horizontal: "
+            + verticalOffset / Math.tan(cameraPitchInRadians + pitchInRadians));
     double horizontalDistanceToOffset =
         Math.abs(
-            heightInCentimeters
+            verticalOffset
                 / Math.tan(cameraPitchInRadians + pitchInRadians)
                 / Math.cos(yawInRadians));
     double distanceToTarget =
@@ -192,7 +195,7 @@ public class Vision extends SubsystemBase {
             + " "
             + horizontalDistanceToOffset
             + " "
-            + heightInCentimeters);
+            + distanceToTarget);
     return Centimeters.of(distanceToTarget);
   }
 
