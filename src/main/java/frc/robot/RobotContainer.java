@@ -18,7 +18,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -266,8 +265,8 @@ public class RobotContainer {
             .whileTrue(
                 DriveCommands.joystickDrive(
                     drive,
-                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
-                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
                     () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
             .onFalse(DriveCommands.stopDriveCommand(drive));
       }
@@ -351,6 +350,12 @@ public class RobotContainer {
           && System.getProperty("os.name").contains("Mac")) {
         controller_two = new CommandSimMacXboxController(3);
         // putting this here because it should only run when we're in sim!
+
+      } else {
+        controller_two = new CommandXboxController(3);
+      }
+
+      if (Constants.currentMode == Constants.Mode.SIM) {
         controller_two
             .a()
             .onTrue(
@@ -363,14 +368,13 @@ public class RobotContainer {
                               Constants.BOT_TO_SHOOTER
                                   .getZ()), // TODO make this shooter pose instead of drive pose
                           10,
-                          new Translation2d(
+                          new Translation3d(
                               drive.getChassisSpeeds().vxMetersPerSecond,
-                              drive.getChassisSpeeds().vyMetersPerSecond),
+                              drive.getChassisSpeeds().vyMetersPerSecond,
+                              0),
                           shotParameters.hoodAngle,
                           shotParameters.turretAngle);
                     }));
-      } else {
-        controller_two = new CommandXboxController(3);
       }
 
       controller_two

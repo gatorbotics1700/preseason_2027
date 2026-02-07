@@ -16,7 +16,6 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
@@ -76,7 +75,7 @@ public class GamePieceSimulation {
   public void launchFuelBall(
       Translation3d shooterPosition,
       double exitVelocityMps,
-      Translation2d shooterVelocity,
+      Translation3d shooterVelocity,
       Rotation2d launchAngle,
       Rotation2d turretAngle) {
 
@@ -90,14 +89,16 @@ public class GamePieceSimulation {
     double vx = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getCos();
     double vy = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getSin();
     double vz = exitVelocityMps * Math.sin(launchAngle.getRadians());
-    vx += shooterVelocity.getX();
-    vy += shooterVelocity.getY();
 
-    Translation3d initialVelocity = new Translation3d(vx, vy, vz);
+    Translation3d initialVelocityUncomp = new Translation3d(vx, vy, vz);
+    Translation3d initialVelocity = initialVelocityUncomp.plus(shooterVelocity);
 
     FuelBall ball = new FuelBall(shooterPosition, initialVelocity, Timer.getFPGATimestamp());
     activeBalls.add(ball);
 
+    Logger.recordOutput("GamePiece/initialVelocityUncomp", initialVelocityUncomp);
+    Logger.recordOutput("GamePiece/InitialVelocity", initialVelocity);
+    Logger.recordOutput("GamePiece/ShooterVelocity", shooterVelocity);
     Logger.recordOutput("GamePiece/LaunchedBall", new Pose3d(shooterPosition, new Rotation3d()));
     Logger.recordOutput("GamePiece/LaunchVelocity", initialVelocity.getNorm());
   }

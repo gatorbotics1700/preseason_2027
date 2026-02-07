@@ -33,7 +33,7 @@ public class ShotCalculator {
             fieldToShooter2d.getY(),
             Constants.BOT_TO_SHOOTER
                 .getZ()); // this assumes the bot pose is always 2d and therefore on the floor
-    Rotation2d uncompYaw =
+    Rotation2d uncompYaw = // field relative
         new Rotation2d(
             Math.atan2(
                 target.getY() - fieldToShooter.getY(), target.getX() - fieldToShooter.getX()));
@@ -48,8 +48,8 @@ public class ShotCalculator {
     // rotation
     Translation2d trajectoryRelativeShooterVelo =
         shooterVelo.rotateBy(
-            uncompYaw); // uncomp yaw is the angle from the robot to the hub so long as
-    // turret zero is robot zero
+            uncompYaw.unaryMinus()); // uncomp yaw is the angle from the robot to the hub so long as
+    // turret zero is robot zero and uncomp yaw is field relative
 
     Logger.recordOutput(
         "shotCalculator/trajectoryRelativeShooterVelo", trajectoryRelativeShooterVelo);
@@ -59,8 +59,12 @@ public class ShotCalculator {
     Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, shotSpeed));
     Rotation2d compYaw = uncompYaw.plus(turretAdjust);
     Logger.recordOutput("shotCalculator/turretAdjust", turretAdjust.getDegrees());
-    Rotation2d turretAngle =
-        compYaw; // if we don't want shoot on the move then just switch this to uncomp yaw!
+    Rotation2d turretAngle = // robot relative
+        compYaw.minus(
+            drivetrainPose
+                .getRotation()); // if we don't want shoot on the move then just switch this to
+    // uncomp yaw!
+    Logger.recordOutput("shotCalculator/turretAngle", turretAngle);
 
     Translation2d shooterToTargetFieldRelative =
         new Translation2d(
@@ -78,7 +82,7 @@ public class ShotCalculator {
     // Amelia uses ballistics equation here to calculate the angle using compRange and
     // shooterToHubHeight!
 
-    Translation2d compBotToTarget = new Translation2d(compRange, compYaw);
+    Translation2d compBotToTarget = new Translation2d(compRange, turretAngle);
     Pose2d compFieldToTarget =
         drivetrainPose.transformBy(new Transform2d(compBotToTarget, new Rotation2d()));
     Logger.recordOutput("shotCalculator/compFieldToTarget", compFieldToTarget);
