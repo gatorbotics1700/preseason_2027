@@ -122,9 +122,9 @@ public class ShotCalculator {
       System.out.println("SHOT CALCULATOR COMPLETED LOOP " + loopCount);
       Rotation2d hoodAdjust = hoodAngle.minus(hoodAngleGuess);
       if (error < 0) {
-        hoodAngleGuess = hoodAngleGuess.plus(hoodAdjust);
-      } else {
         hoodAngleGuess = hoodAngleGuess.minus(hoodAdjust);
+      } else {
+        hoodAngleGuess = hoodAngleGuess.plus(hoodAdjust);
       }
       return calculateShot(drivetrainPose, drivetrainVelocity, target, shotSpeed);
     } else {

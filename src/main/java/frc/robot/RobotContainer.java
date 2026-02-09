@@ -13,9 +13,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 // import frc.robot.commands.AutoDriveCommand;
 // import frc.robot.commands.TeleopDriveCommand;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -375,15 +377,78 @@ public class RobotContainer {
                           params.turretAngle,
                           params.hoodAngle);
                     }));
-        // controller_two
-        //   .b()
-        //   .onTrue(
-        //       new InstantCommand(
-        //           () -> {
+        controller_two
+            .b()
+            .onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(11, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+                    .andThen(
+                        Commands.parallel(
+                            AutoBuilder.pathfindToPose(
+                                new Pose2d(5, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                                new PathConstraints(
+                                    1, 12, Math.toRadians(700), Math.toRadians(1000))),
+                            Commands.waitSeconds(0.2)
+                                .andThen(
+                                    Commands.runOnce(
+                                        () -> {
+                                          // Use current pose and chassis speeds at this instant so
+                                          // all
+                                          // values
+                                          // match.
+                                          Pose2d pose = drive.getPose();
 
-        //             ShotCalculator.testTrajectoryPlotting();
-        //           }));
+                                          ChassisSpeeds cs = drive.getChassisSpeeds();
+                                          ShotParameters params =
+                                              ShotCalculator.calculateShot(
+                                                  pose, cs, Constants.BLUE_HUB, 10);
 
+                                          gamePieceSimulation.launchFuelBall(
+                                              ShotCalculator.getFieldToShooter(
+                                                  pose, Constants.BOT_TO_SHOOTER),
+                                              cs,
+                                              pose.getRotation(),
+                                              10,
+                                              params.turretAngle,
+                                              params.hoodAngle);
+                                        })))));
+        controller_two
+            .x()
+            .onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(11, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+                    .andThen(
+                        Commands.parallel(
+                            AutoBuilder.pathfindToPose(
+                                new Pose2d(11, Constants.BLUE_HUB.getY() + 2, new Rotation2d()),
+                                new PathConstraints(
+                                    3, 12, Math.toRadians(700), Math.toRadians(1000))),
+                            Commands.waitSeconds(0.2)
+                                .andThen(
+                                    Commands.runOnce(
+                                        () -> {
+                                          // Use current pose and chassis speeds at this instant so
+                                          // all
+                                          // values
+                                          // match.
+                                          Pose2d pose = drive.getPose();
+
+                                          ChassisSpeeds cs = drive.getChassisSpeeds();
+                                          ShotParameters params =
+                                              ShotCalculator.calculateShot(
+                                                  pose, cs, Constants.BLUE_HUB, 10);
+
+                                          gamePieceSimulation.launchFuelBall(
+                                              ShotCalculator.getFieldToShooter(
+                                                  pose, Constants.BOT_TO_SHOOTER),
+                                              cs,
+                                              pose.getRotation(),
+                                              10,
+                                              params.turretAngle,
+                                              params.hoodAngle);
+                                        })))));
       } // else {
       //   controller_two
       //       .a()
@@ -444,14 +509,16 @@ public class RobotContainer {
       //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
       //             }));
 
-      controller_two
-          .x()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    hoodSubsystem.setDesiredAngle(
-                        new Rotation2d(Math.PI / 2).minus(shotParameters.hoodAngle));
-                  }));
+      // commented this out because it's using a shot parameters thing we were calculating in
+      // periodic and idk if we still want that
+      // controller_two
+      //     .x()
+      //     .onTrue(
+      //         new InstantCommand(
+      //             () -> {
+      //               hoodSubsystem.setDesiredAngle(
+      //                   new Rotation2d(Math.PI / 2).minus(shotParameters.hoodAngle));
+      //             }));
 
       // controller_two
       //     .y()
@@ -556,8 +623,8 @@ public class RobotContainer {
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
-    shotParameters =
-        ShotCalculator.calculateShot(
-            drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
+    // shotParameters =
+    //     ShotCalculator.calculateShot(
+    //         drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 }

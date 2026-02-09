@@ -86,7 +86,8 @@ public class GamePieceSimulation {
       return; // Only simulate in sim mode
     }
 
-    System.out.println("LAUNCHING BALL AT " + shotSpeed + " MPS");
+    System.out.println(
+        "LAUNCHING BALL AT " + shotSpeed + " MPS WITH DRIVETRAIN SPEED " + chassisSpeeds);
     Rotation2d turretAngle = turretAngleRobotRelative.rotateBy(drivetrainHeading.unaryMinus());
 
     // Turret angle is "where we aim" (toward target); on many bots the barrel exits the opposite
