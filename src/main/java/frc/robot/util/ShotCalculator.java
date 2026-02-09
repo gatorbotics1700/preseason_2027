@@ -4,19 +4,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
 
 // this is what we will use in constant tracking command!
 
 @AutoLog
 public class ShotCalculator {
+  public static double MIN_SHOT_SPEED = 2;
+  public static double MAX_SHOT_SPEED = 21;
+  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(20);
+  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(70);
   public static double lastError = 20;
   public static int loopCount = 0;
 
@@ -60,78 +62,100 @@ public class ShotCalculator {
 
     double shooterToHubHeight = target.getZ() - fieldToShooter.getZ();
 
-    // Turret lead: offset needed = tangentialVelo * shotTime, so tan(lead) = tangentialVelo /
-    // (shotSpeed+radialVelo)
-    double effectiveRadialVelo = shotSpeed * hoodAngleGuess.getCos() + radialVelo;
-
-    Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, effectiveRadialVelo));
-    Rotation2d compTurretToTargetAngle =
-        uncompTurretToTargetAngle.plus(turretAdjust); // field relative
-    Rotation2d turretAngle =
-        compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
-
-    double shotTime =
-        uncompRange
-            / (radialVelo
-                + shotSpeed); // this probably needs a lookup table because shotSpeed isn't the same
-    // direction as radial velo
-
-    // Compensated range (for aim point): shotTime * sqrt(tangential^2 + shotSpeed^2)
-    double compRange =
-        shotTime * Math.sqrt(tangentialVelo * tangentialVelo + shotSpeed * shotSpeed);
-
-    Rotation2d hoodAngle = solveBallistics(compRange, shooterToHubHeight, shotSpeed);
-    double error =
-        getTrajectoryError(
-            compTurretToTargetAngle,
-            hoodAngle,
+    ShotParameters params =
+        sweepTrajectories(
+            tangentialVelo,
+            radialVelo,
+            uncompRange,
+            drivetrainPose,
+            uncompTurretToTargetAngle,
+            shooterToHubHeight,
             fieldRelativeShooterVelo,
             fieldToShooter,
-            shotSpeed,
             target);
 
-    Translation2d compBotToTarget = new Translation2d(compRange, turretAngle);
-    Pose2d compFieldToTarget =
-        drivetrainPose.transformBy(new Transform2d(compBotToTarget, new Rotation2d()));
+    // Turret lead: offset needed = tangentialVelo * shotTime, so tan(lead) = tangentialVelo /
+    // (shotSpeed+radialVelo)
 
-    Logger.recordOutput(
-        "shotCalculator/trajectoryRelativeShooterVelo", trajectoryRelativeShooterVelo);
-    Logger.recordOutput("shotCalculator/hoodAngle", hoodAngle.getDegrees());
-    Logger.recordOutput("shotCalculator/turretAngle", turretAngle);
-    Logger.recordOutput("shotCalculator/turretAdjust", turretAdjust.getDegrees());
-    Logger.recordOutput("shotCalculator/compRangeAdjust", compRange - uncompRange);
-    Logger.recordOutput("shotCalculator/compRange", compRange);
-    Logger.recordOutput("shotCalculator/shotTime", shotTime);
-    Logger.recordOutput("shotCalculator/compFieldToTarget", compFieldToTarget);
+    // Translation2d compBotToTarget = new Translation2d(compRange, params.turretAngle);
+    // Pose2d compFieldToTarget =
+    //     drivetrainPose.transformBy(new Transform2d(compBotToTarget, new Rotation2d()));
 
-    if (loopCount > 9) {
-      System.out.println("SHOT NOT POSSIBLE");
-      lastError = 20;
-      loopCount = 0;
-      return new ShotParameters(turretAngle, hoodAngle);
-    }
-    if (Math.abs(error) > 0.02) {
-      if (Math.abs(lastError) < Math.abs(error)) {
-        System.out.println("ERROR GETTING BIGGER ERROR GETTING BIGGER");
-        // lastError = 20;
-        // loopCount = 0;
-        // return new ShotParameters(turretAngle, hoodAngle);
+    // Logger.recordOutput(
+    //     "shotCalculator/trajectoryRelativeShooterVelo", trajectoryRelativeShooterVelo);
+    // Logger.recordOutput("shotCalculator/hoodAngle", hoodAngle.getDegrees());
+    // Logger.recordOutput("shotCalculator/turretAngle", turretAngle);
+    // Logger.recordOutput("shotCalculator/turretAdjust", turretAdjust.getDegrees());
+    // Logger.recordOutput("shotCalculator/compRangeAdjust", compRange - uncompRange);
+    // Logger.recordOutput("shotCalculator/compRange", compRange);
+    // Logger.recordOutput("shotCalculator/shotTime", shotTime);
+    // Logger.recordOutput("shotCalculator/compFieldToTarget", compFieldToTarget);
+
+    return params;
+  }
+
+  public static ShotParameters sweepTrajectories(
+      double tangentialVelo,
+      double radialVelo,
+      double uncompRange,
+      Pose2d drivetrainPose,
+      Rotation2d uncompTurretToTargetAngle,
+      double shooterToHubHeight,
+      Translation2d fieldRelativeShooterVelo,
+      Translation3d fieldToShooter,
+      Translation3d target) {
+    double shotSpeed = MIN_SHOT_SPEED;
+    Rotation2d turretAngle;
+    Rotation2d hoodAngle = MIN_HOOD_ANGLE;
+    double speedRange = MAX_SHOT_SPEED - MIN_SHOT_SPEED;
+    int speedIterations = (int) (speedRange / 0.5);
+    double speedIncrement = speedRange / (double) speedIterations;
+    double hoodAngleRange = MAX_HOOD_ANGLE.getDegrees() - MIN_HOOD_ANGLE.getDegrees();
+    int angleIterations = (int) (hoodAngleRange / 5);
+    Rotation2d angleIncrement =
+        new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
+    double smallestError = 20;
+    Rotation2d bestTurretAngle = null;
+    Rotation2d bestHoodAngle = null;
+    double bestShotSpeed = 0;
+
+    for (int i = 0; i < speedIterations; i++) {
+      shotSpeed += speedIncrement;
+      for (int j = 0; j < angleIterations; j++) {
+        hoodAngle = hoodAngle.plus(angleIncrement);
+        double effectiveRadialVelo = shotSpeed * hoodAngle.getCos() + radialVelo;
+        double shotTime = uncompRange / (effectiveRadialVelo);
+
+        // Compensated range (for aim point): shotTime * sqrt(tangential^2 + shotSpeed^2)
+        double compRange =
+            shotTime
+                * Math.sqrt(
+                    tangentialVelo * tangentialVelo + effectiveRadialVelo * effectiveRadialVelo);
+
+        hoodAngle = solveBallistics(compRange, shooterToHubHeight, shotSpeed);
+
+        Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, effectiveRadialVelo));
+        Rotation2d compTurretToTargetAngle =
+            uncompTurretToTargetAngle.plus(turretAdjust); // field relative
+        turretAngle = compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
+        double error =
+            getTrajectoryError(
+                compTurretToTargetAngle,
+                hoodAngle,
+                fieldRelativeShooterVelo,
+                fieldToShooter,
+                shotSpeed,
+                target);
+        if (error < smallestError) {
+          smallestError = error;
+          bestTurretAngle = turretAngle;
+          bestHoodAngle = hoodAngle;
+          bestShotSpeed = shotSpeed;
+        }
       }
-      lastError = error;
-      loopCount++;
-      System.out.println("SHOT CALCULATOR COMPLETED LOOP " + loopCount);
-      Rotation2d hoodAdjust = hoodAngle.minus(hoodAngleGuess);
-      if (error < 0) {
-        hoodAngleGuess = hoodAngleGuess.minus(hoodAdjust);
-      } else {
-        hoodAngleGuess = hoodAngleGuess.plus(hoodAdjust);
-      }
-      return calculateShot(drivetrainPose, drivetrainVelocity, target, shotSpeed);
-    } else {
-      lastError = 20;
-      loopCount = 0;
-      return new ShotParameters(turretAngle, hoodAngle);
     }
+
+    return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);
   }
 
   /** Field-frame 3D position of the shooter exit given the robot pose. */

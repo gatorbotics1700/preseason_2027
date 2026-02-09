@@ -373,7 +373,7 @@ public class RobotContainer {
                           ShotCalculator.getFieldToShooter(pose, Constants.BOT_TO_SHOOTER),
                           cs,
                           pose.getRotation(),
-                          10,
+                          params.shotSpeed,
                           params.turretAngle,
                           params.hoodAngle);
                     }));
@@ -409,7 +409,7 @@ public class RobotContainer {
                                                   pose, Constants.BOT_TO_SHOOTER),
                                               cs,
                                               pose.getRotation(),
-                                              10,
+                                              params.shotSpeed,
                                               params.turretAngle,
                                               params.hoodAngle);
                                         })))));
