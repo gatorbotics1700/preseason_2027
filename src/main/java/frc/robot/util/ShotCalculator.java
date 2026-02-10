@@ -17,10 +17,25 @@ import org.littletonrobotics.junction.AutoLog;
 public class ShotCalculator {
   public static double MIN_SHOT_SPEED = 2;
   public static double MAX_SHOT_SPEED = 21;
-  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(20);
-  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(70);
+  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(0);
+  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(Math.toRadians(70));
   public static double lastError = 20;
   public static int loopCount = 0;
+
+  public static double shotSpeed = MIN_SHOT_SPEED;
+  public static Rotation2d turretAngle;
+  public static Rotation2d hoodAngle = MIN_HOOD_ANGLE;
+  public static double speedRange = MAX_SHOT_SPEED - MIN_SHOT_SPEED;
+  public static int speedIterations = (int) (speedRange / 0.5);
+  public static double speedIncrement = speedRange / (double) speedIterations;
+  public static double hoodAngleRange = MAX_HOOD_ANGLE.getDegrees() - MIN_HOOD_ANGLE.getDegrees();
+  public static int angleIterations = (int) (hoodAngleRange / 1);
+  public static Rotation2d angleIncrement =
+      new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
+  public static double smallestError = 200;
+  public static Rotation2d bestTurretAngle = null;
+  public static Rotation2d bestHoodAngle = null;
+  public static double bestShotSpeed = 0;
 
   public static Rotation2d hoodAngleGuess = new Rotation2d(Math.toRadians(45));
 
@@ -104,24 +119,12 @@ public class ShotCalculator {
       Translation2d fieldRelativeShooterVelo,
       Translation3d fieldToShooter,
       Translation3d target) {
-    double shotSpeed = MIN_SHOT_SPEED;
-    Rotation2d turretAngle;
-    Rotation2d hoodAngle = MIN_HOOD_ANGLE;
-    double speedRange = MAX_SHOT_SPEED - MIN_SHOT_SPEED;
-    int speedIterations = (int) (speedRange / 0.5);
-    double speedIncrement = speedRange / (double) speedIterations;
-    double hoodAngleRange = MAX_HOOD_ANGLE.getDegrees() - MIN_HOOD_ANGLE.getDegrees();
-    int angleIterations = (int) (hoodAngleRange / 5);
-    Rotation2d angleIncrement =
-        new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
-    double smallestError = 20;
-    Rotation2d bestTurretAngle = null;
-    Rotation2d bestHoodAngle = null;
-    double bestShotSpeed = 0;
 
     for (int i = 0; i < speedIterations; i++) {
       shotSpeed += speedIncrement;
+      hoodAngle = MIN_HOOD_ANGLE;
       for (int j = 0; j < angleIterations; j++) {
+        // System.out.println(angleIncrement.getDegrees());
         hoodAngle = hoodAngle.plus(angleIncrement);
         double effectiveRadialVelo = shotSpeed * hoodAngle.getCos() + radialVelo;
         double shotTime = uncompRange / (effectiveRadialVelo);
@@ -132,12 +135,12 @@ public class ShotCalculator {
                 * Math.sqrt(
                     tangentialVelo * tangentialVelo + effectiveRadialVelo * effectiveRadialVelo);
 
-        hoodAngle = solveBallistics(compRange, shooterToHubHeight, shotSpeed);
+        // hoodAngle = solveBallistics(compRange, shooterToHubHeight, shotSpeed);
 
         Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, effectiveRadialVelo));
         Rotation2d compTurretToTargetAngle =
             uncompTurretToTargetAngle.plus(turretAdjust); // field relative
-        turretAngle = compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
+        turretAngle = compTurretToTargetAngle.plus(drivetrainPose.getRotation()); // robot relative
         double error =
             getTrajectoryError(
                 compTurretToTargetAngle,
@@ -146,11 +149,15 @@ public class ShotCalculator {
                 fieldToShooter,
                 shotSpeed,
                 target);
-        if (error < smallestError) {
+        // System.out.println(shotSpeed + ", " + hoodAngle.getDegrees() + ", " + error);
+        if (Math.abs(error) < Math.abs(smallestError)) {
           smallestError = error;
           bestTurretAngle = turretAngle;
           bestHoodAngle = hoodAngle;
           bestShotSpeed = shotSpeed;
+          System.out.println("NEW SMALLEST ERROR = " + error);
+          // System.out.println("new best shot params: turret = " + bestTurretAngle.getDegrees() + "
+          // hood = " + bestHoodAngle.getDegrees() + " shotspeed = " + bestShotSpeed);
         }
       }
     }
