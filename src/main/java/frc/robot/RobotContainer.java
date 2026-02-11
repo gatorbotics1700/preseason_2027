@@ -40,7 +40,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
-import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -323,11 +322,14 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
-    // Defer so each button press creates a new DriveToFuel with fresh pose from vision
+    // Schedule a new DriveToFuel command on each press (fresh pose from vision each time)
     controller_two
         .a()
         .onTrue(
-            Commands.defer(() -> IntakeCommands.DriveToFuel(drive, vision), Set.of(drive, vision)));
+            new InstantCommand(
+                () ->
+                    CommandScheduler.getInstance()
+                        .schedule(IntakeCommands.DriveToFuel(drive, vision))));
     controller_two
         .x()
         .onTrue(
