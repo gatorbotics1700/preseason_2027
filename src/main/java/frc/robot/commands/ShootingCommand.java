@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,7 +9,6 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
-import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
 
@@ -51,20 +51,20 @@ public class ShootingCommand extends Command {
   public void initialize() {
     // only want to run hopper if we're actively trying to shoot
     if (flywheelSpeed != 0) {
-      hopperFloorSubsystem.setHopperFloorSpeed(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
+      hopperFloorSubsystem.setHopperFloorVelocity(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
     }
   }
 
   @Override
   public void execute() {
     // calculate angles and get the hood and turret to track
-    ShotParameters params =
-        ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+    ShotParameters params = new ShotParameters(new Rotation2d(), new Rotation2d());
+    // ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
     hoodSubsystem.setDesiredAngle(params.hoodAngle);
     turretSubsystem.setDesiredAngle(params.turretAngle);
 
     // set the flywheel desired speed
-    shooterSubsystem.setFlywheelSpeed(flywheelSpeed);
+    shooterSubsystem.setFlywheelVelocity(flywheelSpeed);
 
     // if we're actually trying to shoot, and the flywheel is up to speed, kick the balls into the
     // shooter!
@@ -74,7 +74,8 @@ public class ShootingCommand extends Command {
     // to be a button
     // TODO: add funnel command (separate command) & instant command to stop running the flywheel
     if (flywheelSpeed != 0
-        && shooterSubsystem.getFlywheelSpeed() == flywheelSpeed) { // TODO add a deadband probably
+        && shooterSubsystem.getFlywheelVelocity()
+            == flywheelSpeed) { // TODO add a deadband probably
       shooterSubsystem.setTransitionSpeed(ShooterSubsystem.TRANSITION_SPEED);
     } else {
       shooterSubsystem.setTransitionSpeed(0);

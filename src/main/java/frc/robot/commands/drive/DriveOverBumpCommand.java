@@ -11,6 +11,7 @@ import frc.robot.subsystems.drive.Drive;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
+// TODO: make sure we have field avoidance file
 public class DriveOverBumpCommand {
 
   public static Command driveOverBump(Drive drive) throws IOException, ParseException {

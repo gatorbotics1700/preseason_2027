@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
@@ -68,6 +70,51 @@ public class Vision extends SubsystemBase {
    */
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
+  }
+
+  public Pose2d getFuelPose(Pose3d robotPose) {
+    Pose2d fuelPose = new Pose2d();
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      var result = io[cameraIndex].getCamera().getLatestResult();
+      PhotonTrackedTarget target = result.getBestTarget();
+      double maxArea = 0;
+      if (target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
+        if (target.getArea() > maxArea) {
+          maxArea = target.getArea();
+
+          Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
+          // photonvision gives us pitch in degrees, the rotation3d in robotToCamera gives us pitch
+          // in radians
+          Distance cameraToTargetDistance =
+              getCameraToTargetDistance(
+                  target.getPitch(),
+                  robotToCamera.getRotation().getY(),
+                  robotToCamera.getMeasureZ());
+          fuelPose =
+              robotPose
+                  .transformBy(robotToCamera)
+                  .transformBy(
+                      new Transform3d(
+                          new Translation3d(),
+                          new Rotation3d(0, target.getPitch(), target.getYaw())))
+                  .transformBy(
+                      new Transform3d(
+                          new Translation3d(
+                              cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
+                          new Rotation3d()))
+                  .toPose2d();
+        }
+      }
+    }
+    return fuelPose;
+  }
+
+  private Distance getCameraToTargetDistance(
+      double pitchInDegrees, double cameraAngleInRadians, Distance height) {
+    // TODO: this logic assumes that roll of the camera is 0
+    return height
+        .minus(Centimeters.of(15))
+        .div(Math.cos(Math.abs(cameraAngleInRadians) + Math.toRadians(pitchInDegrees)));
   }
 
   @Override

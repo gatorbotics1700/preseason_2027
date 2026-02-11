@@ -77,19 +77,204 @@
     {
       "name": "Autonomous",
       "grid_layout": {
-        "layouts": [],
-        "containers": [
+        "layouts": [
           {
-            "title": "Auto Choices",
+            "title": "Auto",
             "x": 0.0,
             "y": 0.0,
             "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Alliance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Alliance",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              },
+              {
+                "title": "Start Position",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Start Position",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "First Destination",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "First Destination Type",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/First Destination/First Destination Type",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              },
+              {
+                "title": "First Destination Side",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/First Destination/First Destination Side",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Second Destination",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Second Destination Type",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Second Destination/Second Destination Type",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              },
+              {
+                "title": "Second Destination Side",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Second Destination/Second Destination Side",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Third Destination",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Third Destination Type",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Third Destination/Third Destination Type",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              },
+              {
+                "title": "Third Destination Side",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "ComboBox Chooser",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Third Destination/Third Destination Side",
+                  "period": 0.06,
+                  "sort_options": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Climb?",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
-              "topic": "/SmartDashboard/Auto Choices",
+              "topic": "/SmartDashboard/Auto/Climb?",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "MatchTime",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
             }
           }
         ]

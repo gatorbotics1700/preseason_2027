@@ -18,6 +18,9 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,15 +41,23 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.mech.ClimberSubsystem;
+import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
+import frc.robot.subsystems.mech.MechIOs.HoodIO;
+import frc.robot.subsystems.mech.MechIOs.HoodIOSim;
+import frc.robot.subsystems.mech.MechIOs.HoodIOTalonFX;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.CommandSimMacXboxController;
+import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ShotCalculator;
+import frc.robot.util.ShotParameters;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -57,9 +68,11 @@ public class RobotContainer {
   private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  // private final HoodSubsystem hoodSubsystem;
+  private final HoodSubsystem hoodSubsystem;
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
+  private ShotParameters shotParameters = null;
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -91,6 +104,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
                 new VisionIOPhotonVision(
                     VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
+        hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
         break;
 
       case SIM:
@@ -114,6 +128,7 @@ public class RobotContainer {
                     VisionConstants.CAMERA_1_NAME,
                     VisionConstants.ROBOT_TO_CAMERA_1,
                     drive::getPose));
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
         break;
 
       default: // TODO: should the default be real as a safety for matches? to be discussed
@@ -127,6 +142,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 (pose) -> {});
         vision = new Vision(drive);
+        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
         break;
     }
 
@@ -205,12 +221,23 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
-    // configureButtonBindings();
   }
 
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
   public void configureDriverButtonBindings() {
     if (DriverStation.isJoystickConnected(0)) {
-      controller = new CommandXboxController(0);
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller = new CommandSimMacXboxController(0);
+      } else {
+        controller = new CommandXboxController(0);
+      }
+
       // Default command, normal field-relative drive
       Trigger driverControl =
           new Trigger(
@@ -219,7 +246,8 @@ public class RobotContainer {
                       || Math.abs(controller.getLeftX()) > 0.1
                       || Math.abs(controller.getRightX()) > 0.1);
       var alliance = DriverStation.getAlliance();
-      if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      boolean isRed = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+      if (isRed) {
         driverControl
             .whileTrue(
                 DriveCommands.joystickDrive(
@@ -228,7 +256,7 @@ public class RobotContainer {
                     () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
                     () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
             .onFalse(DriveCommands.stopDriveCommand(drive));
-      } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
+      } else {
         driverControl
             .whileTrue(
                 DriveCommands.joystickDrive(
@@ -297,54 +325,68 @@ public class RobotContainer {
                     drive.setSlowDrive();
                   },
                   drive));
-
-      controller
-          .leftBumper()
-          .onTrue(
-              Commands.runOnce(
-                  () -> {
-                    try {
-                      CommandScheduler.getInstance().schedule(ClimbCommands.DriveToTower(drive));
-                    } catch (Exception e) {
-                      e.printStackTrace();
-                    }
-                  }));
     }
   }
 
   public void configureCodriverButtonBindings() {
     if (DriverStation.isJoystickConnected(3)) {
-      controller_two = new CommandXboxController(3);
-      // controller_two
-      //     .a()
-      //     .onTrue(
-      //         new ShooterCommand(shooterSubsystem, Constants.FLYWHEEL_SHOOTING_VOLTAGE)
-      //             .alongWith(new WaitCommand(3.0))
-      //             .andThen(
-      //                 new HopperFloorCommand(
-      //                     transitionSubsystem, Constants.KICKER_SHOOTING_VOLTAGE, 0)));
-      // controller_two
-      //   .b()
-      //     .onTrue(
-      //         new TransitionCommand(transitionSubsystem, 0, 0)
-      //             .alongWith(new ShooterCommand(shooterSubsystem, 0)));
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller_two = new CommandSimMacXboxController(3);
+        // putting this here because it should only run when we're in sim!
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      gamePieceSimulation.launchFuelBall(
+                          new Translation3d(
+                              drive.getPose().getX(),
+                              drive.getPose().getY(),
+                              Constants.BOT_TO_SHOOTER
+                                  .getZ()), // TODO make this shooter pose instead of drive pose
+                          10,
+                          new Translation2d(
+                              drive.getChassisSpeeds().vxMetersPerSecond,
+                              drive.getChassisSpeeds().vyMetersPerSecond),
+                          shotParameters.hoodAngle,
+                          shotParameters.turretAngle);
+                    }));
+      } else {
+        controller_two = new CommandXboxController(3);
+      }
 
-      // mech buttons
-      // controller_two
-      //     .x()
-      //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-      // controller_two
-      //     .y()
-      //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
+      controller_two
+          .a()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
+                  }));
 
-      // controller_two
-      //     .x()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //                 () -> {
-      //                   vision.takePicture();
-      //                 })
-      //             .ignoringDisable(true));
+      controller_two
+          .b()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(30.0)));
+                  }));
+
+      controller_two
+          .x()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
+                  }));
+
+      controller_two
+          .y()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
+                  }));
     }
   }
 
@@ -398,25 +440,27 @@ public class RobotContainer {
     return value;
   }
 
-  public void teleopInit() {
+  public void configureButtonBindings() {
     configureDriverButtonBindings();
     configureCodriverButtonBindings();
+  }
 
+  public void teleopInit() {
     // drive.enableTargetPointFacing();
+    configureButtonBindings();
   }
 
   public void periodic() {
+    if (Constants.currentMode == Constants.simMode) {
+      gamePieceSimulation.updateBalls();
+    }
+
+    // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
     // Print  path name to console me thinks
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
-    // System.out.println(
-    //     "Selected Auto Path: " + (selectedPathName != null ? selectedPathName : "None"));
-
-    // Logger.recordOutput("Buttons/Controller1/A", controller.a().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller1/B", controller.b().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller1/X", controller.x().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller1/Y", controller.y().getAsBoolean());
+    System.out.flush(); // Ensure output appears immediately
 
     // Logger.recordOutput("Buttons/Controller2/A", controller_two.a().getAsBoolean());
     // Logger.recordOutput("Buttons/Controller2/B", controller_two.b().getAsBoolean());
@@ -434,5 +478,9 @@ public class RobotContainer {
 
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
+
+    shotParameters =
+        ShotCalculator.calculateShot(
+            drive.getPose(), new ChassisSpeeds(0, 0, 0), Constants.BLUE_HUB, 10);
   }
 }

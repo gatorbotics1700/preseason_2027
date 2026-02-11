@@ -60,6 +60,8 @@ public class VisionConstants {
 
   public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera0Transform();
 
+  public static Transform3d[] ROBOT_TO_CAMERA_TRANSFORMS_ARRAY = createCameraTransformsArray();
+
   // Basic filtering thresholds
   public static double MAX_AMBIGUITY = RobotConfigLoader.getDouble("photonvision.max_ambiguity");
   public static double MAX_Z_ERROR = RobotConfigLoader.getDouble("photonvision.max_z_error");
@@ -89,6 +91,8 @@ public class VisionConstants {
   public static double ANGULAR_STD_DEV_MULTITAG_FACTOR =
       RobotConfigLoader.getDouble("photonvision.angular_std_dev_multitag_factor");
 
+  public static int FUEL_CLASS_ID = 0;
+
   public static Transform3d createRobotToCamera0Transform() {
     return new Transform3d(
         ROBOT_TO_CAMERA_0_X_METERS,
@@ -109,6 +113,11 @@ public class VisionConstants {
             Math.toRadians(ROBOT_TO_CAMERA_1_ROLL_DEGREES),
             Math.toRadians(ROBOT_TO_CAMERA_1_PITCH_DEGREES),
             Math.toRadians(ROBOT_TO_CAMERA_1_YAW_DEGREES)));
+  }
+
+  public static Transform3d[] createCameraTransformsArray() {
+    Transform3d[] array = {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
+    return array;
   }
 
   /** Creates array of camera std dev factors from config values. */
