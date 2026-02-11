@@ -11,6 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
+//TODO: add mech commands into auto stuff
 package frc.robot;
 
 // import frc.robot.commands.AutoDriveCommand;
