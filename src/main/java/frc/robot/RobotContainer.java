@@ -13,14 +13,11 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 // import frc.robot.commands.AutoDriveCommand;
 // import frc.robot.commands.TeleopDriveCommand;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,6 +40,7 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -325,27 +323,11 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
+    // Defer so each button press creates a new DriveToFuel with fresh pose from vision
     controller_two
         .a()
         .onTrue(
-            new InstantCommand(
-                () -> {
-                  PathConstraints constraints =
-                      new PathConstraints(
-                          2, 3, Units.degreesToRadians(700), Units.degreesToRadians(1000));
-
-                  Pose2d currentPose = drive.getPose();
-                  Pose2d desiredPose = vision.getFuelPose(currentPose);
-                  Logger.recordOutput("Odometry/Desired Pose in Intake", desiredPose);
-                  Logger.recordOutput("Odometry/Current Pose in Intake", currentPose);
-                  // Pose2d desiredPose = new Pose2d(5, 7, new Rotation2d());
-                  System.out.println("this is the desired pose here u go: " + desiredPose);
-                  // if (desiredPose == null) {
-                  //   return Commands.none();
-                  // }
-
-                  AutoBuilder.pathfindToPose(desiredPose, constraints);
-                }));
+            Commands.defer(() -> IntakeCommands.DriveToFuel(drive, vision), Set.of(drive, vision)));
     controller_two
         .x()
         .onTrue(
