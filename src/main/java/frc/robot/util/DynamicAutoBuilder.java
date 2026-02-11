@@ -144,22 +144,23 @@ public class DynamicAutoBuilder {
 
     // Only add paths in sequence - if a destination is None, skip it and all subsequent
     // destinations
+    // Actions (intake/shooting) run IN PARALLEL with driving using deadlineWith
     if (dest1 != null && !dest1.equals("None")) {
       Command firstPath = loadPathCommand(alliance, currentLocation, dest1);
-      commandSequence.add(firstPath);
-      commandSequence.add(getActionForDestination(dest1));
+      Command firstAction = getActionForDestination(dest1);
+      commandSequence.add(firstPath.deadlineWith(firstAction));
       currentLocation = dest1;
 
       if (dest2 != null && !dest2.equals("None")) {
         Command secondPath = loadPathCommand(alliance, currentLocation, dest2);
-        commandSequence.add(secondPath);
-        commandSequence.add(getActionForDestination(dest2));
+        Command secondAction = getActionForDestination(dest2);
+        commandSequence.add(secondPath.deadlineWith(secondAction));
         currentLocation = dest2;
 
         if (dest3 != null && !dest3.equals("None")) {
           Command thirdPath = loadPathCommand(alliance, currentLocation, dest3);
-          commandSequence.add(thirdPath);
-          commandSequence.add(getActionForDestination(dest3));
+          Command thirdAction = getActionForDestination(dest3);
+          commandSequence.add(thirdPath.deadlineWith(thirdAction));
           currentLocation = dest3;
         }
       }
