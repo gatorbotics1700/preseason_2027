@@ -116,6 +116,12 @@ public class ClimbCommands {
         .andThen(RetractClimber(climberSubsystem));
   }
 
+  // auto version that skips DriveToTower - use when already at tower (e.g. after depot-to-tower
+  // path)
+  public static Command ClimbWithoutDrive(ClimberSubsystem climberSubsystem) {
+    return ExtendClimber(climberSubsystem).andThen(RetractClimber(climberSubsystem));
+  }
+
   private static class DriveToTowerCommand extends Command {
     private final Drive drive;
     private final String

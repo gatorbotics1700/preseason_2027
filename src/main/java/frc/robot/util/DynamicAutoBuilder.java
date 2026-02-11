@@ -166,21 +166,30 @@ public class DynamicAutoBuilder {
     }
 
     if (climb) {
-      try {
-        // If the last destination is a depot, use a specific depot-to-tower path first
-        // because pathfinding from depot to tower doesn't work well in tight spaces
-        if (isDepot(currentLocation)) {
-          Command depotToTower = loadDepotToTowerPath(alliance, currentLocation);
-          if (depotToTower != null) {
-            System.out.println("  Adding depot-to-tower path before climb");
-            commandSequence.add(depotToTower);
-          } else {
-            System.out.println("  WARNING: No depot-to-tower path found for " + currentLocation);
+      // If the last destination is a depot, use a specific depot-to-tower path first
+      // because pathfinding from depot to tower doesn't work well in tight spaces
+      if (isDepot(currentLocation)) {
+        Command depotToTower = loadDepotToTowerPath(alliance, currentLocation);
+        if (depotToTower != null) {
+          System.out.println("  Adding depot-to-tower path before climb");
+          commandSequence.add(depotToTower);
+          // Use ClimbWithoutDrive since we already drove to the tower
+          commandSequence.add(ClimbCommands.ClimbWithoutDrive(climberSubsystem));
+        } else {
+          System.out.println("  WARNING: No depot-to-tower path found for " + currentLocation);
+          // Fall back to normal climb with DriveToTower
+          try {
+            commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem, alliance));
+          } catch (Exception e) {
+            System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
           }
         }
-        commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem, alliance));
-      } catch (Exception e) {
-        System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
+      } else {
+        try {
+          commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem, alliance));
+        } catch (Exception e) {
+          System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
+        }
       }
     }
 
