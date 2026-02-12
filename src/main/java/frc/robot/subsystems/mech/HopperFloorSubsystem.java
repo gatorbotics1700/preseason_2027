@@ -9,7 +9,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
 
 public class HopperFloorSubsystem extends SubsystemBase {
   public static final double HOPPER_FLOOR_SPEED = 0;
@@ -21,7 +20,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
   private static VelocityVoltage m_velocity;
 
   public HopperFloorSubsystem() {
-    hopperMotor = new TalonFX(Constants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    hopperMotor = new TalonFX(Constants.HOPPER_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
 
     // SLOT 0 CONFIGS & VELOCITY VOLTAGE CONTROL
     m_velocity = new VelocityVoltage(0);

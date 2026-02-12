@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.compound.Diff_MotionMagicDutyCycle_Velocity;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,6 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterSubsystem extends SubsystemBase {
   public static final double TRANSITION_SPEED = 0;
   public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+  public static final double FLYWHEEL_GEAR_RATIO = 30 / 14;
   private final TalonFX flywheelMotor;
   private final TalonFX transitionMotor;
   private double desiredFlywheelVelocity; // in revolutions per second
@@ -25,9 +27,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
     flywheelMotor = new TalonFX(Constants.FLYWHEEL_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
-    transitionMotor = new TalonFX(31, ""); // TunerConstants.mechCANBus);
+    transitionMotor =
+        new TalonFX(Constants.TRANSITION_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
 
     setShooterVoltages(0, 0);
+
+    desiredFlywheelVelocity = 0.0;
 
     // SLOT 0 CONFIGS & VELOCITY VOLTAGE CONTROL // TODO needs tuning
     m_flywheelVelocity = new VelocityVoltage(0);
@@ -56,7 +61,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    flywheelMotor.setControl(m_flywheelVelocity.withVelocity(desiredFlywheelVelocity));
+    // flywheelMotor.setControl(m_flywheelVelocity.withVelocity(desiredFlywheelVelocity));
 
     // transitionMotor.setControl(
     //     dutyCycleOut.withOutput(
@@ -85,6 +90,7 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelMotor.setVoltage(flywheelVoltage);
     Logger.recordOutput("flywheelMotor velocity", flywheelMotor.getVelocity().getValueAsDouble());
     transitionMotor.setVoltage(transitionVoltage);
+    flywheelMotor.setControl(new Diff_MotionMagicDutyCycle_Velocity(3000  , null)null))
   }
 
   public void setFlywheelVoltage(double voltage) {

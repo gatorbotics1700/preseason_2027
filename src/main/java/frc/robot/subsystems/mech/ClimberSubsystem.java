@@ -11,7 +11,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -26,7 +25,7 @@ public class ClimberSubsystem extends SubsystemBase {
   private static MotionMagicExpoVoltage m_request;
 
   public ClimberSubsystem() {
-    motor = new TalonFX(Constants.CLIMBER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    motor = new TalonFX(Constants.CLIMBER_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
     motor.setNeutralMode(NeutralModeValue.Brake);
     // motion magic stuff
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!

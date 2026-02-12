@@ -35,9 +35,9 @@ public class IntakeSubsystem extends SubsystemBase {
   private double intakeVoltage;
 
   public IntakeSubsystem() {
-    intakeMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
-    deployMotor =
+    intakeMotor =
         new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
+    deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
     // TODO check if we really want it inverted because I kinda think we want clockwise to be
     // negative...
     // intakeMotor // TODO see if we actually need to invert
