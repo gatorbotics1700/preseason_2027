@@ -76,7 +76,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getFuelPose(Pose2d robotPose) {
     Pose3d robotPose3d = new Pose3d(robotPose);
-    Pose2d fuelPose = null;
+    Pose3d fuelPose = null;
     double maxArea = 0;
     for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
@@ -138,8 +138,7 @@ public class Vision extends SubsystemBase {
                       new Transform3d(
                           new Translation3d(
                               cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
-                          new Rotation3d()))
-                  .toPose2d();
+                          new Rotation3d()));
         }
       }
     }
@@ -149,7 +148,9 @@ public class Vision extends SubsystemBase {
     }
     double deltaX = fuelPose.getX() - robotPose.getX();
     double deltaY = fuelPose.getY() - robotPose.getY();
-    fuelPose =
+    Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
+
+    Pose2d fuelPose2d =
         new Pose2d(
             fuelPose.getMeasureX(),
             fuelPose.getMeasureY(),
@@ -160,7 +161,7 @@ public class Vision extends SubsystemBase {
                             90)))); // TODO: make the 90 a constant based on where the intake is
     // which is 180
     // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
-    return fuelPose;
+    return fuelPose2d;
   }
 
   public Distance getCameraToTargetDistance(

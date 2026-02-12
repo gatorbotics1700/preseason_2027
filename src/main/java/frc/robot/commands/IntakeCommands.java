@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
@@ -49,7 +48,7 @@ public class IntakeCommands {
 
   public static Command DriveToFuel(Drive drive, Vision vision) {
     PathConstraints constraints =
-        new PathConstraints(2, 3, Units.degreesToRadians(700), Units.degreesToRadians(1000));
+        new PathConstraints(1, 2, Units.degreesToRadians(700), Units.degreesToRadians(1000));
 
     Pose2d currentPose = drive.getPose();
     Pose2d desiredPose = vision.getFuelPose(currentPose);
@@ -61,6 +60,7 @@ public class IntakeCommands {
       return Commands.none();
     }
 
-    return AutoBuilder.pathfindToPose(desiredPose, constraints);
+    // return AutoBuilder.pathfindToPose(desiredPose, constraints);
+    return Commands.none();
   }
 }
