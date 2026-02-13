@@ -76,7 +76,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getFuelPose(Pose2d robotPose) {
     Pose3d robotPose3d = new Pose3d(robotPose);
-    Pose3d fuelPose = null;
+    Pose2d fuelPose = null;
     double maxArea = 0;
     for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
@@ -86,59 +86,55 @@ public class Vision extends SubsystemBase {
           maxArea = target.getArea();
 
           Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
+          // Translation3d cameraInFieldSpace =
+          // robotPose3d.transformBy(robotToCamera).getTranslation();
           // System.out.println(
-          //     "robot camera transform: "
-          //         + robotToCamera
+          //     "camera in robotspace: "
+          //         + robotPose3d.transformBy(robotToCamera)
           //         + " "
-          //         + Math.toDegrees(robotToCamera.getRotation().getX())
-          //         + " "
-          //         + robotToCamera.getRotation().getMeasureY());
-          double cameraPitchRadians =
-              VisionConstants.UNANGLED_CAMERA_SPACE_PITCH_ARRAY[cameraIndex];
-          // photonvision gives us pitch in degrees, the rotation3d in robotToCamera gives us pitch
-          // in radians
-          Distance cameraToTargetDistance =
-              getCameraToTargetDistance(
-                  Math.toRadians(-target.getPitch()),
-                  cameraPitchRadians,
-                  Math.toRadians(-target.getYaw()),
-                  robotToCamera.getMeasureZ().in(Centimeters));
-
-          // System.out.println(
-          //     "testing revolutionary math 2 "
-          //         + -target.getPitch()
-          //         + " "
-          //         + cameraPitchRadians
-          //         + " "
-          //         + cameraToTargetDistance);
-          // Pose3d cameraToFuel =
-          //     new Pose3d()
-          //         .transformBy(
-          //             new Transform3d(
-          //                 new Translation3d(),
-          //                 new Rotation3d(0, Math.toRadians(-target.getPitch()),
-          // Math.toRadians(target.getYaw()))))
-          //         .transformBy(
-          //             new Transform3d(
-          //                 new Translation3d(
-          //                     cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
-          //                 new Rotation3d()));
-          // System.out.println(
-          //     "****HELLO printing cameratofuel pose "
-          //         + cameraToTargetDistance
-          //         + " "
-          //         + cameraToFuel);
-          fuelPose =
-              robotPose3d
-                  .transformBy(robotToCamera)
-                  .rotateBy(
-                      new Rotation3d(
-                          0, Math.toRadians(-target.getPitch()), Math.toRadians(-target.getYaw())))
+          //         + robotPose3d
+          //             .transformBy(robotToCamera)
+          //             .rotateBy(
+          //                 new Rotation3d(
+          //                     0,
+          //                     Math.toRadians(-target.getPitch()),
+          //                     Math.toRadians(-target.getYaw())))
+          //             .getTranslation());
+          Pose3d cameraInFieldSpace = robotPose3d.transformBy(robotToCamera);
+          cameraInFieldSpace =
+              new Pose3d(
+                  cameraInFieldSpace.getTranslation(),
+                  cameraInFieldSpace
+                      .getRotation()
+                      .rotateBy(
+                          new Rotation3d(
+                              0,
+                              Math.toRadians(-target.getPitch()),
+                              Math.toRadians(-target.getYaw()))));
+          Translation3d towardFuelInRobotSpace =
+              cameraInFieldSpace
                   .transformBy(
                       new Transform3d(
                           new Translation3d(
-                              cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
-                          new Rotation3d()));
+                              Centimeters.of(200), Centimeters.of(0), Centimeters.of(0)),
+                          new Rotation3d()))
+                  .getTranslation();
+          System.out.println("point 2: " + towardFuelInRobotSpace);
+          double a = towardFuelInRobotSpace.getX() - cameraInFieldSpace.getX();
+          double b = towardFuelInRobotSpace.getY() - cameraInFieldSpace.getY();
+          double c = towardFuelInRobotSpace.getZ() - cameraInFieldSpace.getZ();
+          System.out.println("a,b,c: " + a + " " + b + " " + c);
+          Distance fuelPoseX =
+              (Centimeters.of(7.5).minus(cameraInFieldSpace.getMeasureZ()))
+                  .div(c)
+                  .times(a)
+                  .plus(cameraInFieldSpace.getMeasureX());
+          Distance fuelPoseY =
+              (Centimeters.of(7.5).minus(cameraInFieldSpace.getMeasureZ()))
+                  .div(c)
+                  .times(b)
+                  .plus(cameraInFieldSpace.getMeasureY());
+          fuelPose = new Pose2d(fuelPoseX, fuelPoseY, new Rotation2d());
         }
       }
     }
@@ -148,9 +144,9 @@ public class Vision extends SubsystemBase {
     }
     double deltaX = fuelPose.getX() - robotPose.getX();
     double deltaY = fuelPose.getY() - robotPose.getY();
-    Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
+    // Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
 
-    Pose2d fuelPose2d =
+    fuelPose =
         new Pose2d(
             fuelPose.getMeasureX(),
             fuelPose.getMeasureY(),
@@ -161,8 +157,101 @@ public class Vision extends SubsystemBase {
                             90)))); // TODO: make the 90 a constant based on where the intake is
     // which is 180
     // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
-    return fuelPose2d;
+    return fuelPose;
   }
+
+  // public Pose2d getFuelPose(Pose2d robotPose) {
+  //   Pose3d robotPose3d = new Pose3d(robotPose);
+  //   Pose3d fuelPose = null;
+  //   double maxArea = 0;
+  //   for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
+  //     PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
+  //     PhotonTrackedTarget target = result.getBestTarget();
+  //     if (target != null && target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
+  //       if (target.getArea() > maxArea) {
+  //         maxArea = target.getArea();
+
+  //         Transform3d robotToCamera =
+  // VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
+  //         // System.out.println(
+  //         //     "robot camera transform: "
+  //         //         + robotToCamera
+  //         //         + " "
+  //         //         + Math.toDegrees(robotToCamera.getRotation().getX())
+  //         //         + " "
+  //         //         + robotToCamera.getRotation().getMeasureY());
+  //         double cameraPitchRadians =
+  //             VisionConstants.UNANGLED_CAMERA_SPACE_PITCH_ARRAY[cameraIndex];
+  //         // photonvision gives us pitch in degrees, the rotation3d in robotToCamera gives us
+  // pitch
+  //         // in radians
+  //         Distance cameraToTargetDistance =
+  //             getCameraToTargetDistance(
+  //                 Math.toRadians(-target.getPitch()),
+  //                 cameraPitchRadians,
+  //                 Math.toRadians(-target.getYaw()),
+  //                 robotToCamera.getMeasureZ().in(Centimeters));
+
+  //         // System.out.println(
+  //         //     "testing revolutionary math 2 "
+  //         //         + -target.getPitch()
+  //         //         + " "
+  //         //         + cameraPitchRadians
+  //         //         + " "
+  //         //         + cameraToTargetDistance);
+  //         // Pose3d cameraToFuel =
+  //         //     new Pose3d()
+  //         //         .transformBy(
+  //         //             new Transform3d(
+  //         //                 new Translation3d(),
+  //         //                 new Rotation3d(0, Math.toRadians(-target.getPitch()),
+  //         // Math.toRadians(target.getYaw()))))
+  //         //         .transformBy(
+  //         //             new Transform3d(
+  //         //                 new Translation3d(
+  //         //                     cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
+  //         //                 new Rotation3d()));
+  //         // System.out.println(
+  //         //     "****HELLO printing cameratofuel pose "
+  //         //         + cameraToTargetDistance
+  //         //         + " "
+  //         //         + cameraToFuel);
+  //         fuelPose =
+  //             robotPose3d
+  //                 .transformBy(robotToCamera)
+  //                 .rotateBy(
+  //                     new Rotation3d(
+  //                         0, Math.toRadians(-target.getPitch()),
+  // Math.toRadians(-target.getYaw())))
+  //                 .transformBy(
+  //                     new Transform3d(
+  //                         new Translation3d(
+  //                             cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
+  //                         new Rotation3d()));
+  //       }
+  //     }
+  //   }
+  //   // System.out.println("fuelPose before rotation stuff: " + fuelPose);
+  //   if (fuelPose == null) {
+  //     return null;
+  //   }
+  //   double deltaX = fuelPose.getX() - robotPose.getX();
+  //   double deltaY = fuelPose.getY() - robotPose.getY();
+  //   Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
+
+  //   Pose2d fuelPose2d =
+  //       new Pose2d(
+  //           fuelPose.getMeasureX(),
+  //           fuelPose.getMeasureY(),
+  //           Calculations.angleToPoint(deltaX, deltaY)
+  //               .rotateBy(
+  //                   new Rotation2d(
+  //                       Math.toRadians(
+  //                           90)))); // TODO: make the 90 a constant based on where the intake is
+  //   // which is 180
+  //   // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
+  //   return fuelPose2d;
+  // }
 
   public Distance getCameraToTargetDistance(
       double pitchInRadians,

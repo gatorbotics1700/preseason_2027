@@ -67,13 +67,13 @@ class VisionMathTest {
   /**
    * Optional override for getCameraToTargetDistance: camera height (cm). Set to -1 to use config.
    */
-  private static final double TEMPLATE_CAMERA_HEIGHT_CM_OVERRIDE = -1; // 107.5
+  private static final double TEMPLATE_CAMERA_HEIGHT_CM_OVERRIDE = 107.5; // 107.5
 
   /**
    * Optional override for getCameraToTargetDistance: camera pitch (degrees). Set to -999 to use
    * config.
    */
-  private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = -999; // 15
+  private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = 15; // 15
 
   /** Robot pose (field coordinates) when the measurement was taken. Units: meters, degrees. */
   private static final double TEMPLATE_ROBOT_POSE_X_METERS = 0;
@@ -106,7 +106,7 @@ class VisionMathTest {
   private static final double TEMPLATE_DISTANCE_TOLERANCE_CM = 2.0;
 
   /** Tolerance for pose assertion (m). Increase if your measurements have uncertainty. */
-  private static final double TEMPLATE_POSE_TOLERANCE_METERS = 10;
+  private static final double TEMPLATE_POSE_TOLERANCE_METERS = 0.1;
 
   /** Tolerance for fuel pose rotation assertion (degrees). */
   private static final double TEMPLATE_ANGULAR_TOLERANCE_DEGREES = 5;
