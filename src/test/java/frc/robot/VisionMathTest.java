@@ -76,9 +76,9 @@ class VisionMathTest {
   private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = -999;
 
   /** Robot pose (field coordinates) when the measurement was taken. Units: meters, degrees. */
-  private static final double TEMPLATE_ROBOT_POSE_X_METERS = 0;
+  private static final double TEMPLATE_ROBOT_POSE_X_METERS = 3;
 
-  private static final double TEMPLATE_ROBOT_POSE_Y_METERS = 0;
+  private static final double TEMPLATE_ROBOT_POSE_Y_METERS = 4;
 
   private static final double TEMPLATE_ROBOT_POSE_ROTATION_DEGREES = 0.0;
 

@@ -100,6 +100,7 @@ public class Vision extends SubsystemBase {
           //                     Math.toRadians(-target.getPitch()),
           //                     Math.toRadians(-target.getYaw())))
           //             .getTranslation());
+          System.out.println("robot pose: " + robotPose);
           Pose3d cameraInFieldSpace = robotPose3d.transformBy(robotToCamera);
           System.out.println(
               "robot to camera: "
@@ -120,15 +121,13 @@ public class Vision extends SubsystemBase {
                   + " "
                   + Math.toDegrees(cameraInFieldSpace.getRotation().getZ()));
           cameraInFieldSpace =
-              new Pose3d(
-                  cameraInFieldSpace.getTranslation(),
-                  cameraInFieldSpace
-                      .getRotation()
-                      .rotateBy(
-                          new Rotation3d(
-                              0,
-                              Math.toRadians(-target.getPitch()),
-                              Math.toRadians(-target.getYaw()))));
+              cameraInFieldSpace.transformBy(
+                  new Transform3d(
+                      new Translation3d(),
+                      new Rotation3d(
+                          0,
+                          Math.toRadians(-target.getPitch()),
+                          Math.toRadians(-target.getYaw()))));
           Translation3d towardFuelInRobotSpace =
               cameraInFieldSpace
                   .transformBy(

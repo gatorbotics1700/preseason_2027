@@ -15,10 +15,8 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.util.RobotConfigLoader;
 
 public class VisionConstants {
@@ -124,38 +122,12 @@ public class VisionConstants {
       double rollDegrees,
       double pitchDegrees,
       double yawDegrees) {
-    System.out.println("yaw degrees" + yawDegrees);
-    Pose3d cameraInRobotSpacePose =
-        new Pose3d(xMeters, yMeters, zMeters, new Rotation3d(0, 0, Math.toRadians(yawDegrees)));
-    cameraInRobotSpacePose =
-        cameraInRobotSpacePose.transformBy(
-            new Transform3d(
-                new Translation3d(),
-                new Rotation3d(
-                    Math.toRadians(rollDegrees),
-                    Math.toRadians(pitchDegrees),
-                    Math.toRadians(yawDegrees))));
-    double robotSpaceRoll = cameraInRobotSpacePose.getRotation().getX();
-    double robotSpacePitch = cameraInRobotSpacePose.getRotation().getY();
-    Pose3d testing = new Pose3d(0, 0, 0, new Rotation3d(0, 0, Math.toRadians(-90)));
-    System.out.println(
-        "testing: " + testing.transformBy(new Transform3d(1, 0, 0, new Rotation3d())));
-    System.out.println(
-        "creating camera transform: " + Math.toDegrees(robotSpaceRoll) + " " + pitchDegrees);
-    System.out.println(
-        "creating camera transform: " + Math.toDegrees(robotSpacePitch) + " " + rollDegrees);
-    Pose3d cameraTransform =
-        new Pose3d(
-            xMeters,
-            yMeters,
-            zMeters,
-            new Rotation3d(robotSpaceRoll, robotSpacePitch, Math.toRadians(yawDegrees)));
-    // Logger.recordOutput("Odometry/robot to camera transform" + cameraTransform);
     return new Transform3d(
         xMeters,
         yMeters,
         zMeters,
-        new Rotation3d(robotSpaceRoll, robotSpacePitch, Math.toRadians(yawDegrees)));
+        new Rotation3d(
+            Math.toRadians(rollDegrees), Math.toRadians(pitchDegrees), Math.toRadians(yawDegrees)));
   }
 
   public static Transform3d[] createCameraTransformsArray() {
