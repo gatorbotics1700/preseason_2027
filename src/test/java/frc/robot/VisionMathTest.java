@@ -76,29 +76,29 @@ class VisionMathTest {
   private static final double TEMPLATE_CAMERA_PITCH_DEG_OVERRIDE = -999;
 
   /** Robot pose (field coordinates) when the measurement was taken. Units: meters, degrees. */
-  private static final double TEMPLATE_ROBOT_POSE_X_METERS = 3;
+  private static final double TEMPLATE_ROBOT_POSE_X_METERS = 0;
 
-  private static final double TEMPLATE_ROBOT_POSE_Y_METERS = 4;
+  private static final double TEMPLATE_ROBOT_POSE_Y_METERS = 0;
 
   private static final double TEMPLATE_ROBOT_POSE_ROTATION_DEGREES = 0.0;
 
   /** Target pitch from PhotonVision (degrees). Positive = target above camera center. */
-  private static final double TEMPLATE_TARGET_PITCH_DEGREES = -13.069;
+  private static final double TEMPLATE_TARGET_PITCH_DEGREES = -17.6;
 
   /** Target yaw from PhotonVision (degrees). Positive = target left of camera center. */
-  private static final double TEMPLATE_TARGET_YAW_DEGREES = 19.295;
+  private static final double TEMPLATE_TARGET_YAW_DEGREES = 3.6;
 
   /**
    * Expected camera-to-target distance from getCameraToTargetDistance. Compute from:
    * (camera_height_cm - 15) / cos(|camera_pitch_rad| + toRadians(target_pitch_deg)) Units:
    * centimeters.
    */
-  private static final double TEMPLATE_EXPECTED_DISTANCE_CM = 200;
+  private static final double TEMPLATE_EXPECTED_DISTANCE_CM = 152;
 
   /** Expected fuel pose (field coordinates) from getFuelPose. Units: meters, degrees. */
-  private static final double TEMPLATE_EXPECTED_FUEL_POSE_X_METERS = 3.95;
+  private static final double TEMPLATE_EXPECTED_FUEL_POSE_X_METERS = -0.12;
 
-  private static final double TEMPLATE_EXPECTED_FUEL_POSE_Y_METERS = 3.4;
+  private static final double TEMPLATE_EXPECTED_FUEL_POSE_Y_METERS = -1.81;
 
   private static final double TEMPLATE_EXPECTED_FUEL_POSE_ROTATION_DEGREES = 90;
 

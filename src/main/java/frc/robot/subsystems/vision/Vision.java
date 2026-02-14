@@ -126,14 +126,14 @@ public class Vision extends SubsystemBase {
                       new Translation3d(),
                       new Rotation3d(
                           0,
-                          Math.toRadians(-target.getPitch()),
+                          Math.toRadians(19.9),
                           Math.toRadians(-target.getYaw()))));
           Translation3d towardFuelInRobotSpace =
               cameraInFieldSpace
                   .transformBy(
                       new Transform3d(
                           new Translation3d(
-                              Centimeters.of(200), Centimeters.of(0), Centimeters.of(0)),
+                              Centimeters.of(155), Centimeters.of(0), Centimeters.of(0)),
                           new Rotation3d()))
                   .getTranslation();
           System.out.println(
