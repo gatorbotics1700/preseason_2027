@@ -43,6 +43,7 @@ import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
+import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
@@ -60,10 +61,10 @@ public class RobotContainer {
   // private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   // private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   // private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
-  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   // private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
   // private ShotParameters shotParameters;
-  private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+  // private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
   // Controllers
   private CommandXboxController controller = null; // port 0
@@ -326,6 +327,8 @@ public class RobotContainer {
   public void configureCodriverButtonBindings() {
     controller_two = new CommandXboxController(3);
 
+    // TODO SHOOTER TESTING BUTTONS - uncomment for use
+
     //   controller_two
     //       .a()
     //       .onTrue(
@@ -348,12 +351,34 @@ public class RobotContainer {
     //                         shooterSubsystem.setTransitionVoltage(10);
     //                       })));
 
+
+    // TODO INTAKE TESTING BUTTONS - uncomment for use
+
+    controller_two
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intakeSubsystem.setIntakeVoltage(0);
+                }));
+
+    controller_two
+        .y()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intakeSubsystem.setIntakeVoltage(10);
+                }));
+
+
+    // TODO TURRET TESTING BUTTONS - uncomment for use
+
     // controller_two
     //     .x()
     //     .onTrue(
     //         new InstantCommand(
     //             () -> {
-    //               intakeSubsystem.setIntakeVoltage(0);
+    //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(400)));
     //             }));
 
     // controller_two
@@ -361,7 +386,7 @@ public class RobotContainer {
     //     .onTrue(
     //         new InstantCommand(
     //             () -> {
-    //               intakeSubsystem.setIntakeVoltage(10);
+    //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-300)));
     //             }));
 
     controller_two
@@ -415,20 +440,7 @@ public class RobotContainer {
     //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20)));
     //             }));
 
-    controller_two
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(400)));
-                }));
-    controller_two
-        .y()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-300)));
-                }));
+    // TODO HOOD TESTING BUTTONS - uncomment for use
 
     controller_two
         .a()
@@ -482,6 +494,7 @@ public class RobotContainer {
     //             () -> {
     //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
     //             }));
+
 
     // commented this out because it's using a shot parameters thing we were calculating in
     // periodic and idk if we still want that

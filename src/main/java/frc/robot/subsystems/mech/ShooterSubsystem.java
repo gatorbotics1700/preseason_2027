@@ -19,8 +19,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX transitionMotor;
   private double desiredFlywheelVelocity; // in revolutions per second
   private double desiredTransitionVoltage;
-  private static MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
-
+  private static MotionMagicVelocityVoltage m_request;
   private static TalonFXConfiguration flywheelTalonFXConfigs;
   private static Slot0Configs flywheelSlot0Configs;
 
@@ -34,8 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     desiredFlywheelVelocity = 0.0;
 
-    // SLOT 0 CONFIGS & VELOCITY VOLTAGE CONTROL // TODO needs tuning
-    // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
+    // TALONFX & MOTIONMAGIC CONFIGS // TODO everything needs tuning; might not need all values for flywheel
     flywheelTalonFXConfigs = new TalonFXConfiguration();
 
     flywheelTalonFXConfigs.withMotorOutput(
@@ -44,26 +42,23 @@ public class ShooterSubsystem extends SubsystemBase {
     // TODO: make tuneable constants
     flywheelSlot0Configs = flywheelTalonFXConfigs.Slot0;
 
-    flywheelSlot0Configs.kG =
-        0; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
-    flywheelSlot0Configs.kS =
-        0.25; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
-    // be 0
-    flywheelSlot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
+    flywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
+    flywheelSlot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
     flywheelSlot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    flywheelSlot0Configs.kP = 2; // A position error of 2.5 rotations results in 12V output
+    flywheelSlot0Configs.kP = 0.11; // A position error of 1 rps results in 0.11 V output
     flywheelSlot0Configs.kI = 0; // no output for integrated error
-    flywheelSlot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    flywheelSlot0Configs.kD = 0; // no output for error derivative
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = flywheelTalonFXConfigs.MotionMagic;
 
-    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // unlimited cruise velocity
-    motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
-    motionMagicConfigs.MotionMagicExpo_kA = 0.1; // Use a slower kA of 0.1 V/(rps/s)
+    motionMagicConfigs.MotionMagicAcceleration = 400; // Target acceleration of 400 rps/s (0.25 seconds to max)
+    motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0/1 seconds)
 
     flywheelMotor.getConfigurator().apply(flywheelTalonFXConfigs);
+    
+    m_request = new MotionMagicVelocityVoltage(0);
   }
 
   public void periodic() {

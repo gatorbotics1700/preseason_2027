@@ -23,6 +23,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
 
     // TALONFX CONFIGS & MOTION MAGIC VELOCITY VOLTAGE CONTROL // TODO check if this works with
     // motionMagicVelocityVoltage - may want to delete some values
+    hopperVelocity = 0.0;
     m_velocity = new MotionMagicVelocityVoltage(0);
     talonFXConfigs = new TalonFXConfiguration();
 
@@ -32,28 +33,23 @@ public class HopperFloorSubsystem extends SubsystemBase {
 
     slot0Configs = talonFXConfigs.Slot0;
 
-    slot0Configs.kG =
-        0.2128; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
-    slot0Configs.kS =
-        0.25; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
-    // just be 0
-    slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
+    slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
+    slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
     slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12V output\
+    slot0Configs.kP = 0.11; // A position error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0.1; // no output for error derivative
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 
-    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // unlimited cruise velocity
-    motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
-    motionMagicConfigs.MotionMagicExpo_kA = 0.1; // Use a slower kA of 0.1 V/(rps/s)
+    motionMagicConfigs.MotionMagicAcceleration = 400; // Target acceleration of 400 rps/s (0.25 seconds to max)
+    motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0.1 seconds)
 
-    hopperMotor.getConfigurator().apply(talonFXConfigs, 0.050);
+    hopperMotor.getConfigurator().apply(talonFXConfigs);
 
-    m_velocity.Slot = 0;
+    m_velocity.Slot = 0; // TODO check what this does
   }
 
   public void periodic() {

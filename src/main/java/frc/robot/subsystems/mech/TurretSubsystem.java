@@ -76,14 +76,14 @@ public class TurretSubsystem extends SubsystemBase {
 
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
+        // this whole method is a mess so TODO check if there's a better way to wrap the angle
     if (Math.abs(desiredAngle.getRadians()) >= Math.PI) {
       // desiredAngle =
       //     new Rotation2d(
       //         MathUtil.angleModulus(
       //             desiredAngle
-      //                 .getRadians())); // TODO check this - trying to wrap the angle so it stays
-      // within -180 and 180
-      int one_eighties = (int) (desiredAngle.getRadians() / Math.PI);
+      //                 .getRadians())); // TODO check this - trying to wrap the angle so it stays within -180 and 180
+      int one_eighties = (int) (desiredAngle.getRadians() / Math.PI); // the number of 180 degrees that fit into the angle
       if (one_eighties % 2 == 0) {
         desiredAngle = new Rotation2d(desiredAngle.getRadians() % Math.PI);
       } else {
@@ -105,8 +105,7 @@ public class TurretSubsystem extends SubsystemBase {
         motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360 % 180;
     return new Rotation2d(
         Math.toRadians(
-            turretAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
-    // seems nicer :/
+            turretAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it seems nicer :/
   }
 
   public double degreesToRevs(double turretAngleDegrees) {
