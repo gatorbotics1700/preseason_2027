@@ -86,47 +86,15 @@ public class Vision extends SubsystemBase {
           maxArea = target.getArea();
 
           Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
-          // Translation3d cameraInFieldSpace =
-          // robotPose3d.transformBy(robotToCamera).getTranslation();
-          // System.out.println(
-          //     "camera in robotspace: "
-          //         + robotPose3d.transformBy(robotToCamera)
-          //         + " "
-          //         + robotPose3d
-          //             .transformBy(robotToCamera)
-          //             .rotateBy(
-          //                 new Rotation3d(
-          //                     0,
-          //                     Math.toRadians(-target.getPitch()),
-          //                     Math.toRadians(-target.getYaw())))
-          //             .getTranslation());
-          System.out.println("robot pose: " + robotPose);
           Pose3d cameraInFieldSpace = robotPose3d.transformBy(robotToCamera);
-          System.out.println(
-              "robot to camera: "
-                  + robotToCamera
-                  + " "
-                  + Math.toDegrees(robotToCamera.getRotation().getX())
-                  + " "
-                  + Math.toDegrees(robotToCamera.getRotation().getY())
-                  + " "
-                  + Math.toDegrees(robotToCamera.getRotation().getZ()));
-          System.out.println(
-              "camera in field space: "
-                  + cameraInFieldSpace
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getX())
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getY())
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getZ()));
+          List<TargetCorner> corners = target.getMinAreaRectCorners();
           cameraInFieldSpace =
               cameraInFieldSpace.transformBy(
                   new Transform3d(
                       new Translation3d(),
                       new Rotation3d(
                           0,
-                          Math.toRadians(19.9),
+                          Math.toRadians(-target.getPitch()),
                           Math.toRadians(-target.getYaw()))));
           Translation3d towardFuelInRobotSpace =
               cameraInFieldSpace
