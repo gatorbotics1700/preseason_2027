@@ -25,9 +25,6 @@ public class ShotCalculator {
   public static double lastError = 20;
   public static int loopCount = 0;
 
-  public static double shotSpeed = MIN_SHOT_SPEED;
-  public static Rotation2d turretAngle;
-  public static Rotation2d hoodAngle = MIN_HOOD_ANGLE;
   public static double speedRange = MAX_SHOT_SPEED - MIN_SHOT_SPEED;
   public static int speedIterations = (int) (speedRange / 0.5);
   public static double speedIncrement = speedRange / (double) speedIterations;
@@ -35,10 +32,10 @@ public class ShotCalculator {
   public static int angleIterations = (int) (hoodAngleRange / 1);
   public static Rotation2d angleIncrement =
       new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
-  public static double smallestError = 200;
-  public static Rotation2d bestTurretAngle = new Rotation2d();
-  public static Rotation2d bestHoodAngle = new Rotation2d();
-  public static double bestShotSpeed = 0;
+
+  public static double shotSpeed = MIN_SHOT_SPEED;
+  public static Rotation2d turretAngle;
+  public static Rotation2d hoodAngle = MIN_HOOD_ANGLE;
 
   public static Rotation2d hoodAngleGuess = new Rotation2d(Math.toRadians(45));
 
@@ -120,13 +117,21 @@ public class ShotCalculator {
       Translation3d fieldToShooter,
       Translation3d target) {
 
+    double smallestError = 200;
+    Rotation2d testHoodAngle = MIN_HOOD_ANGLE;
+    double testShotSpeed = MIN_SHOT_SPEED;
+    Rotation2d testTurretAngle = new Rotation2d();
+    Rotation2d bestTurretAngle = new Rotation2d();
+    Rotation2d bestHoodAngle = new Rotation2d();
+    double bestShotSpeed = 0;
+
     for (int i = 0; i < speedIterations; i++) {
-      shotSpeed += speedIncrement;
-      hoodAngle = MIN_HOOD_ANGLE;
+
       for (int j = 0; j < angleIterations; j++) {
-        // System.out.println(angleIncrement.getDegrees());
-        hoodAngle = hoodAngle.plus(angleIncrement);
-        double effectiveRadialVelo = shotSpeed * hoodAngle.getCos() + radialVelo;
+        System.out.println(testHoodAngle.getDegrees() + ", " + testShotSpeed);
+        // System.out.println(angleIncrement + ", " + angleIterations);
+
+        double effectiveRadialVelo = testShotSpeed * testHoodAngle.getCos() + radialVelo;
         double shotTime = uncompRange / (effectiveRadialVelo);
 
         // Compensated range (for aim point): shotTime * sqrt(tangential^2 + shotSpeed^2)
@@ -140,52 +145,61 @@ public class ShotCalculator {
         Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, effectiveRadialVelo));
         Rotation2d compTurretToTargetAngle =
             uncompTurretToTargetAngle.plus(turretAdjust); // field relative
-        turretAngle = compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
+        testTurretAngle =
+            compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
 
         double error =
             getTrajectoryError(
                 compTurretToTargetAngle,
-                hoodAngle,
+                testHoodAngle,
                 fieldRelativeShooterVelo,
                 fieldToShooter,
-                shotSpeed,
+                testShotSpeed,
                 target);
-        System.out.println(
-            "error: "
-                + error
-                + " turret: "
-                + turretAngle.getDegrees()
-                + " hood: "
-                + hoodAngle.getDegrees()
-                + " shotspeed: "
-                + shotSpeed);
-        double apexTime = apexTime(shotSpeed * Math.sin(hoodAngle.getRadians()));
+        // System.out.println(
+        //     "error: "
+        //         + error
+        //         + " turret: "
+        //         + turretAngle.getDegrees()
+        //         + " hood: "
+        //         + hoodAngle.getDegrees()
+        //         + " shotspeed: "
+        //         + shotSpeed);
+        double apexTime = apexTime(testShotSpeed * Math.sin(testHoodAngle.getRadians()));
         double vertexHeight =
             vertexHeight(
-                fieldToShooter.getZ(), shotSpeed * Math.sin(hoodAngle.getRadians()), apexTime);
+                fieldToShooter.getZ(),
+                testShotSpeed * Math.sin(testHoodAngle.getRadians()),
+                apexTime);
 
-        double vertexRange = vertexRange(shotSpeed * Math.sin(hoodAngle.getRadians()), apexTime);
+        double vertexRange =
+            vertexRange(testShotSpeed * Math.sin(testHoodAngle.getRadians()), apexTime);
         if (
         /*vertexHeight >= MIN_SHOT_HEIGHT
         && vertexHeight <= MAX_SHOT_HEIGHT
-        && */ vertexRange < compRange) {
+        && */ vertexRange < compRange && shotSpeed <= MAX_SHOT_SPEED) {
           // System.out.println(error);
           if (Math.abs(error) < Math.abs(smallestError)) {
             smallestError = error;
-            bestTurretAngle = turretAngle;
-            bestHoodAngle = hoodAngle;
-            bestShotSpeed = shotSpeed;
-            System.out.println("NEW SMALLEST ERROR = " + error);
+            bestTurretAngle = testTurretAngle;
+            bestHoodAngle = testHoodAngle;
+            bestShotSpeed = testShotSpeed;
+            // System.out.println(vertexRange + ", " + compRange);
+            // System.out.println("NEW SMALLEST ERROR = " + error);
             // System.out.println("new best shot params: turret = " + bestTurretAngle.getDegrees() +
             // "
             // hood = " + bestHoodAngle.getDegrees() + " shotspeed = " + bestShotSpeed);
           }
         }
         // System.out.println(shotSpeed + ", " + hoodAngle.getDegrees() + ", " + error);
-
+        testHoodAngle = testHoodAngle.plus(angleIncrement);
       }
+      testShotSpeed += speedIncrement;
     }
-    smallestError = 200;
+
+    if (smallestError > 2) {
+      // System.out.println("NO VIABLE SHOT");
+    }
 
     return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);
   }
