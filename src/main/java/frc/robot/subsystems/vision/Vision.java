@@ -87,7 +87,10 @@ public class Vision extends SubsystemBase {
           maxArea = target.getArea();
 
           Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
-          Pose3d cameraInFieldSpace = robotPose3d.transformBy(robotToCamera);
+          Pose3d cameraInFieldSpace =
+              robotPose3d.transformBy(
+                  robotToCamera); // TODO: log robotpose and camera pose in advantagescope and spin,
+          // testing for accuracy
           List<TargetCorner> corners = target.getMinAreaRectCorners();
           double sumX = 0, sumY = 0;
           for (TargetCorner c : corners) {
@@ -96,15 +99,25 @@ public class Vision extends SubsystemBase {
           }
           double targetPixelsX = sumX / 4.0;
           double targetPixelsY = sumY / 4.0;
-          double targetPitchDegrees = (targetPixelsX - 240) * 52.5;
-          double targetYawDegrees = (targetPixelsY - 320) * 70;
+          double targetPitchDegrees = (targetPixelsY - 240) / 480 * 52.5;
+          double targetYawDegrees =
+              (targetPixelsX - 320)
+                  / 640
+                  * 70; // TODO: lens distortion might ruin this, so make table with real life
+          // values for yaw and pitch
+          Logger.recordOutput("Odometry/targetPixelsX", targetPixelsX);
+          Logger.recordOutput("Odometry/targetPixelsY", targetPixelsY);
+
+          Logger.recordOutput("Odometry/vivien's made up fuel pitch", targetPitchDegrees);
+          Logger.recordOutput("Odometry/vivien's made up fuel yaw", targetYawDegrees);
+
           cameraInFieldSpace =
               cameraInFieldSpace.transformBy(
                   new Transform3d(
                       new Translation3d(),
                       new Rotation3d(
                           0,
-                          Math.toRadians(-targetPitchDegrees),
+                          Math.toRadians(targetPitchDegrees),
                           Math.toRadians(-targetYawDegrees))));
           Translation3d towardFuelInRobotSpace =
               cameraInFieldSpace
@@ -114,21 +127,13 @@ public class Vision extends SubsystemBase {
                               Centimeters.of(155), Centimeters.of(0), Centimeters.of(0)),
                           new Rotation3d()))
                   .getTranslation();
-          System.out.println(
-              "camera in field space: "
-                  + cameraInFieldSpace
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getX())
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getY())
-                  + " "
-                  + Math.toDegrees(cameraInFieldSpace.getRotation().getZ()));
-          System.out.println("point 2: " + towardFuelInRobotSpace);
-          double a = towardFuelInRobotSpace.getX() - cameraInFieldSpace.getX();
+          double a =
+              towardFuelInRobotSpace.getX()
+                  - cameraInFieldSpace.getX(); // TODO: change these names a,b,c
           double b = towardFuelInRobotSpace.getY() - cameraInFieldSpace.getY();
           double c = towardFuelInRobotSpace.getZ() - cameraInFieldSpace.getZ();
           System.out.println("a,b,c: " + a + " " + b + " " + c);
-          Distance fuelPoseX =
+          Distance fuelPoseX = // TODO: change 7.5 to constant
               (Centimeters.of(7.5).minus(cameraInFieldSpace.getMeasureZ()))
                   .div(c)
                   .times(a)
