@@ -126,9 +126,10 @@ public class ShotCalculator {
     double bestShotSpeed = 0;
 
     for (int i = 0; i < speedIterations; i++) {
+      testHoodAngle = MIN_HOOD_ANGLE;
 
       for (int j = 0; j < angleIterations; j++) {
-        System.out.println(testHoodAngle.getDegrees() + ", " + testShotSpeed);
+
         // System.out.println(angleIncrement + ", " + angleIterations);
 
         double effectiveRadialVelo = testShotSpeed * testHoodAngle.getCos() + radialVelo;
@@ -191,6 +192,7 @@ public class ShotCalculator {
             // hood = " + bestHoodAngle.getDegrees() + " shotspeed = " + bestShotSpeed);
           }
         }
+        // System.out.println(testHoodAngle.getDegrees() + ", " + angleIncrement.getDegrees());
         // System.out.println(shotSpeed + ", " + hoodAngle.getDegrees() + ", " + error);
         testHoodAngle = testHoodAngle.plus(angleIncrement);
       }
@@ -198,7 +200,7 @@ public class ShotCalculator {
     }
 
     if (smallestError > 2) {
-      // System.out.println("NO VIABLE SHOT");
+      System.out.println("NO VIABLE SHOT");
     }
 
     return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);

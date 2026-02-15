@@ -381,12 +381,12 @@ public class RobotContainer {
             .b()
             .onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(11, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new Pose2d(1, Constants.BLUE_HUB.getY(), new Rotation2d()),
                         new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
                     .andThen(
                         Commands.parallel(
                             AutoBuilder.pathfindToPose(
-                                new Pose2d(5, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                                new Pose2d(3, Constants.BLUE_HUB.getY(), new Rotation2d()),
                                 new PathConstraints(
                                     1, 12, Math.toRadians(700), Math.toRadians(1000))),
                             Commands.waitSeconds(0.2)
@@ -417,12 +417,12 @@ public class RobotContainer {
             .x()
             .onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(11, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new Pose2d(1, Constants.BLUE_HUB.getY(), new Rotation2d()),
                         new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
                     .andThen(
                         Commands.parallel(
                             AutoBuilder.pathfindToPose(
-                                new Pose2d(11, Constants.BLUE_HUB.getY() + 2, new Rotation2d()),
+                                new Pose2d(1, Constants.BLUE_HUB.getY() + 2, new Rotation2d()),
                                 new PathConstraints(
                                     3, 12, Math.toRadians(700), Math.toRadians(1000))),
                             Commands.waitSeconds(0.2)
