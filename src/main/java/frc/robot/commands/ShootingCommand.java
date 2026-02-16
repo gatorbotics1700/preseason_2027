@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
-import frc.robot.subsystems.mech.TurretSubsystem;
+import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
 
@@ -20,7 +20,8 @@ public class ShootingCommand extends Command {
   private double flywheelSpeed;
   private final HopperFloorSubsystem hopperFloorSubsystem;
   private final HoodSubsystem hoodSubsystem;
-  private final TurretSubsystem turretSubsystem;
+
+  // private final TurretSubsystem turretSubsystem;
 
   // Current logic is that if the flywheel speed is 0 then we're just tracking and if the flywheel
   // speed is not zero then we're trying to shoot, but we may decide we want a separate command for
@@ -29,7 +30,7 @@ public class ShootingCommand extends Command {
   public ShootingCommand(
       ShooterSubsystem shooterSubsystem,
       HoodSubsystem hoodSubsystem,
-      TurretSubsystem turretSubsystem,
+      /*  TurretSubsystem turretSubsystem,*/
       HopperFloorSubsystem hopperFloorSubsystem,
       double flywheelSpeed,
       Supplier<Pose2d> drivetrainPose,
@@ -43,8 +44,8 @@ public class ShootingCommand extends Command {
     this.drivetrainVelocity = drivetrainVelocity;
     this.target = target;
     this.hoodSubsystem = hoodSubsystem;
-    this.turretSubsystem = turretSubsystem;
-    addRequirements(shooterSubsystem, hoodSubsystem, turretSubsystem, hopperFloorSubsystem);
+    // this.turretSubsystem = turretSubsystem;
+    addRequirements(shooterSubsystem, hoodSubsystem, /*turretSubsystem,*/ hopperFloorSubsystem);
   }
 
   @Override
@@ -58,10 +59,12 @@ public class ShootingCommand extends Command {
   @Override
   public void execute() {
     // calculate angles and get the hood and turret to track
-    ShotParameters params = new ShotParameters(new Rotation2d(), new Rotation2d());
-    // ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
-    hoodSubsystem.setDesiredAngle(params.hoodAngle);
-    turretSubsystem.setDesiredAngle(params.turretAngle);
+    ShotParameters params =
+        ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+    hoodSubsystem.setDesiredAngle(
+        new Rotation2d(Math.PI / 2)
+            .minus(params.hoodAngle)); // this requires the hood's zero to be parallel to the ground
+    // since angle calculations for the shot are ground-rleative
 
     // set the flywheel desired speed
     shooterSubsystem.setFlywheelVelocity(flywheelSpeed);
@@ -74,8 +77,8 @@ public class ShootingCommand extends Command {
     // to be a button
     // TODO: add funnel command (separate command) & instant command to stop running the flywheel
     if (flywheelSpeed != 0
-        && shooterSubsystem.getFlywheelVelocity()
-            == flywheelSpeed) { // TODO add a deadband probably
+        && Math.abs(shooterSubsystem.getFlywheelVelocity() - flywheelSpeed)
+            < shooterSubsystem.FLYWHEEL_SPEED_DEADBAND) { // TODO add a deadband probably
       shooterSubsystem.setTransitionSpeed(ShooterSubsystem.TRANSITION_SPEED);
     } else {
       shooterSubsystem.setTransitionSpeed(0);

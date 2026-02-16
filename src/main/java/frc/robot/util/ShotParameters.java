@@ -6,9 +6,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class ShotParameters {
   public Rotation2d turretAngle;
   public Rotation2d hoodAngle;
+  public double shotSpeed;
 
-  public ShotParameters(Rotation2d turretAngle, Rotation2d hoodAngle) {
+  public ShotParameters(Rotation2d turretAngle, Rotation2d hoodAngle, double shotSpeed) {
     this.turretAngle = turretAngle;
     this.hoodAngle = hoodAngle;
+    this.shotSpeed = shotSpeed;
   }
 }

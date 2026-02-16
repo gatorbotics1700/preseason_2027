@@ -43,20 +43,20 @@ public class VisionConstants {
   public static Transform3d ROBOT_TO_CAMERA_0 = createRobotToCamera0Transform();
 
   // Camera names, must match names configured on coprocessor
-  public static final String CAMERA_1_NAME = RobotConfigLoader.getString("camera.0.name");
+  public static final String CAMERA_1_NAME = RobotConfigLoader.getString("camera.1.name");
 
   public static final double ROBOT_TO_CAMERA_1_X_METERS =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.x_meters");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.x_meters");
   public static final double ROBOT_TO_CAMERA_1_Y_METERS =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.y_meters");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.y_meters");
   public static final double ROBOT_TO_CAMERA_1_Z_METERS =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.z_meters");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.z_meters");
   public static final double ROBOT_TO_CAMERA_1_ROLL_DEGREES =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.roll_degrees");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.roll_degrees");
   public static final double ROBOT_TO_CAMERA_1_PITCH_DEGREES =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.pitch_degrees");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.pitch_degrees");
   public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
-      RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.yaw_degrees");
+      RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.yaw_degrees");
 
   public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera0Transform();
 

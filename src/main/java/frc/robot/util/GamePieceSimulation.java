@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import java.util.ArrayList;
@@ -69,35 +70,56 @@ public class GamePieceSimulation {
    * Launch a fuel ball from the shooter.
    *
    * @param shooterPosition 3D position of shooter exit on field
-   * @param shooterVelocity Velocity of game piece from shooter (field frame)
+   * @param shooterVelocity Velocity of shooter/robot in field frame (must not be robot-frame
+   *     ChassisSpeeds; convert with heading before passing)
    * @param launchAngle Hood angle (from horizontal)
    * @param turretAngle Turret angle (field-relative)
    */
   public void launchFuelBall(
       Translation3d shooterPosition,
-      double exitVelocityMps,
-      Translation2d shooterVelocity,
-      Rotation2d launchAngle,
-      Rotation2d turretAngle) {
+      ChassisSpeeds chassisSpeeds,
+      Rotation2d drivetrainHeading,
+      double shotSpeed,
+      Rotation2d turretAngleRobotRelative,
+      Rotation2d hoodAngle) {
 
-    if (Constants.currentMode != Constants.Mode.SIM) {
-      return; // Only simulate in sim mode
+    if (Constants.currentMode != Constants.Mode.SIM || shotSpeed == 0) {
+      return; // Only simulate in sim mode and if the shotSpeed is non-zero
     }
 
-    System.out.println("LAUNCHING BALL AT " + exitVelocityMps + " MPS");
+    System.out.println(
+        "LAUNCHING BALL AT " + shotSpeed + " MPS WITH DRIVETRAIN SPEED " + chassisSpeeds);
+    Rotation2d turretAngle = turretAngleRobotRelative.plus(drivetrainHeading);
+
+    Translation2d shooterVelo =
+        ShotCalculator.calculateShooterVelo(chassisSpeeds, drivetrainHeading);
+    // Turret angle is "where we aim" (toward target); on many bots the barrel exits the opposite
+    // side, so launch direction = turretAngle + 180° to match compFieldToTarget.
 
     // Calculate initial velocity vector in field frame
-    double vx = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getCos();
-    double vy = exitVelocityMps * Math.cos(launchAngle.getRadians()) * turretAngle.getSin();
-    double vz = exitVelocityMps * Math.sin(launchAngle.getRadians());
-    vx += shooterVelocity.getX();
-    vy += shooterVelocity.getY();
+    double vx = shotSpeed * Math.cos(hoodAngle.getRadians()) * turretAngle.getCos();
+    double vy = shotSpeed * Math.cos(hoodAngle.getRadians()) * turretAngle.getSin();
+    double vz = shotSpeed * Math.sin(hoodAngle.getRadians());
+
+    vx += shooterVelo.getX();
+    vy += shooterVelo.getY();
+
+    //  Translation3d trajectoryRelativeExitVelo =
+    //     new Translation3d(
+    //         radialVelo + hoodAngle.getCos() * shotSpeed,
+    //         tangentialVelo,
+    //         hoodAngle.getSin() * shotSpeed);
+    Logger.recordOutput("GamePiece/drivetrainHeading", drivetrainHeading);
+    Logger.recordOutput("GamePiece/turretAngle", turretAngle);
 
     Translation3d initialVelocity = new Translation3d(vx, vy, vz);
 
     FuelBall ball = new FuelBall(shooterPosition, initialVelocity, Timer.getFPGATimestamp());
     activeBalls.add(ball);
 
+    // Logger.recordOutput("GamePiece/initialVelocityUncomp", initialVelocityUncomp);
+    Logger.recordOutput("GamePiece/InitialVelocity", initialVelocity);
+    // Logger.recordOutput("GamePiece/ShooterVelocity", shooterVelocity);
     Logger.recordOutput("GamePiece/LaunchedBall", new Pose3d(shooterPosition, new Rotation3d()));
     Logger.recordOutput("GamePiece/LaunchVelocity", initialVelocity.getNorm());
   }
@@ -145,6 +167,7 @@ public class GamePieceSimulation {
   private void updateBallPhysics(FuelBall ball, double dt) {
     // Calculate drag force
     double speed = ball.velocity.getNorm();
+    double landingTime = 0;
 
     // Avoid division by zero
     if (speed < 0.001) {
@@ -174,6 +197,7 @@ public class GamePieceSimulation {
     // Clamp to ground
     if (ball.position.getZ() < 0) {
       ball.position = new Translation3d(ball.position.getX(), ball.position.getY(), 0);
+      Logger.recordOutput("GamePiece/realShotTime", ball.getAge());
       ball.velocity = new Translation3d(0, 0, 0); // Stop on ground
     }
   }

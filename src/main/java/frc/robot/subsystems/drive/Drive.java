@@ -46,7 +46,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -139,8 +138,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private Pose2d targetPose = new Pose2d();
 
   private Supplier<Rotation2d> desiredAngleSupplier = null;
-  private boolean shouldFaceTargetPoint = false;
-  private Translation2d targetPoint = null;
   private boolean slowDrive;
 
   private static final Translation2d RED_TARGET_POINT = new Translation2d(13, 4.026);
@@ -469,57 +466,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return new Rotation2d(Math.atan2(deltaY, deltaX));
   }
 
-  public void enableTargetPointFacing() {
-    Translation2d allianceTargetPoint = getAllianceTargetPoint();
-    if (allianceTargetPoint != null) {
-      this.targetPoint = allianceTargetPoint;
-      this.shouldFaceTargetPoint = true;
-      updateDesiredAngleSupplier();
-    }
-  }
-
-  private Translation2d getAllianceTargetPoint() {
-    if (DriverStation.getAlliance().isPresent()) {
-      return DriverStation.getAlliance().get() == Alliance.Red
-          ? RED_TARGET_POINT
-          : BLUE_TARGET_POINT;
-    }
-    return null;
-  }
-
-  public void disableTargetPointFacing() {
-    desiredAngleSupplier = null;
-  }
-
-  private void updateDesiredAngleSupplier() {
-    if (targetPoint == null || !shouldFaceTargetPoint) {
-      desiredAngleSupplier = null;
-      return;
-    }
+  public void setDesiredAngleSupplier(Rotation2d desiredAngle) {
 
     desiredAngleSupplier =
         () -> {
-          if (targetPoint == null || !shouldFaceTargetPoint) {
-            return null;
-          }
-          Pose2d currentPose = getPose();
-          double deltaX = targetPoint.getX() - currentPose.getX();
-          double deltaY = targetPoint.getY() - currentPose.getY();
-          return angleToPoint(deltaX, deltaY);
+          return desiredAngle;
         };
-  }
-
-  public void clearTargetPoint() {
-    targetPoint = null;
-    shouldFaceTargetPoint = false;
-    desiredAngleSupplier = null;
-  }
-
-  public Translation2d getTargetPoint() {
-    return targetPoint;
-  }
-
-  public boolean isShouldFaceTargetPoint() {
-    return shouldFaceTargetPoint;
   }
 }

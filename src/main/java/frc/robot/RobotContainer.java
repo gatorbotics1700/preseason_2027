@@ -14,19 +14,20 @@
 //TODO: add mech commands into auto stuff
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 // import frc.robot.commands.AutoDriveCommand;
 // import frc.robot.commands.TeleopDriveCommand;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ClimbCommands;
@@ -45,14 +46,7 @@ import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
-import frc.robot.subsystems.mech.MechIOs.HoodIO;
-import frc.robot.subsystems.mech.MechIOs.HoodIOSim;
-import frc.robot.subsystems.mech.MechIOs.HoodIOTalonFX;
 import frc.robot.subsystems.mech.ShooterSubsystem;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
@@ -66,14 +60,14 @@ import org.littletonrobotics.junction.Logger;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Vision vision;
+  // private final Vision vision;
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  private final HoodSubsystem hoodSubsystem;
+  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
-  private ShotParameters shotParameters = null;
+  private ShotParameters shotParameters;
   // private final TurretSubsystem turretSubsystem;
 
   // Controllers
@@ -82,6 +76,8 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final MultiStepAutoChooser multiStepAutoChooser;
+  private Supplier<Pose2d> robotPose;
+  private Supplier<ChassisSpeeds> chassisSpeeds;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -98,14 +94,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight),
                 (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
-                new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
-        hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
+        // vision =
+        //     new Vision(
+        //         drive,
+        //         new VisionIOPhotonVision(
+        //             VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
+        //         new VisionIOPhotonVision(
+        //             VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
         break;
 
       case SIM:
@@ -118,18 +113,18 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight),
                 (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CAMERA_0_NAME,
-                    VisionConstants.ROBOT_TO_CAMERA_0,
-                    drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CAMERA_1_NAME,
-                    VisionConstants.ROBOT_TO_CAMERA_1,
-                    drive::getPose));
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        // vision =
+        //     new Vision(
+        //         drive,
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.CAMERA_0_NAME,
+        //             VisionConstants.ROBOT_TO_CAMERA_0,
+        //             drive::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.CAMERA_1_NAME,
+        //             VisionConstants.ROBOT_TO_CAMERA_1,
+        //             drive::getPose));
+        DriverStation.silenceJoystickConnectionWarning(true);
         break;
 
       default: // TODO: should the default be real as a safety for matches? to be discussed
@@ -142,14 +137,18 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 (pose) -> {});
-        vision = new Vision(drive);
-        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
+        // vision = new Vision(drive);
+
         break;
     }
 
-    Supplier<Pose2d> robotPose =
+    robotPose =
         () -> {
           return drive.getPose();
+        };
+    chassisSpeeds =
+        () -> {
+          return drive.getChassisSpeeds();
         };
     // turretSubsystem = new TurretSubsystem(robotPose);
 
@@ -251,7 +250,7 @@ public class RobotContainer {
       if (isRed) {
         driverControl
             .whileTrue(
-                DriveCommands.joystickDrive(
+                DriveCommands.joystickDriveWithAutoRotation(
                     drive,
                     () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
                     () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
@@ -260,10 +259,10 @@ public class RobotContainer {
       } else {
         driverControl
             .whileTrue(
-                DriveCommands.joystickDrive(
+                DriveCommands.joystickDriveWithAutoRotation(
                     drive,
-                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
-                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
                     () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
             .onFalse(DriveCommands.stopDriveCommand(drive));
       }
@@ -335,27 +334,117 @@ public class RobotContainer {
           && System.getProperty("os.name").contains("Mac")) {
         controller_two = new CommandSimMacXboxController(3);
         // putting this here because it should only run when we're in sim!
+
+      } else {
+        controller_two = new CommandXboxController(3);
+      }
+
+      if (Constants.currentMode == Constants.Mode.SIM) {
         controller_two
             .a()
             .onTrue(
                 new InstantCommand(
                     () -> {
+                      // Use current pose and chassis speeds at this instant so all values match.
+                      Pose2d pose = drive.getPose();
+
+                      ChassisSpeeds cs = drive.getChassisSpeeds();
+                      ShotParameters params =
+                          ShotCalculator.calculateShot(pose, cs, Constants.BLUE_HUB);
+
                       gamePieceSimulation.launchFuelBall(
-                          new Translation3d(
-                              drive.getPose().getX(),
-                              drive.getPose().getY(),
-                              Constants.BOT_TO_SHOOTER
-                                  .getZ()), // TODO make this shooter pose instead of drive pose
-                          10,
-                          new Translation2d(
-                              drive.getChassisSpeeds().vxMetersPerSecond,
-                              drive.getChassisSpeeds().vyMetersPerSecond),
-                          shotParameters.hoodAngle,
-                          shotParameters.turretAngle);
+                          ShotCalculator.getFieldToShooter(pose, Constants.BOT_TO_SHOOTER),
+                          cs,
+                          drive.getRotation(),
+                          params.shotSpeed,
+                          params.turretAngle,
+                          params.hoodAngle);
                     }));
-      } else {
-        controller_two = new CommandXboxController(3);
-      }
+        controller_two
+            .b()
+            .onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(1, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+                    .andThen(
+                        Commands.parallel(
+                            AutoBuilder.pathfindToPose(
+                                new Pose2d(3, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                                new PathConstraints(
+                                    1, 12, Math.toRadians(700), Math.toRadians(1000))),
+                            Commands.waitSeconds(0.2)
+                                .andThen(
+                                    Commands.runOnce(
+                                        () -> {
+                                          // Use current pose and chassis speeds at this instant so
+                                          // all
+                                          // values
+                                          // match.
+                                          Pose2d pose = drive.getPose();
+
+                                          ChassisSpeeds cs = drive.getChassisSpeeds();
+                                          ShotParameters params =
+                                              ShotCalculator.calculateShot(
+                                                  pose, cs, Constants.BLUE_HUB);
+
+                                          gamePieceSimulation.launchFuelBall(
+                                              ShotCalculator.getFieldToShooter(
+                                                  pose, Constants.BOT_TO_SHOOTER),
+                                              cs,
+                                              pose.getRotation(),
+                                              params.shotSpeed,
+                                              params.turretAngle,
+                                              params.hoodAngle);
+                                        })))));
+        controller_two
+            .x()
+            .onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(1, Constants.BLUE_HUB.getY() + 1, new Rotation2d()),
+                        new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+                    .andThen(
+                        Commands.parallel(
+                            AutoBuilder.pathfindToPose(
+                                new Pose2d(1, Constants.BLUE_HUB.getY() + 2, new Rotation2d()),
+                                new PathConstraints(
+                                    3, 12, Math.toRadians(700), Math.toRadians(1000))),
+                            Commands.waitSeconds(0.2)
+                                .andThen(
+                                    Commands.runOnce(
+                                        () -> {
+                                          // Use current pose and chassis speeds at this instant so
+                                          // all
+                                          // values
+                                          // match.
+                                          Pose2d pose = drive.getPose();
+
+                                          ChassisSpeeds cs = drive.getChassisSpeeds();
+                                          ShotParameters params =
+                                              ShotCalculator.calculateShot(
+                                                  pose, cs, Constants.BLUE_HUB);
+
+                                          gamePieceSimulation.launchFuelBall(
+                                              ShotCalculator.getFieldToShooter(
+                                                  pose, Constants.BOT_TO_SHOOTER),
+                                              cs,
+                                              pose.getRotation(),
+                                              params.shotSpeed,
+                                              params.turretAngle,
+                                              params.hoodAngle);
+                                        })))));
+      } // else {
+      //   controller_two
+      //       .a()
+      //       .onTrue(
+      //           new ShootingCommand(
+      //               shooterSubsystem,
+      //               hoodSubsystem,
+      //               transitionSubsystem,
+      //               0,
+      //               robotPose,
+      //               chassisSpeeds,
+      //               Constants.BLUE_HUB));
+      // }
 
       controller_two
           .a()
@@ -484,8 +573,8 @@ public class RobotContainer {
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
-    shotParameters =
-        ShotCalculator.calculateShot(
-            drive.getPose(), new ChassisSpeeds(0, 0, 0), Constants.BLUE_HUB, 10);
+    // shotParameters =
+    //     ShotCalculator.calculateShot(
+    //         drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 }

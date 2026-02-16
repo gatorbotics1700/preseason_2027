@@ -88,6 +88,7 @@ public final class Constants {
   public static final int CLIMBER_MOTOR_CAN_ID = 36;
 
   public static final int KRAKEN_TICKS_PER_REV = 2048;
+  public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
   public static final double TURRET_DEADBAND = 0.75;
 
@@ -97,10 +98,15 @@ public final class Constants {
   public static final int MID_RUNG_ARM_LENGTH = 18;
   public static final int HIGH_RUNG_ARM_LENGTH = 18;
   public static final double HOPPER_FLOOR_SPEED = 9; // TODO find a real number
-  public static final Pose3d BOT_TO_SHOOTER = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
+  public static final Translation3d BOT_TO_SHOOTER =
+      new Translation3d(
+          0.146, 0,
+          0.368); // TODO figure out what part of the shooter to measure from (this is the center of
+  // the turret plate)
   public static final Translation3d BLUE_HUB =
       new Translation3d(
           4.625594, 4.034663,
-          1.60); // TODO: the z value is currently an estimate of the height we want the ball in the
+          1.80); // z value is 2 centimeters below the very top of the hub (to make sure we aren't
+  // trying to phase through walls)
   // hub
 }
