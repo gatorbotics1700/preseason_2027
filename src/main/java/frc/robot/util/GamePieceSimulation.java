@@ -16,6 +16,7 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
@@ -90,6 +91,8 @@ public class GamePieceSimulation {
         "LAUNCHING BALL AT " + shotSpeed + " MPS WITH DRIVETRAIN SPEED " + chassisSpeeds);
     Rotation2d turretAngle = turretAngleRobotRelative.plus(drivetrainHeading);
 
+    Translation2d shooterVelo =
+        ShotCalculator.calculateShooterVelo(chassisSpeeds, drivetrainHeading);
     // Turret angle is "where we aim" (toward target); on many bots the barrel exits the opposite
     // side, so launch direction = turretAngle + 180° to match compFieldToTarget.
 
@@ -98,8 +101,8 @@ public class GamePieceSimulation {
     double vy = shotSpeed * Math.cos(hoodAngle.getRadians()) * turretAngle.getSin();
     double vz = shotSpeed * Math.sin(hoodAngle.getRadians());
 
-    vx += chassisSpeeds.vxMetersPerSecond;
-    vy += chassisSpeeds.vyMetersPerSecond;
+    vx += shooterVelo.getX();
+    vy += shooterVelo.getY();
 
     //  Translation3d trajectoryRelativeExitVelo =
     //     new Translation3d(

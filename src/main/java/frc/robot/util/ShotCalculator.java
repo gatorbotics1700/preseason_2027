@@ -44,18 +44,19 @@ public class ShotCalculator {
   public ShotCalculator() {}
 
   public static ShotParameters calculateShot(
-      Pose2d drivetrainPose, ChassisSpeeds drivetrainVelocity, Translation3d target) {
+      Pose2d drivetrainPose, ChassisSpeeds chassisSpeeds, Translation3d target) {
     // calculate field relative shooter pose
     Translation3d fieldToShooter = getFieldToShooter(drivetrainPose, Constants.BOT_TO_SHOOTER);
 
     Rotation2d uncompTurretToTargetAngle = getFieldRelativeYaw(fieldToShooter, target);
 
-    Translation2d drivetrainVelo = // robot relative
-        new Translation2d(
-            drivetrainVelocity.vxMetersPerSecond, drivetrainVelocity.vyMetersPerSecond);
-
     Translation2d shooterVelo =
-        drivetrainVelo; // TODO add math later because shooter velo isn't the same as robot velo
+        calculateShooterVelo(
+            chassisSpeeds,
+            drivetrainPose
+                .getRotation()); // TODO check math! kind of hard to check in sim because to
+    // simulate this I do the exact same math on the simulator so it's
+    // self affirming :/
 
     Translation2d fieldRelativeShooterVelo =
         rotateFrameOfReference(shooterVelo, drivetrainPose.getRotation().unaryMinus());
@@ -255,5 +256,19 @@ public class ShotCalculator {
     //   return Math.max(t1, t2); // returns the larger root, which is the one on the way down
     // }
     // return t1 > 0 ? t1 : t2;
+  }
+
+  public static Translation2d calculateShooterVelo(
+      ChassisSpeeds chassisSpeeds, Rotation2d drivetrainHeading) {
+    double botToShooterRadius =
+        Constants.BOT_TO_SHOOTER
+            .getX(); // NOTE: this only works because the shooter is centered in the y, otherwise we
+    // would need to use pythag
+    double omegaAdjust = chassisSpeeds.omegaRadiansPerSecond * botToShooterRadius;
+    double vxAdjust = omegaAdjust * Math.cos(drivetrainHeading.getRadians());
+    double vyAdjust = omegaAdjust * Math.sin(drivetrainHeading.getRadians());
+    double vx = chassisSpeeds.vxMetersPerSecond + vxAdjust;
+    double vy = chassisSpeeds.vyMetersPerSecond + vyAdjust;
+    return new Translation2d(vx, vy);
   }
 }
