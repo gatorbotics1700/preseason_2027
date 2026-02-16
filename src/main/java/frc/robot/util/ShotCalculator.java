@@ -21,8 +21,10 @@ public class ShotCalculator {
   public static double MAX_SHOT_HEIGHT = 10;
   public static double MIN_SHOT_SPEED = 0;
   public static double MAX_SHOT_SPEED = 25;
-  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(Math.toRadians(45)); //TODO get real number from build
-  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(Math.toRadians(90)); //TODO get real number from build
+  public static Rotation2d MIN_HOOD_ANGLE =
+      new Rotation2d(Math.toRadians(45)); // TODO get real number from build
+  public static Rotation2d MAX_HOOD_ANGLE =
+      new Rotation2d(Math.toRadians(90)); // TODO get real number from build
   public static double lastError = 20;
   public static int loopCount = 0;
 
