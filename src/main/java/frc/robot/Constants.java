@@ -86,7 +86,7 @@ public final class Constants {
   public static final double HOPPER_FLOOR_SPEED = 9; // TODO find a real number
   public static final Translation3d BOT_TO_SHOOTER =
       new Translation3d(
-          0, 0.146,
+          0.146, 0,
           0.368); // TODO figure out what part of the shooter to measure from (this is the center of
   // the turret plate)
   public static final Translation3d BLUE_HUB =

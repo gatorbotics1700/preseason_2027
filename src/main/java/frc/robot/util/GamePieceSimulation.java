@@ -83,8 +83,8 @@ public class GamePieceSimulation {
       Rotation2d turretAngleRobotRelative,
       Rotation2d hoodAngle) {
 
-    if (Constants.currentMode != Constants.Mode.SIM) {
-      return; // Only simulate in sim mode
+    if (Constants.currentMode != Constants.Mode.SIM || shotSpeed == 0) {
+      return; // Only simulate in sim mode and if the shotSpeed is non-zero
     }
 
     System.out.println(

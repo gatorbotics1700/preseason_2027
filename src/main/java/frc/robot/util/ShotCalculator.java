@@ -21,8 +21,8 @@ public class ShotCalculator {
   public static double MAX_SHOT_HEIGHT = 10;
   public static double MIN_SHOT_SPEED = 0;
   public static double MAX_SHOT_SPEED = 25;
-  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(Math.toRadians(45));
-  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(Math.toRadians(90));
+  public static Rotation2d MIN_HOOD_ANGLE = new Rotation2d(Math.toRadians(45)); //TODO get real number from build
+  public static Rotation2d MAX_HOOD_ANGLE = new Rotation2d(Math.toRadians(90)); //TODO get real number from build
   public static double lastError = 20;
   public static int loopCount = 0;
 
@@ -33,10 +33,6 @@ public class ShotCalculator {
   public static int angleIterations = (int) (hoodAngleRange / 1);
   public static Rotation2d angleIncrement =
       new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
-
-  public static double shotSpeed = MIN_SHOT_SPEED;
-  public static Rotation2d turretAngle;
-  public static Rotation2d hoodAngle = MIN_HOOD_ANGLE;
 
   // for testing only
   public static Translation3d landingCoords = new Translation3d();
@@ -156,7 +152,7 @@ public class ShotCalculator {
         if (vertexHeight >= MIN_SHOT_HEIGHT
             && vertexHeight <= MAX_SHOT_HEIGHT
             && vertexRange < compRange
-            && shotSpeed <= MAX_SHOT_SPEED
+            && testShotSpeed <= MAX_SHOT_SPEED
             && Math.abs(error) <= SHOT_DEADBAND
             && vertexHeight > highestArc) {
           bestTurretAngle = testTurretAngle;
@@ -250,12 +246,6 @@ public class ShotCalculator {
   public static double timeToTargetHeight(double a, double b, double c) {
     double sqrt = Math.sqrt(b * b - 4 * a * c);
     return (-b - sqrt) / (2 * a);
-    // double t1 = (-b + sqrt) / (2 * a);
-    // double t2 = (-b - sqrt) / (2 * a);
-    // if (t1 > 0 && t2 > 0) {
-    //   return Math.max(t1, t2); // returns the larger root, which is the one on the way down
-    // }
-    // return t1 > 0 ? t1 : t2;
   }
 
   public static Translation2d calculateShooterVelo(
