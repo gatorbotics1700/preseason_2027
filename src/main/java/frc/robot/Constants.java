@@ -107,4 +107,9 @@ public final class Constants {
           1.80); // z value is 2 centimeters below the very top of the hub (to make sure we aren't
   // trying to phase through walls)
   // hub
+  public static final Translation3d RED_HUB = new Translation3d(11.915394, 4.034663, 1.80);
+  public static final Translation3d BLUE_LEFT_FUNNELING = new Translation3d(2.482, 6.653, 0);
+  public static final Translation3d BLUE_RIGHT_FUNNELING = new Translation3d(2.482, 1.511, 0);
+  public static final Translation3d RED_LEFT_FUNNELING = new Translation3d(14.858, 6.653, 0);
+  public static final Translation3d RED_RIGHT_FUNNELING = new Translation3d(14.858, 1.511, 0);
 }

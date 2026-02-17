@@ -23,6 +23,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private static TalonFXConfiguration flywheelTalonFXConfigs;
   private static Slot0Configs flywheelSlot0Configs;
   private static final double FLYWHEEL_RADIUS = 0.0508;
+  private boolean shouldShoot;
 
   public ShooterSubsystem() {
     // TODO put mech canbus id for real robot
@@ -62,6 +63,8 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelMotor.getConfigurator().apply(flywheelTalonFXConfigs);
 
     m_request = new MotionMagicVelocityVoltage(0);
+
+    shouldShoot = false;
   }
 
   public void periodic() {
@@ -121,5 +124,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public static double calculateFlywheelSpeed(double shotSpeed) {
     return shotSpeed / FLYWHEEL_RADIUS;
+  }
+
+  public boolean getShouldShoot() {
+    return shouldShoot;
+  }
+
+  public void toggleShouldShoot() {
+    shouldShoot = !shouldShoot;
   }
 }

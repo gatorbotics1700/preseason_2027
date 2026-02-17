@@ -515,9 +515,7 @@ public class RobotContainer {
         //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
         //             }));
 
-        controller_two
-          .y()
-          .onTrue(new HoodRetractToLimitCommand(hoodSubsystem));
+        controller_two.y().onTrue(new HoodRetractToLimitCommand(hoodSubsystem));
 
         // commented this out because it's using a shot parameters thing we were calculating in
         // periodic and idk if we still want that

@@ -100,7 +100,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // TODO uncomment out this code when ready to test without voltage instant commands
     Logger.recordOutput("Intake/Deploy Limit Switch", limitSwitch.get());
     Logger.recordOutput("Intake/Current Deploy Angle", currentAngle());
-    if (!limitSwitch.get()) { //TODO: check this before testing
+    if (!limitSwitch.get()) { // TODO: check this before testing
       deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     } else {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
