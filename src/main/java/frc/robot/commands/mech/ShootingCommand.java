@@ -98,10 +98,7 @@ public class ShootingCommand extends Command {
         hopperFloorSubsystem.setHopperFloorVelocity(0);
       }
 
-      hoodSubsystem.setDesiredAngle(
-          new Rotation2d(Math.PI / 2)
-              .minus(
-                  params.hoodAngle)); // this requires the hood's zero to be parallel to the ground
+      hoodSubsystem.setDesiredAngle(params.hoodAngle); // this requires the hood's zero to be vertical TODO: Check this!!
 
       // turretSubsystem.setDesiredAngle(params.turretAngle);
       // TODO add drivetrain angle things here instead of the turret angle for testing on sting

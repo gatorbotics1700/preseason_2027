@@ -16,9 +16,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
   public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(0)); // TODO: find a real number
+      new Rotation2d(Math.toRadians(103)); // TODO: check number
   public static final Rotation2d MAX_EXTENSION =
-      new Rotation2d(Math.toRadians(0)); // TODO: find a real number
+      new Rotation2d(Math.toRadians(57)); // TODO: check number
 
   private final DigitalInput limitSwitch;
   private boolean wasLimitSwitchPressed = false;
@@ -105,11 +105,11 @@ public class HoodSubsystem extends SubsystemBase {
   public void setDesiredAngle(Rotation2d desiredAngle) {
     // TODO maybe wrap angle like % 360
     // TODO: check this logic -- don't really know whats going on
-    if (desiredAngle.getDegrees() < 0) {
-      desiredAngle = new Rotation2d(0);
+    if (desiredAngle.getDegrees() > 103) { //TODO: CHECK VALUE!!! I was told 77 but shouldnt it be 103 because the min is negative?
+      desiredAngle = RETRACTED_POSITION;
     }
-    if (desiredAngle.getDegrees() > 40) {
-      desiredAngle = new Rotation2d(Math.PI / 6);
+    if (desiredAngle.getDegrees() < 57) {
+      desiredAngle = MAX_EXTENSION;
     }
     this.desiredAngle = desiredAngle;
   }
@@ -145,7 +145,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void setHoodPositionToRetracted() {
-    hoodMotor.setPosition(0);
+    hoodMotor.setPosition(degreesToRevs(57));
   }
 
   public void setRetractingToLimitSwitch(boolean retracting) {
@@ -154,4 +154,5 @@ public class HoodSubsystem extends SubsystemBase {
       setHoodVoltage(0);
     }
   }
+
 }
