@@ -11,6 +11,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
+import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
@@ -26,7 +27,7 @@ public class ShootingCommand extends Command {
   private final Translation3d targetRight = new Translation3d(10.0, 50.0, 0.0);
   private final Translation3d targetLeft = new Translation3d(10.0, 10.0, 0.0);
 
-  // private final TurretSubsystem turretSubsystem;
+  private final TurretSubsystem turretSubsystem;
 
   // Current logic is that if the flywheel speed is 0 then we're just tracking and if the flywheel
   // speed is not zero then we're trying to shoot, but we may decide we want a separate command for
@@ -35,20 +36,18 @@ public class ShootingCommand extends Command {
   public ShootingCommand(
       ShooterSubsystem shooterSubsystem,
       HoodSubsystem hoodSubsystem,
-      /*  TurretSubsystem turretSubsystem,*/
+      TurretSubsystem turretSubsystem,
       HopperFloorSubsystem hopperFloorSubsystem,
       Supplier<Pose2d> drivetrainPose,
-      Supplier<ChassisSpeeds> drivetrainVelocity,
-      Translation3d target) {
+      Supplier<ChassisSpeeds> drivetrainVelocity) {
 
     this.shooterSubsystem = shooterSubsystem;
     this.hopperFloorSubsystem = hopperFloorSubsystem;
     this.drivetrainPose = drivetrainPose;
     this.drivetrainVelocity = drivetrainVelocity;
-    this.target = target;
     this.hoodSubsystem = hoodSubsystem;
-    // this.turretSubsystem = turretSubsystem;
-    addRequirements(shooterSubsystem, hoodSubsystem, /*turretSubsystem,*/ hopperFloorSubsystem);
+    this.turretSubsystem = turretSubsystem;
+    addRequirements(shooterSubsystem, hoodSubsystem, turretSubsystem, hopperFloorSubsystem);
   }
 
   @Override
@@ -56,30 +55,31 @@ public class ShootingCommand extends Command {
 
   @Override
   public void execute() {
-    if (shooterSubsystem.getShouldShoot()) {
-      if (Constants.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
-          && drivetrainPose.get().getX() < Constants.RED_BUMP_AND_TRENCH_X) {
-        if (Constants.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
-          target =
-              DriverStation.getAlliance().get() == Alliance.Blue
-                  ? Constants.BLUE_RIGHT_FUNNELING
-                  : Constants.RED_LEFT_FUNNELING;
-
-        } else {
-          target =
-              DriverStation.getAlliance().get() == Alliance.Blue
-                  ? Constants.BLUE_LEFT_FUNNELING
-                  : Constants.RED_RIGHT_FUNNELING;
-        }
+    Translation3d target;
+    if (Constants.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
+        && drivetrainPose.get().getX() < Constants.RED_BUMP_AND_TRENCH_X) {
+      if (Constants.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
+        target =
+            DriverStation.getAlliance().get() == Alliance.Blue
+                ? Constants.BLUE_RIGHT_FUNNELING
+                : Constants.RED_LEFT_FUNNELING;
 
       } else {
         target =
             DriverStation.getAlliance().get() == Alliance.Blue
-                ? Constants.BLUE_HUB
-                : Constants.RED_HUB;
+                ? Constants.BLUE_LEFT_FUNNELING
+                : Constants.RED_RIGHT_FUNNELING;
       }
-      ShotParameters params =
-          ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+
+    } else {
+      target =
+          DriverStation.getAlliance().get() == Alliance.Blue
+              ? Constants.BLUE_HUB
+              : Constants.RED_HUB;
+    }
+    ShotParameters params =
+        ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+    if (shooterSubsystem.getShouldShoot()) {
       // calculate angles and get the hood and turret to track
 
       // only want to run hopper if we're actively trying to shoot
@@ -95,10 +95,11 @@ public class ShootingCommand extends Command {
           shooterSubsystem.setDesiredTransitionVoltage(ShooterSubsystem.TRANSITION_VOLTAGE);
         }
       } else {
+        shooterSubsystem.setDesiredTransitionVoltage(0);
         hopperFloorSubsystem.setHopperFloorVelocity(0);
       }
 
-      hoodSubsystem.setDesiredAngle(params.hoodAngle); // this requires the hood's zero to be vertical TODO: Check this!!
+
 
       // turretSubsystem.setDesiredAngle(params.turretAngle);
       // TODO add drivetrain angle things here instead of the turret angle for testing on sting
@@ -117,16 +118,20 @@ public class ShootingCommand extends Command {
       hopperFloorSubsystem.setHopperFloorVelocity(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
     }
+    hoodSubsystem.setDesiredAngle(params.hoodAngle); // this requires the hood's zero to be vertical TODO: Check this!!
+
+    turretSubsystem.setDesiredAngle(params.turretAngle);
   }
 
   // TODO figure out if we want a way to end this command
   @Override
   public boolean isFinished() {
-    if (true) {
-      shooterSubsystem.setFlywheelVelocity(0);
-      hopperFloorSubsystem.setHopperFloorVelocity(0);
-      shooterSubsystem.setDesiredTransitionVoltage(0);
-    }
     return false;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    hopperFloorSubsystem.setHopperFloorVelocity(0);
+    shooterSubsystem.setDesiredTransitionVoltage(0);
   }
 }

@@ -35,8 +35,10 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.ClimbCommands;
+import frc.robot.commands.mech.HoodRetractCommand;
 import frc.robot.commands.mech.HoodRetractToLimitCommand;
 import frc.robot.commands.mech.IntakeCommands;
+import frc.robot.commands.mech.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -98,12 +100,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight),
                 (pose) -> {});
         // vision =
-        //     new Vision(
-        //         drive,
-        //         new VisionIOPhotonVision(
-        //             VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
-        //         new VisionIOPhotonVision(
-        //             VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
+        // new Vision(
+        // drive,
+        // new VisionIOPhotonVision(
+        // VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
+        // new VisionIOPhotonVision(
+        // VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
         break;
 
       case SIM:
@@ -117,16 +119,16 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight),
                 (pose) -> {});
         // vision =
-        //     new Vision(
-        //         drive,
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.CAMERA_0_NAME,
-        //             VisionConstants.ROBOT_TO_CAMERA_0,
-        //             drive::getPose),
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.CAMERA_1_NAME,
-        //             VisionConstants.ROBOT_TO_CAMERA_1,
-        //             drive::getPose));
+        // new Vision(
+        // drive,
+        // new VisionIOPhotonVisionSim(
+        // VisionConstants.CAMERA_0_NAME,
+        // VisionConstants.ROBOT_TO_CAMERA_0,
+        // drive::getPose),
+        // new VisionIOPhotonVisionSim(
+        // VisionConstants.CAMERA_1_NAME,
+        // VisionConstants.ROBOT_TO_CAMERA_1,
+        // drive::getPose));
         DriverStation.silenceJoystickConnectionWarning(true);
         break;
 
@@ -155,7 +157,7 @@ public class RobotContainer {
         };
     turretSubsystem = new TurretSubsystem();
 
-    //     hoodSubsystem = new HoodSubsystem();
+    // hoodSubsystem = new HoodSubsystem();
 
     // Named Commands
     NamedCommands.registerCommand(
@@ -200,8 +202,9 @@ public class RobotContainer {
 
     // mech buttons
     // new Trigger(controller_two::getXButtonPressed)
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-    // new Trigger(controller_two::getYButtonPressed).onTrue(new HoodCommand(hoodSubsystem, false,
+    // .onTrue(new HoodCommand(hoodSubsystem, false, 15));
+    // new Trigger(controller_two::getYButtonPressed).onTrue(new
+    // HoodCommand(hoodSubsystem, false,
     // 0));
 
     // Set up auto routines with multi-step chooser
@@ -209,19 +212,23 @@ public class RobotContainer {
 
     // Set up SysId routines
     // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    // "Drive Wheel Radius Characterization",
+    // DriveCommands.wheelRadiusCharacterization(drive));
     // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    // "Drive Simple FF Characterization",
+    // DriveCommands.feedforwardCharacterization(drive));
     // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // "Drive SysId (Quasistatic Forward)",
+    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // "Drive SysId (Quasistatic Reverse)",
+    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // "Drive SysId (Dynamic Forward)",
+    // drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // "Drive SysId (Dynamic Reverse)",
+    // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
   }
@@ -278,7 +285,7 @@ public class RobotContainer {
                   () -> {
                     try {
                       CommandScheduler.getInstance()
-                          .schedule(DriveOverBumpCommand.driveOverBump(drive));
+                          .schedule(DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem));
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -314,7 +321,19 @@ public class RobotContainer {
                   () -> {
                     try {
                       CommandScheduler.getInstance()
-                          .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+                          .schedule(
+                              new HoodRetractCommand(hoodSubsystem)
+                                  .andThen(
+                                      DriveUnderTrenchCommand.driveUnderTrench(
+                                          drive, shooterSubsystem))
+                                  .andThen(
+                                      new ShootingCommand(
+                                          shooterSubsystem,
+                                          hoodSubsystem,
+                                          turretSubsystem,
+                                          transitionSubsystem,
+                                          robotPose,
+                                          chassisSpeeds)));
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -440,101 +459,104 @@ public class RobotContainer {
         // TODO INTAKE TESTING BUTTONS - uncomment for use
 
         // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               intakeSubsystem.setIntakeVoltage(0);
-        //             }));
+        // .x()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // intakeSubsystem.setIntakeVoltage(0);
+        // }));
 
         // controller_two
-        //     .y()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               intakeSubsystem.setIntakeVoltage(10);
-        //             }));
+        // .y()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // intakeSubsystem.setIntakeVoltage(10);
+        // }));
 
         // controller_two
-        //     .a()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
-        //             }));
+        // .a()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
+        // }));
 
         // TODO: SHOOTER TESTING BUTTONS - uncomment for use
 
         // controller_two
-        //     .b()
-        //     .onTrue(
-        //         new InstantCommand(
-        //                 () -> {
-        //                   shooterSubsystem.setFlywheelVoltage(10);
-        //                 })
-        //             /* .alongWith(new WaitCommand(3))*/
-        //             .alongWith(
-        //                 new InstantCommand(
-        //                     () -> {
-        //                       shooterSubsystem.setTransitionVoltage(10);
-        //                     })));
+        // .b()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // shooterSubsystem.setFlywheelVoltage(10);
+        // })
+        // /* .alongWith(new WaitCommand(3))*/
+        // .alongWith(
+        // new InstantCommand(
+        // () -> {
+        // shooterSubsystem.setTransitionVoltage(10);
+        // })));
+        // controller_two.x().onTrue(new
+        // InstantCommand(()->{shooterSubsystem.toggleShouldShoot();}));
 
         // TODO TURRET TESTING BUTTONS - uncomment for use
 
         // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
-        //             }));
+        // .x()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
+        // }));
 
         // controller_two
-        //     .a()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
-        //             }));
+        // .a()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
+        // }));
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
 
         // controller_two
-        //     .rightBumper()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10.0)));
-        //             }));
+        // .rightBumper()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10.0)));
+        // }));
 
         // controller_two
-        //     .leftBumper()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
-        //             }));
+        // .leftBumper()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
+        // }));
 
         controller_two.y().onTrue(new HoodRetractToLimitCommand(hoodSubsystem));
 
-        // commented this out because it's using a shot parameters thing we were calculating in
+        // commented this out because it's using a shot parameters thing we were
+        // calculating in
         // periodic and idk if we still want that
         // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               hoodSubsystem.setDesiredAngle(
-        //                   new Rotation2d(Math.PI / 2).minus(shotParameters.hoodAngle));
-        //             }));
+        // .x()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // hoodSubsystem.setDesiredAngle(
+        // new Rotation2d(Math.PI / 2).minus(shotParameters.hoodAngle));
+        // }));
 
         // controller_two
-        //     .y()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
-        //             }));
+        // .y()
+        // .onTrue(
+        // new InstantCommand(
+        // () -> {
+        // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
+        // }));
 
       }
     }
@@ -559,7 +581,8 @@ public class RobotContainer {
   }
 
   private double deadband(double value, double deadband) {
-    // If controller reads very tiny value close to zero, we don't want to make the robot think it
+    // If controller reads very tiny value close to zero, we don't want to make the
+    // robot think it
     // has to move
     // Without deadband, robot will think it has to move, and then it will go crazy
     if (Math.abs(value) > deadband) {
@@ -608,14 +631,18 @@ public class RobotContainer {
     // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
-    // Print  path name to console me thinks
+    // Print path name to console me thinks
     String selectedPathName = multiStepAutoChooser.getSelectedPathName();
     System.out.flush(); // Ensure output appears immediately
 
-    // Logger.recordOutput("Buttons/Controller2/A", controller_two.a().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/B", controller_two.b().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/X", controller_two.x().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/Y", controller_two.y().getAsBoolean());
+    // Logger.recordOutput("Buttons/Controller2/A",
+    // controller_two.a().getAsBoolean());
+    // Logger.recordOutput("Buttons/Controller2/B",
+    // controller_two.b().getAsBoolean());
+    // Logger.recordOutput("Buttons/Controller2/X",
+    // controller_two.x().getAsBoolean());
+    // Logger.recordOutput("Buttons/Controller2/Y",
+    // controller_two.y().getAsBoolean());
 
     // Log command scheduler status
     Logger.recordOutput("Commands/SchedulerActive", true);
@@ -630,7 +657,22 @@ public class RobotContainer {
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
     // shotParameters =
-    //     ShotCalculator.calculateShot(
-    //         drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
+    // ShotCalculator.calculateShot(
+    // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
+  }
+
+  public Command MechStop() {
+    return new HoodRetractCommand(hoodSubsystem)
+        .alongWith(
+            IntakeCommands.StopIntake(intakeSubsystem)
+                .andThen(IntakeCommands.RetractIntake(intakeSubsystem)))
+        .alongWith(
+            new InstantCommand(
+                () -> {
+                  turretSubsystem.setDesiredAngle(turretSubsystem.currentAngle());
+                  shooterSubsystem.setFlywheelVelocity(0);
+                  transitionSubsystem.setHopperFloorVelocity(0);
+                  shooterSubsystem.setDesiredTransitionVoltage(0);
+                }));
   }
 }

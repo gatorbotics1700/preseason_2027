@@ -133,4 +133,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public void toggleShouldShoot() {
     shouldShoot = !shouldShoot;
   }
+
+  public void setShouldShoot(boolean shouldShoot) {
+    this.shouldShoot = shouldShoot;
+  }
 }

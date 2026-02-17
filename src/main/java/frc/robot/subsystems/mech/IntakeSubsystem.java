@@ -19,6 +19,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public final TalonFX deployMotor; // deploys the entire intake
 
   private final DigitalInput limitSwitch;
+  private final DigitalInput hallEffect;
 
   private final TalonFXConfiguration deployTalonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
@@ -42,6 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
     desiredVoltage = 0;
 
     limitSwitch = new DigitalInput(0); // TODO: change during testing
+    hallEffect = new DigitalInput(1);//TODO:change port during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()
@@ -104,6 +106,9 @@ public class IntakeSubsystem extends SubsystemBase {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     } else {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
+    }
+    if(hallEffect.get()){//TODO: check closed vs open before testing
+      setDeployPositionToZero();
     }
     // intakeMotor.setVoltage(desiredVoltage);
   }
