@@ -24,7 +24,7 @@ public class IntakeCommands {
         () -> {
           Logger.recordOutput("Auto/Intake/Command", "RETRACT");
           Logger.recordOutput("Auto/Intake/TargetAngle", intakeSubsystem.RETRACTED_POSITION);
-          intakeSubsystem.setDesiredangle(intakeSubsystem.RETRACTED_POSITION);
+          intakeSubsystem.setDesiredAngle(intakeSubsystem.RETRACTED_POSITION);
         });
   }
 
@@ -33,7 +33,7 @@ public class IntakeCommands {
         () -> {
           Logger.recordOutput("Auto/Intake/Command", "DEPLOY");
           Logger.recordOutput("Auto/Intake/TargetAngle", intakeSubsystem.EXTENDED_POSITION);
-          intakeSubsystem.setDesiredangle(intakeSubsystem.EXTENDED_POSITION);
+          intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
         });
   }
 

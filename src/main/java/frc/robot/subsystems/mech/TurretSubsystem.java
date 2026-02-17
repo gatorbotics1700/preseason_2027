@@ -66,7 +66,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     // Logger.recordOutput("turret/output" + turretMotor.get());
     System.out.println(desiredAngle.getDegrees());
   }
@@ -77,28 +77,28 @@ public class TurretSubsystem extends SubsystemBase {
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     // this whole method is a mess so TODO check if there's a better way to wrap the angle
-    if (Math.abs(desiredAngle.getRadians()) >= Math.PI) {
-      // desiredAngle =
-      //     new Rotation2d(
-      //         MathUtil.angleModulus(
-      //             desiredAngle
-      //                 .getRadians())); // TODO check this - trying to wrap the angle so it stays
-      // within -180 and 180
-      int one_eighties =
-          (int)
-              (desiredAngle.getRadians()
-                  / Math.PI); // the number of 180 degrees that fit into the angle
-      if (one_eighties % 2 == 0) {
-        desiredAngle = new Rotation2d(desiredAngle.getRadians() % Math.PI);
-      } else {
-        if (desiredAngle.getRadians() >= Math.PI) {
-          desiredAngle = new Rotation2d(-((Math.PI) - (desiredAngle.getRadians() % Math.PI)));
-        }
-        if (desiredAngle.getRadians() <= -Math.PI) {
-          desiredAngle = new Rotation2d((Math.PI) + (desiredAngle.getRadians() % Math.PI));
-        }
-      }
-    }
+    // if (Math.abs(desiredAngle.getRadians()) >= Math.PI) {
+    //   // desiredAngle =
+    //   //     new Rotation2d(
+    //   //         MathUtil.angleModulus(
+    //   //             desiredAngle
+    //   //                 .getRadians())); // TODO check this - trying to wrap the angle so it stays
+    //   // within -180 and 180
+    //   int one_eighties =
+    //       (int)
+    //           (desiredAngle.getRadians()
+    //               / Math.PI); // the number of 180 degrees that fit into the angle
+    //   if (one_eighties % 2 == 0) {
+    //     desiredAngle = new Rotation2d(desiredAngle.getRadians() % Math.PI);
+    //   } else {
+    //     if (desiredAngle.getRadians() >= Math.PI) {
+    //       desiredAngle = new Rotation2d(-((Math.PI) - (desiredAngle.getRadians() % Math.PI)));
+    //     }
+    //     if (desiredAngle.getRadians() <= -Math.PI) {
+    //       desiredAngle = new Rotation2d((Math.PI) + (desiredAngle.getRadians() % Math.PI));
+    //     }
+    //   }
+    // }
 
     this.desiredAngle = desiredAngle;
   }

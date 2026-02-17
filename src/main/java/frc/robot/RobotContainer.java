@@ -48,6 +48,7 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
+import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.MultiStepAutoChooser;
@@ -69,7 +70,7 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
   private ShotParameters shotParameters;
-  // private final TurretSubsystem turretSubsystem;
+  private final TurretSubsystem turretSubsystem;
 
   // Controllers
   private CommandXboxController controller = null; // port 0
@@ -151,7 +152,7 @@ public class RobotContainer {
         () -> {
           return drive.getChassisSpeeds();
         };
-    // turretSubsystem = new TurretSubsystem(robotPose);
+    turretSubsystem = new TurretSubsystem();
 
     //     hoodSubsystem = new HoodSubsystem();
 
@@ -435,37 +436,47 @@ public class RobotContainer {
                                               params.hoodAngle);
                                         })))));
       } else {
-        controller_two
-            .b()
-            .onTrue(
-                new InstantCommand(
-                        () -> {
-                          shooterSubsystem.setFlywheelVoltage(10);
-                        })
-                    /* .alongWith(new WaitCommand(3))*/
-                    .alongWith(
-                        new InstantCommand(
-                            () -> {
-                              shooterSubsystem.setTransitionVoltage(10);
-                            })));
-
         // TODO INTAKE TESTING BUTTONS - uncomment for use
 
-        controller_two
-            .x()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      intakeSubsystem.setIntakeVoltage(0);
-                    }));
+        // controller_two
+        //     .x()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               intakeSubsystem.setIntakeVoltage(0);
+        //             }));
 
-        controller_two
-            .y()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      intakeSubsystem.setIntakeVoltage(10);
-                    }));
+        // controller_two
+        //     .y()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               intakeSubsystem.setIntakeVoltage(10);
+        //             }));
+
+        // controller_two
+        //     .a()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
+        //             }));
+        
+        // TODO: SHOOTER TESTING BUTTONS - uncomment for use
+
+        // controller_two
+        //     .b()
+        //     .onTrue(
+        //         new InstantCommand(
+        //                 () -> {
+        //                   shooterSubsystem.setFlywheelVoltage(10);
+        //                 })
+        //             /* .alongWith(new WaitCommand(3))*/
+        //             .alongWith(
+        //                 new InstantCommand(
+        //                     () -> {
+        //                       shooterSubsystem.setTransitionVoltage(10);
+        //                     })));
 
         // TODO TURRET TESTING BUTTONS - uncomment for use
 
@@ -474,37 +485,21 @@ public class RobotContainer {
         //     .onTrue(
         //         new InstantCommand(
         //             () -> {
-        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(400)));
+        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
         //             }));
 
         // controller_two
-        //     .y()
+        //     .a()
         //     .onTrue(
         //         new InstantCommand(
         //             () -> {
-        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-300)));
-        //             }));
-
-        controller_two
-            .y()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      intakeSubsystem.setIntakeVoltage(10);
-                    }));
-
-        // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20)));
+        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
         //             }));
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
 
         // controller_two
-        //     .x()
+        //     .rightBumper()
         //     .onTrue(
         //         new InstantCommand(
         //             () -> {
@@ -512,11 +507,11 @@ public class RobotContainer {
         //             }));
 
         // controller_two
-        //     .y()
+        //     .leftBumper()
         //     .onTrue(
         //         new InstantCommand(
         //             () -> {
-        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(20.0)));
+        //               hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
         //             }));
 
         // commented this out because it's using a shot parameters thing we were calculating in

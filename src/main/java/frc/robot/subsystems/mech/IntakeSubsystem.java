@@ -1,5 +1,7 @@
 package frc.robot.subsystems.mech;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -8,6 +10,7 @@ import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -15,6 +18,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public final TalonFX intakeMotor; // spins the rollers
   public final TalonFX deployMotor; // deploys the entire intake
+
+  public final DigitalInput limitSwitch;
 
   private final TalonFXConfiguration deployTalonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
@@ -26,10 +31,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
   private final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-  public final Rotation2d EXTENDED_POSITION =
-      new Rotation2d(Math.toRadians(90)); // ticks, TODO: change
-  public final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(0)); // ticks, TODO: change
+  public final Rotation2d EXTENDED_POSITION = new Rotation2d(Math.toRadians(85)); // TODO: change
+  public final Rotation2d RETRACTED_POSITION = new Rotation2d(Math.toRadians(0)); // TODO: change
 
   public IntakeSubsystem() {
     // TODO change back to mechCANbus for robot
@@ -38,6 +41,8 @@ public class IntakeSubsystem extends SubsystemBase {
     deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
 
     desiredVoltage = 0;
+
+    limitSwitch = new DigitalInput(0); // TODO: change during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()
@@ -79,16 +84,30 @@ public class IntakeSubsystem extends SubsystemBase {
     m_request = new MotionMagicExpoVoltage(0);
 
     intakeMotor.setVoltage(0);
+
+    // Treat current position as 0 so "deploy position" is the zero reference
+    setDeployPositionToZero();
+  }
+
+  /** Sets the deploy motor's encoder so the current position is 0. Call when intake is at deploy. */
+  public void setDeployPositionToZero() {
+    deployMotor.setPosition(0);
   }
 
   @Override
   public void periodic() {
     // TODO uncomment out this code when ready to test without voltage instant commands
-    // deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    Logger.recordOutput("Intake/Deploy Limit Switch", limitSwitch.get());
+    Logger.recordOutput("Intake/Current Deploy Angle", currentAngle());
+    if (!limitSwitch.get()) {
+      deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    } else {
+      deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
+    }
     // intakeMotor.setVoltage(desiredVoltage);
   }
 
-  public void setDesiredangle(
+  public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     this.desiredAngle = desiredAngle;
   }
