@@ -22,7 +22,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 6;
-  private Encoder boreEncoder = new Encoder(0, 1); // TODO real port values
+  private Encoder boreEncoder = new Encoder(7, 1); // TODO real port values
   private double turretAngleDegrees;
 
   private Rotation2d desiredAngle;
@@ -78,7 +78,7 @@ public class TurretSubsystem extends SubsystemBase {
             / Constants.KRAKEN_TICKS_PER_REV
             * 360;
     // Logger.recordOutput("turret/output" + turretMotor.get());
-    System.out.println(desiredAngle.getDegrees());
+    // System.out.println(desiredAngle.getDegrees());
   }
 
   public void setDesiredAngle(

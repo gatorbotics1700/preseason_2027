@@ -77,7 +77,8 @@ public final class Constants {
   public static final int INTAKE_MOTOR_CAN_ID = 9; // needs changing
 
   public static final int EXTENSION_MOTOR_CAN_ID = 12; // needs changing
-  public static final int FLYWHEEL_MOTOR_CAN_ID = 30;
+  public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
+  public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
   public static final int HOOD_MOTOR_CAN_ID = 17;
   public static final int TRANSITION_MOTOR_CAN_ID = 31;
   public static final int HOPPER_MOTOR_CAN_ID = 16;

@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
   public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(103)); // TODO: check number
+      new Rotation2d(Math.toRadians(77)); // TODO: check number
   public static final Rotation2d MAX_EXTENSION =
       new Rotation2d(Math.toRadians(57)); // TODO: check number
 
@@ -33,12 +33,13 @@ public class HoodSubsystem extends SubsystemBase {
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
   // PROTOTYPE GEAR RATIOS
-  private static final double HOOD_SHAFT_REVS_PER_MECH_REV = 155.0 / 15.0;
+  // private static final double HOOD_SHAFT_REVS_PER_MECH_REV = 155.0 / 15.0;
   private static final double HOOD_GEARBOX_RATIO = 9.0;
   private double desiredVelocity;
 
   // REAL HOOD GEAR RATIOS
   private static final double REAL_HOOD_GEAR_RATIO = 2.25;
+  private static final double HOOD_SHAFT_REVS_PER_MECH_REV = 164.0 / 10.0;
 
   private final TalonFX hoodMotor =
       new TalonFX(
@@ -53,7 +54,7 @@ public class HoodSubsystem extends SubsystemBase {
     talonFXConfigs = new TalonFXConfiguration();
 
     talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
@@ -81,7 +82,9 @@ public class HoodSubsystem extends SubsystemBase {
 
     m_request = new MotionMagicExpoVoltage(0);
 
-    limitSwitch = new DigitalInput(0); // TODO: change to actual value
+    limitSwitch = new DigitalInput(2); // TODO: change to actual value
+
+    setHoodPositionToRetracted();
   }
 
   @Override
@@ -105,10 +108,14 @@ public class HoodSubsystem extends SubsystemBase {
   public void setDesiredAngle(Rotation2d desiredAngle) {
     // TODO maybe wrap angle like % 360
     // TODO: check this logic -- don't really know whats going on
-    if (desiredAngle.getDegrees() > 103) { //TODO: CHECK VALUE!!! I was told 77 but shouldnt it be 103 because the min is negative?
+    if (desiredAngle.getDegrees()
+        > RETRACTED_POSITION
+            .getDegrees()) { // TODO: CHECK VALUE!!! I was told 77 but shouldnt it be 103 because
+      // the min is
+      // negative?
       desiredAngle = RETRACTED_POSITION;
     }
-    if (desiredAngle.getDegrees() < 57) {
+    if (desiredAngle.getDegrees() < MAX_EXTENSION.getDegrees()) {
       desiredAngle = MAX_EXTENSION;
     }
     this.desiredAngle = desiredAngle;
@@ -121,14 +128,19 @@ public class HoodSubsystem extends SubsystemBase {
   public double degreesToRevs(double hoodAngleDegrees) {
     return hoodAngleDegrees
         / 360.0
-        * REAL_HOOD_GEAR_RATIO; // * HOOD_SHAFT_REVS_PER_MECH_REV * HOOD_GEARBOX_RATIO;
+        * REAL_HOOD_GEAR_RATIO
+        * HOOD_SHAFT_REVS_PER_MECH_REV; // * HOOD_SHAFT_REVS_PER_MECH_REV * HOOD_GEARBOX_RATIO;
     // TODO change back for prototype testing
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
     double hoodAngleDegrees =
-        motorPositionRevs / REAL_HOOD_GEAR_RATIO; // motorPositionRevs / HOOD_GEARBOX_RATIO /
+        motorPositionRevs
+            / REAL_HOOD_GEAR_RATIO
+            / HOOD_SHAFT_REVS_PER_MECH_REV
+            * 360
+            % 360; // motorPositionRevs / HOOD_GEARBOX_RATIO /
     // HOOD_SHAFT_REVS_PER_MECH_REV * 360 % 360; // TODO change back for prototype testing
     return new Rotation2d(
         Math.toRadians(
@@ -145,7 +157,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void setHoodPositionToRetracted() {
-    hoodMotor.setPosition(degreesToRevs(57));
+    hoodMotor.setPosition(degreesToRevs(RETRACTED_POSITION.getDegrees()));
   }
 
   public void setRetractingToLimitSwitch(boolean retracting) {
@@ -154,5 +166,4 @@ public class HoodSubsystem extends SubsystemBase {
       setHoodVoltage(0);
     }
   }
-
 }

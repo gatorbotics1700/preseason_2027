@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class HopperFloorSubsystem extends SubsystemBase {
-  public static final double HOPPER_FLOOR_SPEED = 0;
+  public static final double HOPPER_FLOOR_SPEED = 0.5;
   public final TalonFX hopperMotor;
   private double hopperVelocity;
   private static TalonFXConfiguration talonFXConfigs;

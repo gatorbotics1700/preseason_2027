@@ -42,8 +42,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     desiredVoltage = 0;
 
-    limitSwitch = new DigitalInput(0); // TODO: change during testing
-    hallEffect = new DigitalInput(1);//TODO:change port during testing
+    limitSwitch = new DigitalInput(3); // TODO: change during testing
+    hallEffect = new DigitalInput(4); // TODO:change port during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()
@@ -107,7 +107,7 @@ public class IntakeSubsystem extends SubsystemBase {
     } else {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
     }
-    if(hallEffect.get()){//TODO: check closed vs open before testing
+    if (hallEffect.get()) { // TODO: check closed vs open before testing
       setDeployPositionToZero();
     }
     // intakeMotor.setVoltage(desiredVoltage);
