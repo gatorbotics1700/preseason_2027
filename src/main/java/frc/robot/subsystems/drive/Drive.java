@@ -148,7 +148,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private static final double TRANSLATION_kP = 2.5;
   private static final double ROTATION_kP = 0.02;
   private final double TRANSLATION_MIN_SPEED = 0.15;
-    private final double ROTATION_MIN_SPEED = 0.25;
+  private final double ROTATION_MIN_SPEED = 0.25;
 
   public Drive(
       GyroIO gyroIO,
@@ -482,45 +482,49 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   public void driveToPose(Pose2d desiredPose) {
-        Pose2d currentPose = getPose();
-        double xError = desiredPose.getX() - currentPose.getX();
-        double yError = desiredPose.getY() - currentPose.getY();
-        double rotationError = desiredPose.getRotation().getDegrees() - currentPose.getRotation().getDegrees();
-        rotationError = MathUtil.inputModulus(rotationError, -180, 180); // sets the value between -180 and 180
+    Pose2d currentPose = getPose();
+    double xError = calculateDistanceError(currentPose.getX(), desiredPose.getX());
+    double yError = calculateDistanceError(currentPose.getY(), desiredPose.getY());
+    double rotationError =
+        calculateRotationError(
+            desiredPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
 
-        if (Math.abs(xError) < VisionConstants.DISTANCE_DEADBAND_METERS) { // Stop if within deadband
-            xError = 0.0;
-            // System.out.println("AT X DEADBAND");
-        }
-
-        if (Math.abs(yError) < VisionConstants.DISTANCE_DEADBAND_METERS) {
-            yError = 0.0;
-            // System.out.println("AT Y DEADBAND");
-        }
-        
-        if (Math.abs(rotationError) < VisionConstants.ROTATION_DEADBAND_DEGREES) {
-            rotationError = 0.0;
-             System.out.println("AT ROTATION DEADBAND");
-        }
-
-        boolean atDesiredPose = xError == 0.0 && yError == 0.0 && rotationError == 0.0;
-
-        if (atDesiredPose) { // stop
-            stop();
-            System.out.println("At desired pose, stopping.");
-            return;
-        }
-
-        double xSpeed = Math.max(Math.abs(xError * TRANSLATION_kP), TRANSLATION_MIN_SPEED) * Math.signum(xError);
-        double ySpeed = Math.max(Math.abs(yError * TRANSLATION_kP), TRANSLATION_MIN_SPEED) * Math.signum(yError);
-        double rotationSpeed = Math.max(Math.abs(rotationError * ROTATION_kP), ROTATION_MIN_SPEED) * Math.signum(rotationError);
-        if(xSpeed >= 1.8){
-            xSpeed = 1.8;
-        }
-        if(ySpeed >= 1.8){
-            ySpeed = 1.8;
-        }
-       System.out.println("rotationspeed:"+rotationSpeed);
-        runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotationSpeed, currentPose.getRotation()));
+    double xSpeed =
+        Math.max(Math.abs(xError * TRANSLATION_kP), TRANSLATION_MIN_SPEED) * Math.signum(xError);
+    double ySpeed =
+        Math.max(Math.abs(yError * TRANSLATION_kP), TRANSLATION_MIN_SPEED) * Math.signum(yError);
+    double rotationSpeed =
+        Math.max(Math.abs(rotationError * ROTATION_kP), ROTATION_MIN_SPEED)
+            * Math.signum(rotationError);
+    if (xSpeed >= 1.8) {
+      xSpeed = 1.8;
     }
+    if (ySpeed >= 1.8) {
+      ySpeed = 1.8;
+    }
+    System.out.println("rotationspeed:" + rotationSpeed);
+    runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, ySpeed, rotationSpeed, currentPose.getRotation()));
+  }
+
+  public double calculateDistanceError(double currentValue, double desiredValue) {
+    double error = desiredValue - currentValue;
+    if (Math.abs(error) < VisionConstants.DISTANCE_DEADBAND_METERS) { // Stop if within deadband
+      error = 0.0;
+      // System.out.println("AT X DEADBAND");
+    }
+    return error;
+  }
+
+  public double calculateRotationError(double currentRotation, double desiredRotation) {
+    double error = desiredRotation - currentRotation;
+    error = MathUtil.inputModulus(error, -180, 180); // sets the value between -180 and 180
+
+    if (Math.abs(error) < VisionConstants.ROTATION_DEADBAND_DEGREES) { // Stop if within deadband
+      error = 0.0;
+      // System.out.println("AT X DEADBAND");
+    }
+    return error;
+  }
 }
