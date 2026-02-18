@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
@@ -43,7 +44,7 @@ public class HoodSubsystem extends SubsystemBase {
   private final TalonFX hoodMotor =
       new TalonFX(
           Constants.HOOD_MOTOR_CAN_ID,
-          ""); // TunerConstants.mechCANBus); // TODO put back mechCANBus on real robot
+          TunerConstants.mechCANBus); // TODO put back mechCANBus on real robot
   private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
@@ -105,7 +106,7 @@ public class HoodSubsystem extends SubsystemBase {
   public void setDesiredAngle(Rotation2d desiredAngle) {
     // TODO maybe wrap angle like % 360
     // TODO: check this logic -- don't really know whats going on
-    if (desiredAngle.getDegrees() > 77) { 
+    if (desiredAngle.getDegrees() > 77) {
       desiredAngle = RETRACTED_POSITION;
     }
     if (desiredAngle.getDegrees() < 57) {
@@ -154,5 +155,4 @@ public class HoodSubsystem extends SubsystemBase {
       setHoodVoltage(0);
     }
   }
-
 }

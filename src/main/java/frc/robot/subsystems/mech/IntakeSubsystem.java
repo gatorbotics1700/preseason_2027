@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -36,14 +37,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public IntakeSubsystem() {
     // TODO change back to mechCANbus for robot
-    intakeMotor =
-        new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
-    deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
+    intakeMotor = new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     desiredVoltage = 0;
 
-    limitSwitch = new DigitalInput(0); // TODO: change during testing
-    hallEffect = new DigitalInput(1);//TODO:change port during testing
+    limitSwitch = new DigitalInput(1); // TODO: change during testing
+    hallEffect = new DigitalInput(2); // TODO:change port during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()
@@ -107,7 +107,7 @@ public class IntakeSubsystem extends SubsystemBase {
     } else {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
     }
-    if(hallEffect.get()){//TODO: check closed vs open before testing
+    if (hallEffect.get()) { // TODO: check closed vs open before testing
       setDeployPositionToZero();
     }
     // intakeMotor.setVoltage(desiredVoltage);

@@ -1,7 +1,6 @@
 package frc.robot.commands.mech;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -99,8 +98,6 @@ public class ShootingCommand extends Command {
         hopperFloorSubsystem.setHopperFloorVelocity(0);
       }
 
-
-
       // turretSubsystem.setDesiredAngle(params.turretAngle);
       // TODO add drivetrain angle things here instead of the turret angle for testing on sting
 
@@ -118,7 +115,8 @@ public class ShootingCommand extends Command {
       hopperFloorSubsystem.setHopperFloorVelocity(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
     }
-    hoodSubsystem.setDesiredAngle(params.hoodAngle); // this requires the hood's zero to be vertical TODO: Check this!!
+    hoodSubsystem.setDesiredAngle(
+        params.hoodAngle); // this requires the hood's zero to be vertical TODO: Check this!!
 
     turretSubsystem.setDesiredAngle(params.turretAngle);
   }

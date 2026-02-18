@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class TurretSubsystem extends SubsystemBase {
   public final TalonFX turretMotor;
@@ -22,7 +23,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 6;
-  private Encoder boreEncoder = new Encoder(0, 1); // TODO real port values
+  private Encoder boreEncoder = new Encoder(3, 4); // TODO real port values
   private double turretAngleDegrees;
 
   private Rotation2d desiredAngle;
@@ -31,7 +32,7 @@ public class TurretSubsystem extends SubsystemBase {
     turretMotor =
         new TalonFX(
             Constants.TURRET_MOTOR_CAN_ID,
-            ""); // TunerConstants.mechCANBus); // TODO change back to mechCANBus for robot
+            TunerConstants.mechCANBus); // TODO change back to mechCANBus for robot
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     desiredAngle = new Rotation2d(0);

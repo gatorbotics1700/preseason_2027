@@ -255,7 +255,7 @@ public class RobotContainer {
                   Math.abs(controller.getLeftY()) > 0.1
                       || Math.abs(controller.getLeftX()) > 0.1
                       || Math.abs(controller.getRightX()) > 0.1);
-      if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.MISSISSIPPI_SERIAL)) {
+      if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
         driverControl
             .whileTrue(
                 DriveCommands.joystickDriveWithAutoRotation(
@@ -617,8 +617,8 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    if(RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.MISSISSIPPI_SERIAL)){
-    drive.enableTargetPointFacing();
+    if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
+      drive.enableTargetPointFacing();
     }
     configureButtonBindings();
   }

@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -27,9 +28,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
     // TODO put mech canbus id for real robot
-    flywheelMotor = new TalonFX(Constants.FLYWHEEL_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
-    transitionMotor =
-        new TalonFX(Constants.TRANSITION_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
+    flywheelMotor = new TalonFX(Constants.FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    transitionMotor = new TalonFX(Constants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     setShooterVoltages(0, 0);
 

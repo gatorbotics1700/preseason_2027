@@ -46,7 +46,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -479,12 +478,14 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   private Translation2d getAllianceTargetPoint() {
-    if (DriverStation.getAlliance().isPresent()) {
-      return DriverStation.getAlliance().get() == Alliance.Red
-          ? Constants.RED_HUB.toTranslation2d()
-          : Constants.BLUE_HUB.toTranslation2d();
-    }
-    return null;
+    // if (DriverStation.getAlliance().isPresent()) {
+    //   return DriverStation.getAlliance().get() == Alliance.Red
+    //       ? Constants.RED_HUB.toTranslation2d()
+    //       : Constants.BLUE_HUB.toTranslation2d();
+    // }
+    // return null;
+
+    return new Translation2d(147.0, 0);
   }
 
   public void disableTargetPointFacing() {
