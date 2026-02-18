@@ -1,7 +1,6 @@
 package frc.robot.commands.mech;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
 
 /**
@@ -9,7 +8,7 @@ import frc.robot.subsystems.mech.TurretSubsystem;
  */
 public class TurretHomingCommand extends Command {
   private final TurretSubsystem turretSubsystem;
-  private double homingVoltage = 0.5; //TODO: change
+  private double homingVoltage = 0.5; // TODO: change
   private double currentToZeroError;
 
   public TurretHomingCommand(TurretSubsystem turretSubsystem) {
@@ -18,13 +17,12 @@ public class TurretHomingCommand extends Command {
   }
 
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
-    //TODO: CHECK IF SENSOR IS ON OR OFF WHEN SENSED
-    if(!turretSubsystem.getHallEffectValue()){
+    // TODO: CHECK IF SENSOR IS ON OR OFF WHEN SENSED
+    if (!turretSubsystem.getHallEffectValue()) {
       turretSubsystem.setMotorVoltage(homingVoltage);
     }
     currentToZeroError = turretSubsystem.getTurretOffset();
@@ -32,7 +30,9 @@ public class TurretHomingCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    turretSubsystem.turretMotor.setPosition(turretSubsystem.getTurretOffset() + turretSubsystem.getCurrentToOffsetError()); //TODO: VIVIEN APPLY MATH
+    turretSubsystem.turretMotor.setPosition(
+        turretSubsystem.getTurretOffset()
+            + turretSubsystem.getCurrentToOffsetError()); // TODO: VIVIEN APPLY MATH
   }
 
   @Override

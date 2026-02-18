@@ -74,8 +74,7 @@ public final class Constants {
   public static final Distance ROBOT_RADIUS_WITH_BUMPERS = Centimeters.of(57);
 
   /* MECH */
-  public static final int INTAKE_MOTOR_CAN_ID = 9; // needs changing
-
+  public static final int INTAKE_MOTOR_CAN_ID = 9;
   public static final int EXTENSION_MOTOR_CAN_ID = 12; // needs changing
   public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
   public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
@@ -83,7 +82,7 @@ public final class Constants {
   public static final int TRANSITION_MOTOR_CAN_ID = 31;
   public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int TURRET_MOTOR_CAN_ID = 14;
-  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 9;
+  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10; // needs changing
   public static final int CLIMBER_MOTOR_CAN_ID = 36;
 
   public static final int KRAKEN_TICKS_PER_REV = 2048;

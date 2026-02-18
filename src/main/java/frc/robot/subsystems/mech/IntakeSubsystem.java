@@ -31,14 +31,17 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
   private final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-  public final Rotation2d EXTENDED_POSITION = new Rotation2d(Math.toRadians(85)); // TODO: change
-  public final Rotation2d RETRACTED_POSITION = new Rotation2d(Math.toRadians(0)); // TODO: change
+  public final double EXTENDED_ANGLE_DEGREES = 85;
+  public final double RETRACTED_ANGLE_DEGREES = 0;
+
+  public final Rotation2d EXTENDED_POSITION = new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
+  public final Rotation2d RETRACTED_POSITION = new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
 
   public IntakeSubsystem() {
     // TODO change back to mechCANbus for robot
-    intakeMotor =
+    intakeMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
+    deployMotor =
         new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
-    deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, ""); // TunerConstants.mechCANBus);
 
     desiredVoltage = 0;
 
@@ -56,7 +59,9 @@ public class IntakeSubsystem extends SubsystemBase {
     deployTalonFXConfigs = new TalonFXConfiguration();
 
     deployTalonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        new MotorOutputConfigs()
+            .withInverted(
+                InvertedValue.CounterClockwise_Positive)); // TODO check if we want to invert
 
     // TODO: TUNE ALL OF THESE
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
@@ -102,20 +107,28 @@ public class IntakeSubsystem extends SubsystemBase {
     // TODO uncomment out this code when ready to test without voltage instant commands
     Logger.recordOutput("Intake/Deploy Limit Switch", limitSwitch.get());
     Logger.recordOutput("Intake/Current Deploy Angle", currentAngle());
-    if (!limitSwitch.get()) { // TODO: check this before testing
-      deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
-    } else {
-      deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
-    }
-    if (hallEffect.get()) { // TODO: check closed vs open before testing
-      setDeployPositionToZero();
-    }
+    // if (!limitSwitch.get()) { // TODO: check this before testing
+    //   deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    // } else {
+    //   deployMotor.setControl(m_request.withPosition(degreesToRevs(currentAngle().getDegrees())));
+    // }
+    // if (hallEffect.get()) { // TODO: check closed vs open before testing
+    //   setDeployPositionToZero();
+    // }
     // intakeMotor.setVoltage(desiredVoltage);
   }
 
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     this.desiredAngle = desiredAngle;
+  }
+
+  public void retractDeployMotor(){
+    deployMotor.setControl(m_request.withPosition(degreesToRevs(RETRACTED_ANGLE_DEGREES)));
+  }
+
+  public void extendDeployMotor(){
+    deployMotor.setControl(m_request.withPosition(degreesToRevs(EXTENDED_ANGLE_DEGREES)));
   }
 
   public void setDesiredIntakeVoltage(double desiredIntakeVoltage) {
@@ -148,4 +161,6 @@ public class IntakeSubsystem extends SubsystemBase {
         * DEPLOY_PULLEY_ONE_GEAR_RATIO
         * DEPLOY_GEARBOX_RATIO;
   }
+
+
 }

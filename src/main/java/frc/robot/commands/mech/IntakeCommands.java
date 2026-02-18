@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeCommands {
 
   private static final double INTAKING_VOLTAGE =
-      9; // TODO get a real number (I just picked my favorite)
+      10; // TODO get a real number (I just picked my favorite)
 
   private IntakeCommands() {}
 
@@ -40,14 +40,14 @@ public class IntakeCommands {
   public static Command RunIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
-          intakeSubsystem.setDesiredIntakeVoltage(INTAKING_VOLTAGE);
+          intakeSubsystem.setIntakeVoltage(10);
         });
   }
 
   public static Command StopIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
-          intakeSubsystem.setDesiredIntakeVoltage(0);
+          intakeSubsystem.setIntakeVoltage(0);
         });
   }
 
