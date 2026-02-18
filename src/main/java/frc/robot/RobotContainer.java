@@ -33,7 +33,7 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.ClimbCommands;
-import frc.robot.commands.mech.HomeHoodCommand;
+import frc.robot.commands.mech.HoodHomingCommand;
 import frc.robot.commands.mech.HoodRetractCommand;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
@@ -703,6 +703,6 @@ public class RobotContainer {
   }
 
   public Command HomeMechanisms() { // TODO: add any other homing commands with alongWith
-    return new HomeHoodCommand(hoodSubsystem);
+    return new HoodHomingCommand(hoodSubsystem);
   }
 }

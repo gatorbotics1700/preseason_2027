@@ -6,10 +6,10 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 /**
  * Runs the hood toward retract until the retracted limit switch is pressed, then zeros position.
  */
-public class HomeHoodCommand extends Command {
+public class HoodHomingCommand extends Command {
   private final HoodSubsystem hoodSubsystem;
 
-  public HomeHoodCommand(HoodSubsystem hoodSubsystem) {
+  public HoodHomingCommand(HoodSubsystem hoodSubsystem) {
     this.hoodSubsystem = hoodSubsystem;
     addRequirements(hoodSubsystem);
   }

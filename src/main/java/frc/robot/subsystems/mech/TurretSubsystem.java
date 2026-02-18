@@ -1,5 +1,7 @@
 package frc.robot.subsystems.mech;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -10,6 +12,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -23,7 +26,9 @@ public class TurretSubsystem extends SubsystemBase {
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 6;
   private Encoder boreEncoder = new Encoder(7, 1); // TODO real port values
+  private final DigitalInput hallEffect=new DigitalInput(5);//TODO real port values
   private double turretAngleDegrees;
+  private final double TURRET_ENCODER_OFFSET = 0.0; //TODO: Find actual offset
 
   private Rotation2d desiredAngle;
 
@@ -79,6 +84,7 @@ public class TurretSubsystem extends SubsystemBase {
             * 360;
     // Logger.recordOutput("turret/output" + turretMotor.get());
     // System.out.println(desiredAngle.getDegrees());
+    Logger.recordOutput("turret/halleEffect", hallEffect.get());
   }
 
   public void setDesiredAngle(
@@ -101,5 +107,21 @@ public class TurretSubsystem extends SubsystemBase {
 
   public double degreesToRevs(double turretAngleDegrees) {
     return turretAngleDegrees / 360 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
+  }
+
+  public boolean getHallEffectValue(){
+    return hallEffect.get();
+  }
+
+  public void setMotorVoltage(double voltage){
+    turretMotor.setVoltage(voltage);
+  }
+
+  public double getTurretOffset(){
+    return TURRET_ENCODER_OFFSET;
+  }
+
+  public double getCurrentToOffsetError(){
+    return boreEncoder.get() - TURRET_ENCODER_OFFSET;
   }
 }
