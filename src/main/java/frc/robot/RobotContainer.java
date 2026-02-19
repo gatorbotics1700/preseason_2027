@@ -483,20 +483,36 @@ public class RobotContainer {
         // TODO: SHOOTER TESTING BUTTONS - uncomment for use
 
         // controller_two
-        // .b()
-        // .onTrue(
-        // new InstantCommand(
-        // () -> {
-        // shooterSubsystem.setFlywheelVoltage(10);
-        // })
-        // /* .alongWith(new WaitCommand(3))*/
-        // .alongWith(
-        // new InstantCommand(
-        // () -> {
-        // shooterSubsystem.setTransitionVoltage(10);
-        // })));
-        // controller_two.x().onTrue(new
-        // InstantCommand(()->{shooterSubsystem.toggleShouldShoot();}));
+        //     .b()
+        //     .onTrue(
+        //         new InstantCommand(
+        //                 () -> {
+        //                   shooterSubsystem.setFlywheelVoltage(10);
+        //                 })
+        //             /* .alongWith(new WaitCommand(3))*/
+        //             .alongWith(
+        //                 new InstantCommand(
+        //                     () -> {
+        //                       shooterSubsystem.setTransitionVoltage(10);
+        //                     })));
+        controller_two
+            .x()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      shooterSubsystem.toggleShouldShoot();
+                    }));
+
+        controller_two
+            .a()
+            .onTrue(
+                new ShootingCommand(
+                    shooterSubsystem,
+                    hoodSubsystem,
+                    turretSubsystem,
+                    transitionSubsystem,
+                    robotPose,
+                    chassisSpeeds));
 
         // TODO TURRET TESTING BUTTONS - uncomment for use
 

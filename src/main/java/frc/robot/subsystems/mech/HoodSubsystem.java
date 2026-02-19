@@ -17,9 +17,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
   public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(77)); // TODO: check number
+      new Rotation2d(Math.toRadians(83)); // TODO: check number //77
   public static final Rotation2d MAX_EXTENSION =
-      new Rotation2d(Math.toRadians(57)); // TODO: check number
+      new Rotation2d(Math.toRadians(43)); // TODO: check number //57
 
   private final DigitalInput limitSwitch;
   private boolean wasLimitSwitchPressed = false;
@@ -54,7 +54,7 @@ public class HoodSubsystem extends SubsystemBase {
     talonFXConfigs = new TalonFXConfiguration();
 
     talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
@@ -83,6 +83,7 @@ public class HoodSubsystem extends SubsystemBase {
     m_request = new MotionMagicExpoVoltage(0);
 
     limitSwitch = new DigitalInput(0); // TODO: change to actual value
+    setHoodPositionToRetracted();
   }
 
   @Override
@@ -99,6 +100,8 @@ public class HoodSubsystem extends SubsystemBase {
     Logger.recordOutput("hood desired angle", desiredAngle.getDegrees());
     Logger.recordOutput("hood motor output", hoodMotor.get());
     Logger.recordOutput("hood current angle", getCurrentAngle().getDegrees());
+    System.out.println("HOOD ANGLE: " + getCurrentAngle().getDegrees());
+    System.out.println("DESIRED HOOD ANGLE: " + desiredAngle.getDegrees());
     Logger.recordOutput("hood current velocity", hoodMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("hood retract limit switch", isRetractedLimitSwitchPressed());
   }
@@ -106,10 +109,10 @@ public class HoodSubsystem extends SubsystemBase {
   public void setDesiredAngle(Rotation2d desiredAngle) {
     // TODO maybe wrap angle like % 360
     // TODO: check this logic -- don't really know whats going on
-    if (desiredAngle.getDegrees() > 77) {
+    if (desiredAngle.getDegrees() > 83) { // 77
       desiredAngle = RETRACTED_POSITION;
     }
-    if (desiredAngle.getDegrees() < 57) {
+    if (desiredAngle.getDegrees() < 43) { // 57
       desiredAngle = MAX_EXTENSION;
     }
     this.desiredAngle = desiredAngle;
@@ -122,15 +125,20 @@ public class HoodSubsystem extends SubsystemBase {
   public double degreesToRevs(double hoodAngleDegrees) {
     return hoodAngleDegrees
         / 360.0
-        * REAL_HOOD_GEAR_RATIO; // * HOOD_SHAFT_REVS_PER_MECH_REV * HOOD_GEARBOX_RATIO;
+        /** REAL_HOOD_GEAR_RATIO; */
+        * HOOD_SHAFT_REVS_PER_MECH_REV
+        * HOOD_GEARBOX_RATIO;
     // TODO change back for prototype testing
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
     double hoodAngleDegrees =
-        motorPositionRevs / REAL_HOOD_GEAR_RATIO; // motorPositionRevs / HOOD_GEARBOX_RATIO /
-    // HOOD_SHAFT_REVS_PER_MECH_REV * 360 % 360; // TODO change back for prototype testing
+        /*motorPositionRevs / REAL_HOOD_GEAR_RATIO;*/ motorPositionRevs
+            / HOOD_GEARBOX_RATIO
+            / HOOD_SHAFT_REVS_PER_MECH_REV
+            * 360
+            % 360; // TODO change back for prototype testing
     return new Rotation2d(
         Math.toRadians(
             hoodAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
@@ -146,7 +154,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void setHoodPositionToRetracted() {
-    hoodMotor.setPosition(degreesToRevs(57));
+    hoodMotor.setPosition(degreesToRevs(83)); // 57?
   }
 
   public void setRetractingToLimitSwitch(boolean retracting) {

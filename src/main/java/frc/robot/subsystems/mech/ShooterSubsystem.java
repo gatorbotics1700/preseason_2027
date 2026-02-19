@@ -80,6 +80,8 @@ public class ShooterSubsystem extends SubsystemBase {
     } else {
       Logger.recordOutput("Kicker", false);
     }
+
+    System.out.println("SHOULD SHOOT: " + true);
   }
 
   public void setFlywheelVelocity(double desiredFlywheelVelocity) {
@@ -123,6 +125,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public static double calculateFlywheelSpeed(double shotSpeed) {
+    System.out.println("FLYWHEEL SPEED: " + shotSpeed / FLYWHEEL_RADIUS);
     return shotSpeed / FLYWHEEL_RADIUS;
   }
 

@@ -485,7 +485,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     // }
     // return null;
 
-    return new Translation2d(147.0, 0);
+    return new Translation2d(3.734, 0);
   }
 
   public void disableTargetPointFacing() {
@@ -506,7 +506,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
           Pose2d currentPose = getPose();
           double deltaX = targetPoint.getX() - currentPose.getX();
           double deltaY = targetPoint.getY() - currentPose.getY();
-          return angleToPoint(deltaX, deltaY);
+          return angleToPoint(deltaX, deltaY).plus(Rotation2d.fromDegrees(90));
         };
   }
 

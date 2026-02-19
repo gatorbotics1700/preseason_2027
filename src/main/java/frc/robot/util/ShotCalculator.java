@@ -16,17 +16,17 @@ import org.littletonrobotics.junction.Logger;
 
 @AutoLog
 public class ShotCalculator {
-  public static double SHOT_DEADBAND = 0.1;
-  public static double MIN_SHOT_HEIGHT = 2;
-  public static double MAX_SHOT_HEIGHT = 10;
+  public static double SHOT_DEADBAND = 0.05;
+  public static double MIN_SHOT_HEIGHT = 1; // 2;
+  public static double MAX_SHOT_HEIGHT = 2; // 10;
   public static double MIN_SHOT_SPEED = 0;
   public static double MAX_SHOT_SPEED = 25;
   public static Rotation2d MIN_HOOD_ANGLE =
-      new Rotation2d(Math.toRadians(45)); // TODO get real number from build
+      new Rotation2d(Math.toRadians(43)); // TODO get real number from build
   public static Rotation2d MAX_HOOD_ANGLE =
-      new Rotation2d(Math.toRadians(90)); // TODO get real number from build
-  public static double lastError = 20;
-  public static int loopCount = 0;
+      new Rotation2d(Math.toRadians(83)); // TODO get real number from build
+  // public static double lastError = 20;
+  // public static int loopCount = 0;
 
   public static double speedRange = MAX_SHOT_SPEED - MIN_SHOT_SPEED;
   public static int speedIterations = (int) (speedRange / 0.5);
