@@ -32,8 +32,13 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
   private final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-  public final Rotation2d EXTENDED_POSITION = new Rotation2d(Math.toRadians(85)); // TODO: change
-  public final Rotation2d RETRACTED_POSITION = new Rotation2d(Math.toRadians(0)); // TODO: change
+  public final double EXTENDED_ANGLE_DEGREES = 85;
+  public final double RETRACTED_ANGLE_DEGREES = 0;
+
+  public final Rotation2d EXTENDED_POSITION =
+      new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
+  public final Rotation2d RETRACTED_POSITION =
+      new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
 
   public IntakeSubsystem() {
     // TODO change back to mechCANbus for robot
@@ -111,6 +116,14 @@ public class IntakeSubsystem extends SubsystemBase {
       setDeployPositionToZero();
     }
     // intakeMotor.setVoltage(desiredVoltage);
+  }
+
+  public void retractDeployMotor() {
+    deployMotor.setControl(m_request.withPosition(degreesToRevs(RETRACTED_ANGLE_DEGREES)));
+  }
+
+  public void extendDeployMotor() {
+    deployMotor.setControl(m_request.withPosition(degreesToRevs(EXTENDED_ANGLE_DEGREES)));
   }
 
   public void setDesiredAngle(

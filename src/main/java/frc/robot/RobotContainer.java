@@ -36,7 +36,7 @@ import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodRetractCommand;
-import frc.robot.commands.mech.HoodRetractToLimitCommand;
+import frc.robot.commands.mech.HoodHomingCommand;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
 import frc.robot.generated.TunerConstants;
@@ -550,7 +550,7 @@ public class RobotContainer {
         // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
         // }));
 
-        controller_two.y().onTrue(new HoodRetractToLimitCommand(hoodSubsystem));
+        controller_two.y().onTrue(new HoodHomingCommand(hoodSubsystem));
 
         // commented this out because it's using a shot parameters thing we were
         // calculating in
