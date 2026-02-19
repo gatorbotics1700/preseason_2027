@@ -41,7 +41,6 @@ public class IntakeSubsystem extends SubsystemBase {
       new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
 
   public IntakeSubsystem() {
-    // TODO change back to mechCANbus for robot
     intakeMotor = new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 

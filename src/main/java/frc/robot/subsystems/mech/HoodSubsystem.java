@@ -48,7 +48,7 @@ public class HoodSubsystem extends SubsystemBase {
   private final TalonFX hoodMotor =
       new TalonFX(
           Constants.HOOD_MOTOR_CAN_ID,
-          TunerConstants.mechCANBus); // TODO put back mechCANBus on real robot
+          TunerConstants.mechCANBus);
   private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;

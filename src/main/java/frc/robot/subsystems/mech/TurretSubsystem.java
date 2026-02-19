@@ -41,7 +41,7 @@ public class TurretSubsystem extends SubsystemBase {
     turretMotor =
         new TalonFX(
             Constants.TURRET_MOTOR_CAN_ID,
-            TunerConstants.mechCANBus); // TODO change back to mechCANBus for robot
+            TunerConstants.mechCANBus);
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     desiredAngle = new Rotation2d(0);
