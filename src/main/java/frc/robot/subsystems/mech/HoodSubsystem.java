@@ -40,13 +40,9 @@ public class HoodSubsystem extends SubsystemBase {
   private Rotation2d desiredAngle = RETRACTED_POSITION;
   private final double POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
-  // PROTOTYPE GEAR RATIOS
-  private static final double HOOD_SHAFT_REVS_PER_MECH_REV = 155.0 / 15.0;
-  private static final double HOOD_GEARBOX_RATIO = 9.0;
-  private double desiredVelocity;
-
-  // REAL HOOD GEAR RATIOS
-  private static final double REAL_HOOD_GEAR_RATIO = 2.25;
+  // GEAR RATIOS
+  private static final double HOOD_SHAFT_REVS_PER_MECH_REV = RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
+  private static final double HOOD_GEAR_RATIO = RobotConfigLoader.getDouble("mech.hood_gear_ratio");
 
   private final TalonFX hoodMotor =
       new TalonFX(
@@ -132,20 +128,18 @@ public class HoodSubsystem extends SubsystemBase {
   public double degreesToRevs(double hoodAngleDegrees) {
     return hoodAngleDegrees
         / 360.0
-        /** REAL_HOOD_GEAR_RATIO; */
         * HOOD_SHAFT_REVS_PER_MECH_REV
-        * HOOD_GEARBOX_RATIO;
-    // TODO change back for prototype testing
+        * HOOD_GEAR_RATIO;
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
     double hoodAngleDegrees =
-        /*motorPositionRevs / REAL_HOOD_GEAR_RATIO;*/ motorPositionRevs
-            / HOOD_GEARBOX_RATIO
+        motorPositionRevs
+            / HOOD_GEAR_RATIO
             / HOOD_SHAFT_REVS_PER_MECH_REV
             * 360
-            % 360; // TODO change back for prototype testing
+            % 360; 
     return new Rotation2d(
         Math.toRadians(
             hoodAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
