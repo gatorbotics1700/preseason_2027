@@ -13,13 +13,20 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
+
   public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(83)); // TODO: check number //77
+      new Rotation2d(
+          Math.toRadians(
+              RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number //77
   public static final Rotation2d MAX_EXTENSION =
-      new Rotation2d(Math.toRadians(43)); // TODO: check number //57
+      new Rotation2d(
+          Math.toRadians(
+              RobotConfigLoader.getInt(
+                  "mech.hood_max_extension_degrees"))); // TODO: check number //57
 
   private final DigitalInput limitSwitch;
   private boolean wasLimitSwitchPressed = false;
