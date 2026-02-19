@@ -54,6 +54,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.RobotConfigLoader;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -478,6 +479,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   private Translation2d getAllianceTargetPoint() {
+    // TODO: this needs to be reset to target the hubs eventually
     // if (DriverStation.getAlliance().isPresent()) {
     //   return DriverStation.getAlliance().get() == Alliance.Red
     //       ? Constants.RED_HUB.toTranslation2d()
@@ -506,7 +508,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
           Pose2d currentPose = getPose();
           double deltaX = targetPoint.getX() - currentPose.getX();
           double deltaY = targetPoint.getY() - currentPose.getY();
-          return angleToPoint(deltaX, deltaY).plus(Rotation2d.fromDegrees(90));
+          if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
+            return angleToPoint(deltaX, deltaY).plus(Rotation2d.fromDegrees(90));
+          }
+          return angleToPoint(deltaX, deltaY);
         };
   }
 

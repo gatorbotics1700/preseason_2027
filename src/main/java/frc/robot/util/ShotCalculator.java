@@ -22,9 +22,9 @@ public class ShotCalculator {
   public static double MIN_SHOT_SPEED = 0;
   public static double MAX_SHOT_SPEED = 25;
   public static Rotation2d MIN_HOOD_ANGLE =
-      new Rotation2d(Math.toRadians(43)); // TODO get real number from build
+      new Rotation2d(Math.toRadians(RobotConfigLoader.getInt("mech.hood_max_extension_degrees")));
   public static Rotation2d MAX_HOOD_ANGLE =
-      new Rotation2d(Math.toRadians(83)); // TODO get real number from build
+      new Rotation2d(Math.toRadians(RobotConfigLoader.getInt("mech.hood_retracted_degrees")));
   // public static double lastError = 20;
   // public static int loopCount = 0;
 

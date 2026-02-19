@@ -79,7 +79,9 @@ public class ShootingCommand extends Command {
               ? Constants.BLUE_HUB
               : Constants.RED_HUB;
     }
-    target = new Translation3d(3.734, 0, 0.813);
+    target =
+        new Translation3d(
+            3.734, 0, 0.813); // TODO: get rid of this when we want to use actual field coords
     ShotParameters params =
         ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
     System.out.println("PARAMS SHOT SPEED: " + params.shotSpeed);

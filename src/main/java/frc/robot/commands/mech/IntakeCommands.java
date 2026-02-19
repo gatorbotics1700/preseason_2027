@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.vision.Vision;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakeCommands {
 
@@ -20,27 +19,17 @@ public class IntakeCommands {
   private IntakeCommands() {}
 
   public static Command RetractIntake(IntakeSubsystem intakeSubsystem) {
-    return new InstantCommand(
-        () -> {
-          Logger.recordOutput("Auto/Intake/Command", "RETRACT");
-          Logger.recordOutput("Auto/Intake/TargetAngle", intakeSubsystem.RETRACTED_POSITION);
-          intakeSubsystem.setDesiredAngle(intakeSubsystem.RETRACTED_POSITION);
-        });
+    return new DeployIntakeCommand(true, intakeSubsystem);
   }
 
   public static Command DeployIntake(IntakeSubsystem intakeSubsystem) {
-    return new InstantCommand(
-        () -> {
-          Logger.recordOutput("Auto/Intake/Command", "DEPLOY");
-          Logger.recordOutput("Auto/Intake/TargetAngle", intakeSubsystem.EXTENDED_POSITION);
-          intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
-        });
+    return new DeployIntakeCommand(false, intakeSubsystem);
   }
 
   public static Command RunIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
-          intakeSubsystem.setIntakeVoltage(10);
+          intakeSubsystem.setIntakeVoltage(INTAKING_VOLTAGE);
         });
   }
 

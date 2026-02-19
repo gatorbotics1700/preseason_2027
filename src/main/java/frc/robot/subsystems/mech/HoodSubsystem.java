@@ -57,8 +57,13 @@ public class HoodSubsystem extends SubsystemBase {
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
 
-    talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+    if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
+      talonFXConfigs.withMotorOutput(
+          new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+    } else {
+      talonFXConfigs.withMotorOutput(
+          new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+    }
 
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
@@ -113,9 +118,7 @@ public class HoodSubsystem extends SubsystemBase {
   public void setDesiredAngle(Rotation2d desiredAngle) {
     // TODO maybe wrap angle like % 360
     // TODO: check this logic -- don't really know whats going on
-    if (desiredAngle.getDegrees()
-        > RETRACTED_POSITION
-            .getDegrees()) { // TODO: CHECK VALUE!!! I was told 77 but shouldnt it be 103 because
+    if (desiredAngle.getDegrees() > RETRACTED_POSITION.getDegrees()) {
       // the min is
       // negative?
       desiredAngle = RETRACTED_POSITION;
