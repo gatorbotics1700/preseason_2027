@@ -487,7 +487,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     double yError = calculateDistanceError(currentPose.getY(), desiredPose.getY());
     double rotationError =
         calculateRotationError(
-            desiredPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
+            currentPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
 
     double xSpeed =
         Math.max(Math.abs(xError * TRANSLATION_kP), TRANSLATION_MIN_SPEED) * Math.signum(xError);

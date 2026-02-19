@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.Calculations;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -48,7 +49,7 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final List<Pose3d> tagPoses = new LinkedList<>();
   private boolean hasTargetInSim;
-  private final Translation2d[] simulatedTargets = {new Translation2d(6.711,5.71),new Translation2d(8.356,3.22),new Translation2d(7.331,0.896),new Translation2d(9.614,5.085),new Translation2d(9.501,6.622)};
+  private ArrayList<Translation2d> simulatedTargets = new ArrayList<Translation2d>();
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -68,7 +69,8 @@ public class Vision extends SubsystemBase {
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
 
-    hasTargetInSim=false;
+    hasTargetInSim = false;
+    resetSimulatedTargets();
   }
 
   /**
@@ -104,7 +106,7 @@ public class Vision extends SubsystemBase {
           }
           double targetPixelsX = sumX / 4.0;
           double targetPixelsY = sumY / 4.0;
-          //both pitch and yaw are using right hand coordinate system
+          // both pitch and yaw are using right hand coordinate system
           double targetPitchDegrees = (targetPixelsY - 240) / 480 * 52.5;
           double targetYawDegrees =
               -(targetPixelsX - 320)
@@ -175,22 +177,20 @@ public class Vision extends SubsystemBase {
     return fuelPose;
   }
 
-  public Pose2d tempGetFuelPoseInSim(Pose2d robotPose){
-    
+  public Pose2d tempGetFuelPoseInSim(Pose2d robotPose) {
+
     // System.out.println("fuelPose before rotation stuff: " + fuelPose);
-    if (!hasTargetInSim) {
-      return null;
+    // if (!hasTargetInSim) {
+    //   return null;
+    // }
+    int closestFuelIndex = getClosestFuelIndex(robotPose);
+    Pose2d closestFuelPose = null;
+    if (closestFuelIndex != -1) {
+      closestFuelPose = new Pose2d(simulatedTargets.get(closestFuelIndex), new Rotation2d());
+    } else {
+      return closestFuelPose;
     }
-    Pose2d closestFuelPose=null;
-    double minDistInMeters=16;
-    for(Translation2d target:simulatedTargets){
-        Pose2d targetPose = new Pose2d(target,new Rotation2d());
-        double robotToTargetDist=Calculations.distanceToPoseInMeters(robotPose, targetPose);
-        if(robotToTargetDist<minDistInMeters){
-          minDistInMeters=robotToTargetDist;
-          closestFuelPose=targetPose;
-        }
-    }
+
     double deltaX = closestFuelPose.getX() - robotPose.getX();
     double deltaY = closestFuelPose.getY() - robotPose.getY();
     // Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
@@ -207,6 +207,35 @@ public class Vision extends SubsystemBase {
     // which is 180
     // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
     return closestFuelPose;
+  }
+
+  private int getClosestFuelIndex(Pose2d robotPose) {
+    double minDistInMeters = 16;
+    int closestFuelIndex = -1;
+    for (int t = 0; t < simulatedTargets.size(); t++) {
+      Translation2d target = simulatedTargets.get(t);
+      Pose2d targetPose = new Pose2d(target, new Rotation2d());
+      // Logger.recordOutput("Odometry/simuatedTarget" + t, targetPose);
+      double robotToTargetDist = Calculations.distanceToPoseInMeters(robotPose, targetPose);
+      if (robotToTargetDist < minDistInMeters) {
+        minDistInMeters = robotToTargetDist;
+        closestFuelIndex = t;
+      }
+    }
+    return closestFuelIndex;
+  }
+
+  public void deleteClosestFuel(Pose2d robotPose) {
+    simulatedTargets.remove(getClosestFuelIndex(robotPose));
+  }
+
+  public void resetSimulatedTargets() {
+    simulatedTargets.clear();
+    simulatedTargets.add(new Translation2d(6.711, 5.71));
+    simulatedTargets.add(new Translation2d(8.356, 3.22));
+    simulatedTargets.add(new Translation2d(7.331, 0.896));
+    simulatedTargets.add(new Translation2d(9.614, 5.085));
+    simulatedTargets.add(new Translation2d(9.501, 6.622));
   }
 
   @Override
@@ -325,6 +354,13 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+
+    Logger.recordOutput("Odometry/hasTargetInSim", hasTargetInSim);
+    for (int t = 0; t < simulatedTargets.size(); t++) {
+      Translation2d target = simulatedTargets.get(t);
+      Pose2d targetPose = new Pose2d(target, new Rotation2d());
+      Logger.recordOutput("Odometry/simuatedTarget" + t, targetPose);
+    }
   }
 
   @FunctionalInterface
@@ -362,7 +398,7 @@ public class Vision extends SubsystemBase {
     io[0].getCamera().takeInputSnapshot();
   }
 
-  public void toggleSimHasTarget(){
-    hasTargetInSim=!hasTargetInSim;
+  public void toggleSimHasTarget() {
+    hasTargetInSim = !hasTargetInSim;
   }
 }

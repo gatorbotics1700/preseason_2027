@@ -40,27 +40,32 @@ public class DriveToFuelCommand extends Command {
   public void execute() {
     Pose2d currentPose = drive.getPose();
     Pose2d newFuelPose;
-    if(Constants.currentMode==Constants.Mode.SIM){
-      newFuelPose=vision.tempGetFuelPoseInSim(currentPose);
-    }else{
-    newFuelPose = vision.getFuelPose(currentPose);
-  }
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      newFuelPose = vision.tempGetFuelPoseInSim(currentPose);
+    } else {
+      newFuelPose = vision.getFuelPose(currentPose);
+    }
     if (newFuelPose != null) {
-      //TODO think about the case where theres a ball in the blind spot but you still see another target uh oh
+      // TODO think about the case where theres a ball in the blind spot but you still see another
+      // target uh oh
       desiredPose = newFuelPose;
       double xError = drive.calculateDistanceError(currentPose.getX(), desiredPose.getX());
       double yError = drive.calculateDistanceError(currentPose.getY(), desiredPose.getY());
       double rotationError =
           drive.calculateRotationError(
-              desiredPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
-      boolean atDesiredPose = xError == 0.0 && yError == 0.0 && rotationError == 0.0;
+              currentPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
+      boolean atDesiredPose = xError == 0.0 && yError == 0.0;
       if (atDesiredPose) {
+        if (Constants.currentMode == Constants.Mode.SIM) {
+          vision.deleteClosestFuel(currentPose);
+        }
         desiredPose = null;
       }
     } else {
       // if we no longer see fuel and it's far enough away, we can safely assume somebody else stole
       // it so we should stop trying to go there
-      if (Calculations.distanceToPoseInMeters(currentPose, desiredPose) > BLIND_SPOT_DEADBAND) {
+      if (desiredPose != null
+          && Calculations.distanceToPoseInMeters(currentPose, desiredPose) > BLIND_SPOT_DEADBAND) {
         desiredPose = null;
       }
     }
