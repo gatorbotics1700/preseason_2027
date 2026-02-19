@@ -8,8 +8,7 @@ import frc.robot.subsystems.mech.TurretSubsystem;
  */
 public class TurretHomingCommand extends Command {
   private final TurretSubsystem turretSubsystem;
-  private double homingVoltage = 0.5; // TODO: change
-  private double currentToZeroError;
+  private double homingVoltage = 0.5; // TODO: change, plus check direction
 
   public TurretHomingCommand(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
@@ -25,14 +24,11 @@ public class TurretHomingCommand extends Command {
     if (!turretSubsystem.getHallEffectValue()) {
       turretSubsystem.setMotorVoltage(homingVoltage);
     }
-    currentToZeroError = turretSubsystem.getTurretOffset();
   }
 
   @Override
   public void end(boolean interrupted) {
-    turretSubsystem.turretMotor.setPosition(
-        turretSubsystem.getTurretOffset()
-            + turretSubsystem.getCurrentToOffsetError()); // TODO: VIVIEN APPLY MATH
+    turretSubsystem.homeTurret();
   }
 
   @Override
