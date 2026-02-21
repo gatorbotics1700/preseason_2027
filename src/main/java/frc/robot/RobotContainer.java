@@ -14,8 +14,7 @@
 // TODO: add mech commands into auto stuff
 package frc.robot;
 
-// import frc.robot.commands.AutoDriveCommand;
-// import frc.robot.commands.TeleopDriveCommand;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -154,53 +153,6 @@ public class RobotContainer {
 
     //     hoodSubsystem = new HoodSubsystem();
 
-    // Named Commands
-    NamedCommands.registerCommand(
-        "Shooter Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
-
-    // intake commands
-
-    NamedCommands.registerCommand(
-        "Intake Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance()
-                  .schedule(
-                      IntakeCommands.DeployIntake(intakeSubsystem)
-                          .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
-            }));
-
-    NamedCommands.registerCommand(
-        "Stop Kicker Command",
-        new InstantCommand(
-            () -> {
-              CommandScheduler.getInstance().schedule(Commands.none());
-            }));
-
-    // CLIMB COMMAND
-
-    // NamedCommands.registerCommand(
-    //     "Climb Command",
-    //     new InstantCommand(
-    //         () -> {
-    //           try {
-    //             CommandScheduler.getInstance()
-    //                 .schedule(ClimbCommands.Climb(drive, climberSubsystem));
-    //           } catch (Exception e) {
-    //             e.printStackTrace();
-    //           }
-    //         }));
-
-    // mech buttons
-    // new Trigger(controller_two::getXButtonPressed)
-    //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-    // new Trigger(controller_two::getYButtonPressed).onTrue(new HoodCommand(hoodSubsystem, false,
-    // 0));
-
     // Set up auto routines with multi-step chooser
     multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
 
@@ -219,8 +171,6 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // Configure the button bindings
   }
 
   /**
@@ -360,7 +310,6 @@ public class RobotContainer {
   }
 
   public void configureCodriverButtonBindings() {
-    controller_two = new CommandXboxController(3);
     if (DriverStation.isJoystickConnected(3)) {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
@@ -572,65 +521,6 @@ public class RobotContainer {
     //   }
     // }
 
-    // // drive over bump
-    // controller
-    //     .a()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               try {
-    //                 CommandScheduler.getInstance()
-    //                     .schedule(DriveOverBumpCommand.driveOverBump(drive));
-    //               } catch (Exception e) {
-    //                 e.printStackTrace();
-    //               }
-    //             }));
-
-    // // Reset gyro to 0° when B button is pressed
-    // controller
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () -> {
-    //                   if (DriverStation.getAlliance().isPresent()
-    //                       && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-    //                     drive.setPose(
-    //                         new Pose2d(
-    //                             drive.getPose().getTranslation(),
-    //                             new Rotation2d(Math.toRadians(0))));
-    //                   } else {
-    //                     drive.setPose(
-    //                         new Pose2d(
-    //                             drive.getPose().getTranslation(),
-    //                             new Rotation2d(Math.toRadians(0))));
-    //                   }
-    //                 },
-    //                 drive)
-    //             .ignoringDisable(true));
-
-    // // drive under trench
-    // controller
-    //     .x()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               try {
-    //                 CommandScheduler.getInstance()
-    //                     .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
-    //               } catch (Exception e) {
-    //                 e.printStackTrace();
-    //               }
-    //             }));
-
-    controller_two
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  drive.setSlowDrive();
-                },
-                drive));
-
     // controller_two
     //     .a()
     //     .onTrue(
@@ -654,13 +544,20 @@ public class RobotContainer {
     //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
 
     // Schedule a new DriveToFuel command on each press (fresh pose from vision each time)
-    controller_two
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.setPose(new Pose2d(3, 4, new Rotation2d()));
-                }));
+    // controller_two
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 CommandScheduler.getInstance()
+    //                     .schedule(IntakeCommands.DriveToFuel(drive, vision))));
+    // controller_two
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.setPose(new Pose2d(3, 4, new Rotation2d()));
+    //             }));
   }
 
   public Command getAutonomousCommand() {
@@ -714,6 +611,7 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverButtonBindings();
     configureCodriverButtonBindings();
   }
