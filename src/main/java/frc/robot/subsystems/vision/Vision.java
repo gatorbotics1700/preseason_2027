@@ -226,7 +226,10 @@ public class Vision extends SubsystemBase {
   }
 
   public void deleteClosestSimulatedTarget(Pose2d robotPose) {
-    simulatedTargets.remove(getValidFuelIndexSim(robotPose));
+    int index = getValidFuelIndexSim(robotPose);
+    if (index != -1) {
+      simulatedTargets.remove(getValidFuelIndexSim(robotPose));
+    }
   }
 
   public void resetSimulatedTargets() {
@@ -240,7 +243,10 @@ public class Vision extends SubsystemBase {
 
   public boolean canSeeSimulatedTarget(Pose2d robotPose, Translation2d fuelPosition) {
     final double SIMULATED_CAMERA_FOV_DEGREES = 70;
-    robotPose = robotPose.rotateBy(new Rotation2d(Math.toRadians(180)));
+    robotPose =
+        new Pose2d(
+            robotPose.getTranslation(),
+            robotPose.getRotation().rotateBy(new Rotation2d(Math.toRadians(180))));
     Rotation2d leftSlope =
         robotPose
             .getRotation()
@@ -383,11 +389,11 @@ public class Vision extends SubsystemBase {
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
 
-    Logger.recordOutput("Odometry/hasTargetInSim", hasTargetInSim);
+    Logger.recordOutput("DriveToFuel/hasTargetInSim", hasTargetInSim);
     for (int t = 0; t < simulatedTargets.size(); t++) {
       Translation2d target = simulatedTargets.get(t);
       Pose2d targetPose = new Pose2d(target, new Rotation2d());
-      Logger.recordOutput("Odometry/simuatedTarget" + t, targetPose);
+      Logger.recordOutput("DriveToFuel/simuatedTarget" + t, targetPose);
     }
   }
 

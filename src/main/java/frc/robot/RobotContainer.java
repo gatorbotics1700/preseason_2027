@@ -350,12 +350,12 @@ public class RobotContainer {
                     ;
                   }));
       controller
-        .b()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.setPose(new Pose2d(6, 4, new Rotation2d()));
-                }));
+          .b()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    drive.setPose(new Pose2d(6, 4, new Rotation2d()));
+                  }));
     }
   }
 

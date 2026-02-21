@@ -17,10 +17,11 @@ public class DriveToFuelCommand extends Command {
   private Pose2d desiredPose;
 
   private static final double BLIND_SPOT_DEADBAND = 0.5; // TODO change
-  private static final double MAX_IDLE_TIME_SECONDS = 2; // TODO change based off real world maybe?
+  private static final double MAX_IDLE_MILLISECONDS =
+      2000; // TODO change based off real world maybe?
 
   private static final double ROTATING_SPEED_RADIANS_PER_SECOND =
-      2; // TODO change based off real life
+      2.5; // TODO change based off real life
 
   private double validTargetSeenTime;
 
@@ -28,6 +29,7 @@ public class DriveToFuelCommand extends Command {
   public DriveToFuelCommand(Drive drive, Vision vision) {
     this.drive = drive;
     this.vision = vision;
+    validTargetSeenTime = 0.0;
     addRequirements(drive, vision);
   }
 
@@ -45,22 +47,12 @@ public class DriveToFuelCommand extends Command {
     } else {
       newFuelPose = vision.getFuelPose(currentPose);
     }
+
     if (newFuelPose != null) {
       // TODO think about the case where theres a ball in the blind spot but you still see another
       // target uh oh
       desiredPose = newFuelPose;
-      double xError = drive.calculateDistanceError(currentPose.getX(), desiredPose.getX());
-      double yError = drive.calculateDistanceError(currentPose.getY(), desiredPose.getY());
-      double rotationError =
-          drive.calculateRotationError(
-              currentPose.getRotation().getDegrees(), desiredPose.getRotation().getDegrees());
-      boolean atDesiredPose = xError == 0.0 && yError == 0.0;
-      if (atDesiredPose) {
-        if (Constants.currentMode == Constants.Mode.SIM) {
-          vision.deleteClosestSimulatedTarget(currentPose);
-        }
-        desiredPose = null;
-      }
+      System.out.println("newFuelPose: " + newFuelPose);
     } else {
       // if we no longer see fuel and it's far enough away, we can safely assume somebody else stole
       // it so we should stop trying to go there
@@ -69,17 +61,32 @@ public class DriveToFuelCommand extends Command {
         desiredPose = null;
       }
     }
-    Logger.recordOutput("Odometry/Desired Pose in Intake", desiredPose);
-    Logger.recordOutput("Odometry/Current Pose in Intake", currentPose);
-    System.out.println("this is the desired pose here u go: " + desiredPose);
-    System.out.println(
-        "this is the seconds since we saw a target last: "
-            + (System.currentTimeMillis() - validTargetSeenTime));
+    boolean atDesiredPose = false;
+
     if (desiredPose != null) {
+      double xError = drive.calculateDistanceError(currentPose.getX(), desiredPose.getX());
+      double yError = drive.calculateDistanceError(currentPose.getY(), desiredPose.getY());
+      atDesiredPose = xError == 0.0 && yError == 0.0;
+      System.out.println("at desired pose: " + xError + " " + yError);
+      if (atDesiredPose) {
+        if (Constants.currentMode == Constants.Mode.SIM) {
+          vision.deleteClosestSimulatedTarget(currentPose);
+          System.out.println("TARGET INTAKEN IN SIM");
+        }
+      }
+    }
+    Logger.recordOutput("DriveToFuel/Desired Pose in Intake", desiredPose);
+    Logger.recordOutput("DriveToFuel/Current Pose in Intake", currentPose);
+    Logger.recordOutput(
+        "DriveToFuel/time since target seen", System.currentTimeMillis() - validTargetSeenTime);
+    if (atDesiredPose
+        || desiredPose == null
+            && System.currentTimeMillis() - validTargetSeenTime > MAX_IDLE_MILLISECONDS) {
+      drive.runVelocity(new ChassisSpeeds(0, 0, ROTATING_SPEED_RADIANS_PER_SECOND));
+    } else if (desiredPose != null) {
+      System.out.println("this is the desired pose here u go: " + desiredPose);
       drive.driveToPose(desiredPose);
       validTargetSeenTime = System.currentTimeMillis();
-    } else if (System.currentTimeMillis() - validTargetSeenTime > MAX_IDLE_TIME_SECONDS) {
-      drive.runVelocity(new ChassisSpeeds(0, 0, ROTATING_SPEED_RADIANS_PER_SECOND));
     } else {
       drive.stop();
     }

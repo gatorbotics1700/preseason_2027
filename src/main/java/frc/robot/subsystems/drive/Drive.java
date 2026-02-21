@@ -146,9 +146,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private static final Translation2d BLUE_TARGET_POINT = new Translation2d(4.5, 4.026);
 
   private static final double TRANSLATION_kP = 2.5;
-  private static final double ROTATION_kP = 0.02;
-  private final double TRANSLATION_MIN_SPEED = 0.15;
-  private final double ROTATION_MIN_SPEED = 0.25;
+  private static final double ROTATION_kP = 0.1;
+  private final double TRANSLATION_MIN_SPEED = 0.5;
+  private final double ROTATION_MIN_SPEED = 0.3;
 
   public Drive(
       GyroIO gyroIO,
@@ -502,7 +502,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     if (ySpeed >= 1.8) {
       ySpeed = 1.8;
     }
-    System.out.println("rotationspeed:" + rotationSpeed);
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xSpeed, ySpeed, rotationSpeed, currentPose.getRotation()));
