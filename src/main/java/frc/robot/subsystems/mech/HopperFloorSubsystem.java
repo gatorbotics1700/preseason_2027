@@ -8,24 +8,23 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.HopperFloorConstants;
+import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class HopperFloorSubsystem extends SubsystemBase {
-  public static final double HOPPER_FLOOR_SPEED = 0.5;
   public final TalonFX hopperMotor;
-  private double hopperVelocity;
+  private double desiredHopperVelocity;
   private static TalonFXConfiguration talonFXConfigs;
   private static Slot0Configs slot0Configs;
   private static MotionMagicVelocityVoltage m_velocity;
 
   public HopperFloorSubsystem() {
-    hopperMotor = new TalonFX(Constants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    hopperMotor = new TalonFX(HopperFloorConstants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     // TALONFX CONFIGS & MOTION MAGIC VELOCITY VOLTAGE CONTROL // TODO check if this works with
     // motionMagicVelocityVoltage - may want to delete some values
-    hopperVelocity = 0.0;
+    desiredHopperVelocity = 0.0;
     m_velocity = new MotionMagicVelocityVoltage(0);
     talonFXConfigs = new TalonFXConfiguration();
 
@@ -56,12 +55,12 @@ public class HopperFloorSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    Logger.recordOutput("Mech/Hopper Floor/Desired Velocity", hopperVelocity);
+    Logger.recordOutput("Mech/Hopper Floor/Desired Velocity", desiredHopperVelocity);
     Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
-    hopperMotor.setControl(m_velocity.withVelocity(hopperVelocity));
+    hopperMotor.setControl(m_velocity.withVelocity(desiredHopperVelocity));
   }
 
-  public void setHopperFloorVelocity(double hopperVelocity) {
-    this.hopperVelocity = hopperVelocity;
+  public void setDesiredHopperFloorVelocity(double hopperVelocity) {
+    this.desiredHopperVelocity = hopperVelocity;
   }
 }

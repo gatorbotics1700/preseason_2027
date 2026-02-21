@@ -4,53 +4,29 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends SubsystemBase {
-  // retracted position is the max hood angle, because we measure from vertical
-  public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(
-          Math.toRadians(
-              RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number //77
-  public static final Rotation2d MIN_ANGLE =
-      new Rotation2d(
-          Math.toRadians(
-              RobotConfigLoader.getInt(
-                  "mech.hood_max_extension_degrees"))); // TODO: check number //57
 
   private final DigitalInput limitSwitch;
-  private boolean wasLimitSwitchPressed = false;
 
   // when false, run voltage control
   private boolean positionControl = true;
 
-  /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
-  // public static final double RETRACT_TO_LIMIT_VOLTAGE = -0.5;
-  public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
-
-  public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
-
-  private Rotation2d desiredAngle = RETRACTED_POSITION;
+  private Rotation2d desiredAngle = HoodConstants.RETRACTED_POSITION;
   public final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
-  // GEAR RATIOS
-  private static final double HOOD_SHAFT_REVS_PER_MECH_REV =
-      RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
-  private static final double HOOD_GEAR_RATIO = RobotConfigLoader.getDouble("mech.hood_gear_ratio");
-
   private final TalonFX hoodMotor =
-      new TalonFX(Constants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-  private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+      new TalonFX(HoodConstants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
 
@@ -66,7 +42,6 @@ public class HoodSubsystem extends SubsystemBase {
           new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
     }
 
-    // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
     slot0Configs.kG =
@@ -92,7 +67,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     m_request = new MotionMagicExpoVoltage(0);
 
-    limitSwitch = new DigitalInput(Constants.HOOD_LIMIT_SWITCH_PORT);
+    limitSwitch = new DigitalInput(HoodConstants.HOOD_LIMIT_SWITCH_PORT);
   }
 
   @Override
@@ -125,11 +100,11 @@ public class HoodSubsystem extends SubsystemBase {
 
   public void setDesiredAngle(Rotation2d desiredAngle) {
     positionControl = true;
-    if (desiredAngle.getDegrees() > RETRACTED_POSITION.getDegrees()) {
-      desiredAngle = RETRACTED_POSITION;
+    if (desiredAngle.getDegrees() > HoodConstants.RETRACTED_POSITION.getDegrees()) {
+      desiredAngle = HoodConstants.RETRACTED_POSITION;
     }
-    if (desiredAngle.getDegrees() < MIN_ANGLE.getDegrees()) {
-      desiredAngle = MIN_ANGLE;
+    if (desiredAngle.getDegrees() < HoodConstants.MIN_ANGLE.getDegrees()) {
+      desiredAngle = HoodConstants.MIN_ANGLE;
     }
     this.desiredAngle = desiredAngle;
   }
@@ -144,17 +119,21 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public double degreesToRevs(double hoodAngleDegrees) {
-    return hoodAngleDegrees / 360.0 * HOOD_SHAFT_REVS_PER_MECH_REV * HOOD_GEAR_RATIO;
+    return hoodAngleDegrees
+        / 360.0
+        * HoodConstants.HOOD_SHAFT_REVS_PER_MECH_REV
+        * HoodConstants.HOOD_GEAR_RATIO;
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
     double hoodAngleDegrees =
-        motorPositionRevs / HOOD_GEAR_RATIO / HOOD_SHAFT_REVS_PER_MECH_REV * 360 % 360;
-    return new Rotation2d(
-        Math.toRadians(
-            hoodAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
-    // seems nicer :/
+        motorPositionRevs
+            / HoodConstants.HOOD_GEAR_RATIO
+            / HoodConstants.HOOD_SHAFT_REVS_PER_MECH_REV
+            * 360
+            % 360;
+    return new Rotation2d(Math.toRadians(hoodAngleDegrees));
   }
 
   public void setHoodVoltage(double voltage) {
@@ -167,12 +146,6 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void zeroHood() {
-    hoodMotor.setPosition(degreesToRevs(RETRACTED_POSITION.getDegrees()));
-    // double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
-    // double offset = degreesToRevs(RETRACTED_POSITION.getDegrees());
-    // // if we assume the limit switch triggers at the retracted position, then we are calling this
-    // // method when the current position is the retracted position. therefore we want zero to be
-    // // wherever we are right now minus the retracted position
-    // hoodMotor.setPosition((motorPositionRevs - offset) % 1); // TODO logic check this math
+    hoodMotor.setPosition(degreesToRevs(HoodConstants.RETRACTED_POSITION.getDegrees()));
   }
 }

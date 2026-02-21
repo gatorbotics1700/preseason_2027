@@ -10,8 +10,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -28,28 +28,15 @@ public class IntakeSubsystem extends SubsystemBase {
   private double desiredIntakeVoltage;
   private double desiredDeployVoltage;
 
-  private static final int DEPLOY_GEARBOX_RATIO = 9; // TODO find the real value
-  private static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
-  private static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
-
-  public static final double EXTENDED_ANGLE_DEGREES =
-      85; // TODO figure out if this is from vertical or from retracted position?
-  public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
-
-  public static final Rotation2d EXTENDED_POSITION =
-      new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
-  public static final Rotation2d RETRACTED_POSITION =
-      new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
-
-  public static final double HOMING_VOLTAGE = 10; // TODO tune
-
   public IntakeSubsystem() {
-    intakeMotor = new TalonFX(Constants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-    deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    intakeMotor =
+        new TalonFX(IntakeConstants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    deployMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     desiredIntakeVoltage = 0;
     hallEffect =
-        new DigitalInput(Constants.INTAKE_HALL_EFFECT_PORT); // TODO:change port during testing
+        new DigitalInput(
+            IntakeConstants.INTAKE_HALL_EFFECT_PORT); // TODO:change port during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()
@@ -121,18 +108,20 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void retractDeployMotor() {
-    deployMotor.setControl(m_request.withPosition(degreesToRevs(RETRACTED_ANGLE_DEGREES)));
+    deployMotor.setControl(
+        m_request.withPosition(degreesToRevs(IntakeConstants.RETRACTED_ANGLE_DEGREES)));
   }
 
   public void extendDeployMotor() {
-    deployMotor.setControl(m_request.withPosition(degreesToRevs(EXTENDED_ANGLE_DEGREES)));
+    deployMotor.setControl(
+        m_request.withPosition(degreesToRevs(IntakeConstants.EXTENDED_ANGLE_DEGREES)));
   }
 
   public void setDesiredAngle(Rotation2d angle) {
-    if (angle.getDegrees() < RETRACTED_POSITION.getDegrees()) {
-      desiredAngle = RETRACTED_POSITION;
-    } else if (angle.getDegrees() > EXTENDED_POSITION.getDegrees()) {
-      desiredAngle = EXTENDED_POSITION;
+    if (angle.getDegrees() < IntakeConstants.RETRACTED_POSITION.getDegrees()) {
+      desiredAngle = IntakeConstants.RETRACTED_POSITION;
+    } else if (angle.getDegrees() > IntakeConstants.EXTENDED_POSITION.getDegrees()) {
+      desiredAngle = IntakeConstants.EXTENDED_POSITION;
     } else {
       desiredAngle = angle;
     }
@@ -153,9 +142,9 @@ public class IntakeSubsystem extends SubsystemBase {
     double motorPositionRevs = deployMotor.getPosition().getValueAsDouble();
     double deployAngleDegrees =
         motorPositionRevs
-            / DEPLOY_GEARBOX_RATIO
-            / DEPLOY_PULLEY_ONE_GEAR_RATIO
-            / DEPLOY_PULLEY_TWO_GEAR_RATIO
+            / IntakeConstants.DEPLOY_GEARBOX_RATIO
+            / IntakeConstants.DEPLOY_PULLEY_ONE_GEAR_RATIO
+            / IntakeConstants.DEPLOY_PULLEY_TWO_GEAR_RATIO
             * 360.0
             % 360; // TODO check if we multiply or divide by the gear ratio
     return new Rotation2d(
@@ -167,14 +156,14 @@ public class IntakeSubsystem extends SubsystemBase {
   public double degreesToRevs(double deployAngleDegrees) {
     return deployAngleDegrees
         / 360.0
-        * DEPLOY_PULLEY_TWO_GEAR_RATIO
-        * DEPLOY_PULLEY_ONE_GEAR_RATIO
-        * DEPLOY_GEARBOX_RATIO;
+        * IntakeConstants.DEPLOY_PULLEY_TWO_GEAR_RATIO
+        * IntakeConstants.DEPLOY_PULLEY_ONE_GEAR_RATIO
+        * IntakeConstants.DEPLOY_GEARBOX_RATIO;
   }
 
   public void zeroIntakeDeploy() {
     double motorPositionRevs = deployMotor.getPosition().getValueAsDouble();
-    double offset = degreesToRevs(RETRACTED_POSITION.getDegrees());
+    double offset = degreesToRevs(IntakeConstants.RETRACTED_POSITION.getDegrees());
     // if we assume the limit switch triggers at the retracted position, then we are calling this
     // method when the current position is the retracted position. therefore we want zero to be
     // wherever we are right now minus the retracted position

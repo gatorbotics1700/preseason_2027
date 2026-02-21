@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants;
-import frc.robot.subsystems.mech.HoodSubsystem;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.ShooterConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -25,8 +25,8 @@ public class ShotCalculator {
       30; // in mps, so calculate using flywheel rps * 2 * Math.PI * flywheel radius * flywheel slip
   // kraken x60 max velocity is ~100 rps
   // TODO we may not want this to be another variable
-  public static Rotation2d MIN_HOOD_ANGLE = HoodSubsystem.MIN_ANGLE;
-  public static Rotation2d MAX_HOOD_ANGLE = HoodSubsystem.RETRACTED_POSITION;
+  public static Rotation2d MIN_HOOD_ANGLE = HoodConstants.MIN_ANGLE;
+  public static Rotation2d MAX_HOOD_ANGLE = HoodConstants.RETRACTED_POSITION;
 
   // for testing only, used for logging where the calculator expects the ball to hit the target's
   // height ("land" on the target)
@@ -54,7 +54,8 @@ public class ShotCalculator {
   public static ShotParameters calculateShot(
       Pose2d drivetrainPose, ChassisSpeeds chassisSpeeds, Translation3d target) {
     // calculate field relative shooter pose
-    Translation3d fieldToShooter = getFieldToShooter(drivetrainPose, Constants.BOT_TO_SHOOTER);
+    Translation3d fieldToShooter =
+        getFieldToShooter(drivetrainPose, ShooterConstants.BOT_TO_SHOOTER);
 
     Rotation2d uncompTurretToTargetAngle = getFieldRelativeYaw(fieldToShooter, target);
 
@@ -271,7 +272,7 @@ public class ShotCalculator {
   public static Translation2d calculateShooterVelo(
       ChassisSpeeds chassisSpeeds, Rotation2d drivetrainHeading) {
     double botToShooterRadius =
-        Constants.BOT_TO_SHOOTER
+        ShooterConstants.BOT_TO_SHOOTER
             .getX(); // NOTE: this only works because the shooter is centered in the y, otherwise we
     // would need to use pythag
     double omegaAdjust = chassisSpeeds.omegaRadiansPerSecond * botToShooterRadius;

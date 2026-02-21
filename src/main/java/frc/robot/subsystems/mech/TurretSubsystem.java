@@ -13,8 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -28,10 +28,10 @@ public class TurretSubsystem extends SubsystemBase {
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
   private Encoder boreEncoder =
       new Encoder(
-          Constants.TURRET_BORE_ENCODER_PORT1,
-          Constants.TURRET_BORE_ENCODER_PORT2); // TODO real port values
+          TurretConstants.TURRET_BORE_ENCODER_PORT1,
+          TurretConstants.TURRET_BORE_ENCODER_PORT2); // TODO real port values
   private final DigitalInput hallEffect =
-      new DigitalInput(Constants.TURRET_HALL_EFFECT_PORT); // TODO real port values
+      new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT); // TODO real port values
   private final double TURRET_ENCODER_OFFSET = 0.0; // TODO: Find actual offset
   private final double TURRET_HOMING_ANGLE =
       0.0; // TODO: this is the angle for "zeroing" the turret but it might not actually be zero
@@ -42,7 +42,7 @@ public class TurretSubsystem extends SubsystemBase {
   private Rotation2d desiredAngle;
 
   public TurretSubsystem() {
-    turretMotor = new TalonFX(Constants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     desiredAngle = new Rotation2d(0);

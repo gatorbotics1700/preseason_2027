@@ -2,6 +2,7 @@ package frc.robot.commands.mech;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.HoodConstants;
 import frc.robot.subsystems.mech.HoodSubsystem;
 
 /**
@@ -29,7 +30,7 @@ public class HoodHomingCommand extends Command {
   public void execute() {
     if (!stageOneComplete) {
       // Move fast towards limit switch and rough zero
-      hoodSubsystem.setHoodVoltage(HoodSubsystem.FAST_HOMING_VOLTAGE);
+      hoodSubsystem.setHoodVoltage(HoodConstants.FAST_HOMING_VOLTAGE);
       if (hoodSubsystem.isRetractedLimitSwitchPressed()) {
         hoodSubsystem.zeroHood();
         stageOneComplete = true;
@@ -38,28 +39,22 @@ public class HoodHomingCommand extends Command {
       // Back off
       // TODO tune that angle
       hoodSubsystem.setDesiredAngle(
-          HoodSubsystem.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(5))));
+          HoodConstants.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(5))));
       if (hoodSubsystem.isRetractedLimitSwitchPressed()) {
         stageTwoComplete = true;
       }
     } else {
       // Move slowly towards limit switch and final zero
-      hoodSubsystem.setHoodVoltage(HoodSubsystem.SLOW_HOMING_VOLTAGE);
+      hoodSubsystem.setHoodVoltage(HoodConstants.SLOW_HOMING_VOLTAGE);
       if (hoodSubsystem.isRetractedLimitSwitchPressed()) {
         hoodSubsystem.zeroHood();
         hoodSubsystem.setDesiredAngle(
-            HoodSubsystem.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(1))));
+            HoodConstants.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(1))));
         stageThreeComplete = true;
         System.out.println("ENDING");
       }
     }
     System.out.println("HOMING");
-  }
-
-  // TODO delete?
-  @Override
-  public void end(boolean interrupted) {
-    // hoodSubsystem.setRetractingToLimitSwitch(false);
   }
 
   @Override

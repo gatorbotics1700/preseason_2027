@@ -8,14 +8,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.vision.Vision;
 
 public class IntakeCommands {
-
-  private static final double INTAKING_VOLTAGE =
-      10; // TODO get a real number (I just picked my favorite)
 
   private IntakeCommands() {}
 
@@ -37,7 +35,7 @@ public class IntakeCommands {
 
     @Override
     public void initialize() {
-      intakeSubsystem.setDeployVoltage(IntakeSubsystem.HOMING_VOLTAGE);
+      intakeSubsystem.setDeployVoltage(IntakeConstants.HOMING_VOLTAGE);
     }
 
     @Override
@@ -53,7 +51,7 @@ public class IntakeCommands {
       intakeSubsystem.zeroIntakeDeploy();
       ;
       intakeSubsystem.setDesiredAngle(
-          IntakeSubsystem.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
+          IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
       ;
     }
   }
@@ -61,7 +59,7 @@ public class IntakeCommands {
   public static Command RunIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
         () -> {
-          intakeSubsystem.setIntakeVoltage(INTAKING_VOLTAGE);
+          intakeSubsystem.setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
         });
   }
 

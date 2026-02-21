@@ -6,7 +6,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Constants.FieldCoordinates;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import java.io.IOException;
@@ -24,21 +24,21 @@ public class DriveOverBumpCommand {
     System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
     Command pathToFollow;
 
-    if (pose.getX() <= Constants.FIELD_CENTER.getX()) { // BLUE
-      if (pose.getY() < Constants.FIELD_CENTER.getY()
-          && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
+    if (pose.getX() <= FieldCoordinates.FIELD_CENTER.getX()) { // BLUE
+      if (pose.getY() < FieldCoordinates.FIELD_CENTER.getY()
+          && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B BR N to A"), constraints);
         shooterSubsystem.setShouldShoot(true);
-      } else if (pose.getY() > Constants.FIELD_CENTER.getY()
-          && pose.getX() < Constants.BLUE_BUMP_AND_TRENCH_X) {
+      } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
+          && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B BL N to A"), constraints);
         shooterSubsystem.setShouldShoot(true);
-      } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
-          && (pose.getX() > Constants.BLUE_BUMP_AND_TRENCH_X)) {
+      } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
+          && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B BL A to N"), constraints);
@@ -50,20 +50,20 @@ public class DriveOverBumpCommand {
         shooterSubsystem.setShouldShoot(false);
       }
     } else { // RED
-      if (pose.getY() < Constants.FIELD_CENTER.getY()
-          && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
+      if (pose.getY() < FieldCoordinates.FIELD_CENTER.getY()
+          && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R BL A to N"), constraints);
         shooterSubsystem.setShouldShoot(false);
-      } else if (pose.getY() > Constants.FIELD_CENTER.getY()
-          && pose.getX() < Constants.RED_BUMP_AND_TRENCH_X) {
+      } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
+          && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R BR A to N"), constraints);
         shooterSubsystem.setShouldShoot(false);
-      } else if ((pose.getY() > Constants.FIELD_CENTER.getY())
-          && (pose.getX() > Constants.RED_BUMP_AND_TRENCH_X)) {
+      } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
+          && (pose.getX() > FieldCoordinates.RED_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R BR N to A"), constraints);

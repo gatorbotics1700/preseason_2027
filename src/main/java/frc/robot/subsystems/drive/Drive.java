@@ -51,8 +51,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.Mode;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.RobotConfigLoader;
@@ -483,8 +484,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     // TODO: this needs to be reset to target the hubs eventually
     if (DriverStation.getAlliance().isPresent()) {
       return DriverStation.getAlliance().get() == Alliance.Red
-          ? Constants.RED_HUB.toTranslation2d()
-          : Constants.BLUE_HUB.toTranslation2d();
+          ? FieldCoordinates.RED_HUB.toTranslation2d()
+          : FieldCoordinates.BLUE_HUB.toTranslation2d();
     }
     return null;
 

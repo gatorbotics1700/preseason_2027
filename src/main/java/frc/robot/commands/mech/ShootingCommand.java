@@ -6,7 +6,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Constants.FieldCoordinates;
+import frc.robot.Constants.HopperFloorConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
@@ -58,26 +60,26 @@ public class ShootingCommand extends Command {
   @Override
   public void execute() {
     Translation3d target;
-    if (Constants.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
-        && drivetrainPose.get().getX() < Constants.RED_BUMP_AND_TRENCH_X) {
-      if (Constants.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
+    if (FieldCoordinates.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
+        && drivetrainPose.get().getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
+      if (FieldCoordinates.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
         target =
             DriverStation.getAlliance().get() == Alliance.Blue
-                ? Constants.BLUE_RIGHT_FUNNELING
-                : Constants.RED_LEFT_FUNNELING;
+                ? FieldCoordinates.BLUE_RIGHT_FUNNELING
+                : FieldCoordinates.RED_LEFT_FUNNELING;
 
       } else {
         target =
             DriverStation.getAlliance().get() == Alliance.Blue
-                ? Constants.BLUE_LEFT_FUNNELING
-                : Constants.RED_RIGHT_FUNNELING;
+                ? FieldCoordinates.BLUE_LEFT_FUNNELING
+                : FieldCoordinates.RED_RIGHT_FUNNELING;
       }
 
     } else {
       target =
           DriverStation.getAlliance().get() == Alliance.Blue
-              ? Constants.BLUE_HUB
-              : Constants.RED_HUB;
+              ? FieldCoordinates.BLUE_HUB
+              : FieldCoordinates.RED_HUB;
     }
     target =
         new Translation3d(
@@ -111,17 +113,18 @@ public class ShootingCommand extends Command {
         System.out.println("VALID SHOT VALID SHOT");
         shooterSubsystem.setDesiredFlywheelVelocity(
             desiredFlywheelSpeed); // set velocity to our desired velocity
-        hopperFloorSubsystem.setHopperFloorVelocity(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
+        hopperFloorSubsystem.setDesiredHopperFloorVelocity(
+            HopperFloorConstants.HOPPER_FLOOR_VELOCITY);
         if (Math.abs(shooterSubsystem.getFlywheelVelocity() - desiredFlywheelSpeed)
-            < ShooterSubsystem
+            < ShooterConstants
                 .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
           // velocity
           System.out.println("SHOOTING SHOOTING SHOOTING");
-          shooterSubsystem.setDesiredTransitionVoltage(ShooterSubsystem.TRANSITION_VOLTAGE);
+          shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
         }
       } else { // if we dont have a valid shot
         System.out.println("INVALID SHOT INVALID SHOT");
-        hopperFloorSubsystem.setHopperFloorVelocity(0);
+        hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
         shooterSubsystem.setDesiredTransitionVoltage(0);
       }
       // this requires the hood's zero to be vertical TODO: Check this!!
@@ -132,7 +135,7 @@ public class ShootingCommand extends Command {
       shooterSubsystem.setDesiredFlywheelVelocity(0);
       // shooterSubsystem.setFlywheelVoltage(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
-      hopperFloorSubsystem.setHopperFloorVelocity(0);
+      hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
     }
 
     // if (shooterSubsystem.getShouldShoot()) {
@@ -186,7 +189,7 @@ public class ShootingCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     shooterSubsystem.setDesiredFlywheelVelocity(0);
-    hopperFloorSubsystem.setHopperFloorVelocity(0);
+    hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
     shooterSubsystem.setDesiredTransitionVoltage(0);
   }
 }

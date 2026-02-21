@@ -8,18 +8,11 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
-  public static final double TRANSITION_VOLTAGE = 10;
-
-  public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
-  private static final double FLYWHEEL_RADIUS = 0.0508;
-  public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-  private static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
-
   private final TalonFX leftFlywheelMotor;
   private final TalonFX rightFlywheelMotor;
   private final TalonFX transitionMotor;
@@ -38,14 +31,12 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean shouldShoot;
 
   public ShooterSubsystem() {
-    // TODO put mech canbus id for real robot
     leftFlywheelMotor =
-        new TalonFX(Constants.LEFT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+        new TalonFX(ShooterConstants.LEFT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     rightFlywheelMotor =
-        new TalonFX(Constants.RIGHT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-    transitionMotor = new TalonFX(Constants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-
-    // setShooterVoltages(0, 0);
+        new TalonFX(ShooterConstants.RIGHT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    transitionMotor =
+        new TalonFX(ShooterConstants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     desiredFlywheelVelocity = 0.0;
 
@@ -159,11 +150,11 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getExitVelocity() {
-    return FLYWHEEL_SLIP
+    return ShooterConstants.FLYWHEEL_SLIP
         * getFlywheelVelocity()
         * 2
         * Math.PI
-        * Constants
+        * ShooterConstants
             .FLYWHEEL_RADIUS_METERS; // 0.7 for the slip is a tentative estimate to account for loss
     // of energy
     // due to
@@ -172,7 +163,11 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
-    return shotSpeed / FLYWHEEL_SLIP / 2 / Math.PI / Constants.FLYWHEEL_RADIUS_METERS;
+    return shotSpeed
+        / ShooterConstants.FLYWHEEL_SLIP
+        / 2
+        / Math.PI
+        / ShooterConstants.FLYWHEEL_RADIUS_METERS;
   }
 
   public boolean getShouldShoot() {

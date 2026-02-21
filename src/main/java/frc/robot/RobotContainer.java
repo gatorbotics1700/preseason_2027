@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FieldCoordinates;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
@@ -37,7 +39,7 @@ import frc.robot.commands.mech.HoodHomingCommand;
 import frc.robot.commands.mech.HoodRetractCommand;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -371,10 +373,10 @@ public class RobotContainer {
 
                       ChassisSpeeds cs = drive.getChassisSpeeds();
                       ShotParameters params =
-                          ShotCalculator.calculateShot(pose, cs, Constants.BLUE_HUB);
+                          ShotCalculator.calculateShot(pose, cs, FieldCoordinates.BLUE_HUB);
 
                       gamePieceSimulation.launchFuelBall(
-                          ShotCalculator.getFieldToShooter(pose, Constants.BOT_TO_SHOOTER),
+                          ShotCalculator.getFieldToShooter(pose, ShooterConstants.BOT_TO_SHOOTER),
                           cs,
                           drive.getRotation(),
                           params.shotSpeed,
@@ -385,12 +387,12 @@ public class RobotContainer {
             .b()
             .onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(1, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                        new Pose2d(1, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
                         new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
                     .andThen(
                         Commands.parallel(
                             AutoBuilder.pathfindToPose(
-                                new Pose2d(3, Constants.BLUE_HUB.getY(), new Rotation2d()),
+                                new Pose2d(3, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
                                 new PathConstraints(
                                     1, 12, Math.toRadians(700), Math.toRadians(1000))),
                             Commands.waitSeconds(0.2)
@@ -406,11 +408,11 @@ public class RobotContainer {
                                           ChassisSpeeds cs = drive.getChassisSpeeds();
                                           ShotParameters params =
                                               ShotCalculator.calculateShot(
-                                                  pose, cs, Constants.BLUE_HUB);
+                                                  pose, cs, FieldCoordinates.BLUE_HUB);
 
                                           gamePieceSimulation.launchFuelBall(
                                               ShotCalculator.getFieldToShooter(
-                                                  pose, Constants.BOT_TO_SHOOTER),
+                                                  pose, ShooterConstants.BOT_TO_SHOOTER),
                                               cs,
                                               pose.getRotation(),
                                               params.shotSpeed,
@@ -421,12 +423,13 @@ public class RobotContainer {
             .x()
             .onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(1, Constants.BLUE_HUB.getY() + 1, new Rotation2d()),
+                        new Pose2d(1, FieldCoordinates.BLUE_HUB.getY() + 1, new Rotation2d()),
                         new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
                     .andThen(
                         Commands.parallel(
                             AutoBuilder.pathfindToPose(
-                                new Pose2d(1, Constants.BLUE_HUB.getY() + 2, new Rotation2d()),
+                                new Pose2d(
+                                    1, FieldCoordinates.BLUE_HUB.getY() + 2, new Rotation2d()),
                                 new PathConstraints(
                                     3, 12, Math.toRadians(700), Math.toRadians(1000))),
                             Commands.waitSeconds(0.2)
@@ -442,11 +445,11 @@ public class RobotContainer {
                                           ChassisSpeeds cs = drive.getChassisSpeeds();
                                           ShotParameters params =
                                               ShotCalculator.calculateShot(
-                                                  pose, cs, Constants.BLUE_HUB);
+                                                  pose, cs, FieldCoordinates.BLUE_HUB);
 
                                           gamePieceSimulation.launchFuelBall(
                                               ShotCalculator.getFieldToShooter(
-                                                  pose, Constants.BOT_TO_SHOOTER),
+                                                  pose, ShooterConstants.BOT_TO_SHOOTER),
                                               cs,
                                               pose.getRotation(),
                                               params.shotSpeed,
@@ -691,7 +694,7 @@ public class RobotContainer {
             () -> {
               turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
               shooterSubsystem.setDesiredFlywheelVelocity(0);
-              transitionSubsystem.setHopperFloorVelocity(0);
+              transitionSubsystem.setDesiredHopperFloorVelocity(0);
               shooterSubsystem.setDesiredTransitionVoltage(0);
               hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
               hoodSubsystem.setHoodVoltage(0);

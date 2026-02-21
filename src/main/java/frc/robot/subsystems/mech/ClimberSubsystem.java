@@ -10,18 +10,11 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimberSubsystem extends SubsystemBase {
-
-  private static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
-  private static final double WINCH_INCHES_PER_REV = (3 / 4) * Math.PI; // TODO get a real number
-  // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
-  public static final double MAX_EXTENSION_INCHES = 30; // TODO get a real number
-  public static final double RETRACTED_HEIGHT_INCHES = 20; // TODO get a real number
-  public static final double HOMING_VOLTAGE = 10; // TODO get a real number
   private boolean positionControl = true; // if false use voltage control
 
   public final TalonFX motor;
@@ -33,8 +26,8 @@ public class ClimberSubsystem extends SubsystemBase {
   private double desiredPositionInches;
 
   public ClimberSubsystem() {
-    limitSwitch = new DigitalInput(Constants.CLIMBER_LIMIT_SWITCH_PORT);
-    motor = new TalonFX(Constants.CLIMBER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    limitSwitch = new DigitalInput(ClimberConstants.CLIMBER_LIMIT_SWITCH_PORT);
+    motor = new TalonFX(ClimberConstants.CLIMBER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     motor.setNeutralMode(NeutralModeValue.Brake);
 
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
@@ -84,10 +77,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void setDesiredPositionInches(double desiredPositionInches) {
     positionControl = true;
-    if (desiredPositionInches < RETRACTED_HEIGHT_INCHES) {
-      this.desiredPositionInches = RETRACTED_HEIGHT_INCHES;
-    } else if (desiredPositionInches > MAX_EXTENSION_INCHES) {
-      this.desiredPositionInches = MAX_EXTENSION_INCHES;
+    if (desiredPositionInches < ClimberConstants.RETRACTED_HEIGHT_INCHES) {
+      this.desiredPositionInches = ClimberConstants.RETRACTED_HEIGHT_INCHES;
+    } else if (desiredPositionInches > ClimberConstants.MAX_EXTENSION_INCHES) {
+      this.desiredPositionInches = ClimberConstants.MAX_EXTENSION_INCHES;
     } else {
       this.desiredPositionInches = desiredPositionInches;
     }
@@ -99,11 +92,15 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public double currentPositionInches() {
-    return motor.getPosition().getValueAsDouble() / CLIMBER_GEAR_RATIO * WINCH_INCHES_PER_REV;
+    return motor.getPosition().getValueAsDouble()
+        / ClimberConstants.CLIMBER_GEAR_RATIO
+        * ClimberConstants.WINCH_INCHES_PER_REV;
   }
 
   public double inchesToRevs(double positionInches) {
-    return positionInches / WINCH_INCHES_PER_REV * CLIMBER_GEAR_RATIO;
+    return positionInches
+        / ClimberConstants.WINCH_INCHES_PER_REV
+        * ClimberConstants.CLIMBER_GEAR_RATIO;
   }
 
   public void zeroClimber() {
@@ -111,7 +108,7 @@ public class ClimberSubsystem extends SubsystemBase {
     // this so current position doesn't become zero, but whatever the retracted height is off the
     // floor
     double motorPositionRevs = motor.getPosition().getValueAsDouble();
-    double offset = inchesToRevs(RETRACTED_HEIGHT_INCHES);
+    double offset = inchesToRevs(ClimberConstants.RETRACTED_HEIGHT_INCHES);
     // if we assume the limit switch triggers at the retracted position, then we are calling this
     // method when the current position is the retracted position. therefore we want zero to be
     // wherever we are right now minus the retracted position
