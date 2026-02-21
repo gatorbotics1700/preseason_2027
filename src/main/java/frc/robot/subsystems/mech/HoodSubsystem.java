@@ -36,9 +36,9 @@ public class HoodSubsystem extends SubsystemBase {
 
   /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
   // public static final double RETRACT_TO_LIMIT_VOLTAGE = -0.5;
-  public static final double FAST_HOMING_VOLTAGE = -1; // TODO tune
+  public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
 
-  public static final double SLOW_HOMING_VOLTAGE = -0.5; // TODO tune
+  public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
 
   private Rotation2d desiredAngle = RETRACTED_POSITION;
   public final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
@@ -63,21 +63,21 @@ public class HoodSubsystem extends SubsystemBase {
           new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
     } else {
       talonFXConfigs.withMotorOutput(
-          new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+          new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
     }
 
     // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
     slot0Configs.kG =
-        0.2128; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
+        0.25; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
     slot0Configs.kS =
-        0.25; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
+        0.3; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
     // just be 0
     slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kP = 5; // A position error of 2.5 rotations results in 12V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
 
@@ -92,11 +92,24 @@ public class HoodSubsystem extends SubsystemBase {
 
     m_request = new MotionMagicExpoVoltage(0);
 
-    limitSwitch = new DigitalInput(9); // TODO: change to actual value
+    limitSwitch = new DigitalInput(Constants.HOOD_LIMIT_SWITCH_PORT);
   }
 
   @Override
   public void periodic() {
+    if (limitSwitch.get()) {
+      if (positionControl) {
+        if (desiredAngle.getDegrees() > getCurrentAngle().getDegrees()) {
+          desiredAngle = getCurrentAngle();
+          setHoodVoltage(0);
+        }
+      } else {
+        if (hoodMotor.getMotorVoltage().getValueAsDouble() > 0) {
+          setHoodVoltage(0);
+        }
+      }
+    }
+
     if (positionControl) {
       setHoodPosition(desiredAngle);
     }
@@ -126,6 +139,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void setHoodPosition(Rotation2d desiredAngle) {
+    positionControl = true;
     hoodMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
   }
 
@@ -153,11 +167,12 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void zeroHood() {
-    double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
-    double offset = degreesToRevs(RETRACTED_POSITION.getDegrees());
-    // if we assume the limit switch triggers at the retracted position, then we are calling this
-    // method when the current position is the retracted position. therefore we want zero to be
-    // wherever we are right now minus the retracted position
-    hoodMotor.setPosition((motorPositionRevs - offset) % 1); // TODO logic check this math
+    hoodMotor.setPosition(degreesToRevs(RETRACTED_POSITION.getDegrees()));
+    // double motorPositionRevs = hoodMotor.getPosition().getValueAsDouble();
+    // double offset = degreesToRevs(RETRACTED_POSITION.getDegrees());
+    // // if we assume the limit switch triggers at the retracted position, then we are calling this
+    // // method when the current position is the retracted position. therefore we want zero to be
+    // // wherever we are right now minus the retracted position
+    // hoodMotor.setPosition((motorPositionRevs - offset) % 1); // TODO logic check this math
   }
 }

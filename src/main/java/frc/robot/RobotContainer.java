@@ -534,22 +534,21 @@ public class RobotContainer {
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
 
-        // controller_two
-        // .rightBumper()
-        // .onTrue(
-        // new InstantCommand(
-        // () -> {
-        // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10.0)));
-        // }));
+        controller_two
+            .rightBumper()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(57.0)));
+                    }));
 
-        // controller_two
-        // .leftBumper()
-        // .onTrue(
-        // new InstantCommand(
-        // () -> {
-        // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0.0)));
-        // }));
-
+        controller_two
+            .leftBumper()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(77.0)));
+                    }));
         controller_two.y().onTrue(new HoodHomingCommand(hoodSubsystem));
         controller_two.a().onTrue(RunShooterWheels());
         controller_two.b().onTrue(MechStop());
@@ -685,17 +684,17 @@ public class RobotContainer {
   }
 
   public Command MechStop() {
-    return /*new HoodRetractCommand(hoodSubsystem)
-           .alongWith(
+    return /*
                IntakeCommands.StopIntake(intakeSubsystem)
                    .andThen(IntakeCommands.RetractIntake(intakeSubsystem)))
            .alongWith(*/ new InstantCommand(
             () -> {
-              turretSubsystem.setDesiredAngle(turretSubsystem.currentAngle());
-              shooterSubsystem.setFlywheelVelocity(0);
-              shooterSubsystem.setTransitionVoltage(0);
+              turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
+              shooterSubsystem.setDesiredFlywheelVelocity(0);
               transitionSubsystem.setHopperFloorVelocity(0);
               shooterSubsystem.setDesiredTransitionVoltage(0);
+              hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
+              hoodSubsystem.setHoodVoltage(0);
             }
             // )
             )
@@ -706,8 +705,8 @@ public class RobotContainer {
     return new InstantCommand(
         () -> {
           // shooterSubsystem.setFlywheelVoltage(6);
-          shooterSubsystem.setFlywheelVelocity(ShooterSubsystem.calculateFlywheelSpeed(5));
-          shooterSubsystem.setTransitionVoltage(12);
+          shooterSubsystem.setDesiredFlywheelVelocity(ShooterSubsystem.calculateFlywheelSpeed(22));
+          shooterSubsystem.setDesiredTransitionVoltage(12);
         });
   }
 
@@ -715,7 +714,8 @@ public class RobotContainer {
     return new InstantCommand(
             () -> {
               // shooterSubsystem.setFlywheelVoltage(6);
-              shooterSubsystem.setFlywheelVelocity(ShooterSubsystem.calculateFlywheelSpeed(5));
+              shooterSubsystem.setDesiredFlywheelVelocity(
+                  ShooterSubsystem.calculateFlywheelSpeed(5));
               shooterSubsystem.setTransitionVoltage(12);
               // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
               // //TODO uncomment???

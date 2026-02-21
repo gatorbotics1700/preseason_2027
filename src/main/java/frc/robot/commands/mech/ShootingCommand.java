@@ -109,7 +109,8 @@ public class ShootingCommand extends Command {
       if (params.shotSpeed != 0) { // and if we have a valid shot
         double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
         System.out.println("VALID SHOT VALID SHOT");
-        shooterSubsystem.setFlywheelVelocity(desiredFlywheelSpeed); // set velocity to our desired velocity
+        shooterSubsystem.setDesiredFlywheelVelocity(
+            desiredFlywheelSpeed); // set velocity to our desired velocity
         hopperFloorSubsystem.setHopperFloorVelocity(HopperFloorSubsystem.HOPPER_FLOOR_SPEED);
         if (Math.abs(shooterSubsystem.getFlywheelVelocity() - desiredFlywheelSpeed)
             < ShooterSubsystem
@@ -124,11 +125,11 @@ public class ShootingCommand extends Command {
         shooterSubsystem.setDesiredTransitionVoltage(0);
       }
       // this requires the hood's zero to be vertical TODO: Check this!!
-      hoodSubsystem.setDesiredAngle(params.hoodAngle); 
+      hoodSubsystem.setDesiredAngle(params.hoodAngle);
       turretSubsystem.setDesiredAngle(params.turretAngle);
     } else {
       System.out.println("WE DONT WANT TO SHOOT");
-      shooterSubsystem.setFlywheelVelocity(0);
+      shooterSubsystem.setDesiredFlywheelVelocity(0);
       // shooterSubsystem.setFlywheelVoltage(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
       hopperFloorSubsystem.setHopperFloorVelocity(0);
@@ -173,7 +174,7 @@ public class ShootingCommand extends Command {
     //   hopperFloorSubsystem.setHopperFloorVelocity(0);
     //   shooterSubsystem.setDesiredTransitionVoltage(0);
     // }
-   
+
   }
 
   // TODO figure out if we want a way to end this command
@@ -184,7 +185,7 @@ public class ShootingCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    shooterSubsystem.setFlywheelVelocity(0);
+    shooterSubsystem.setDesiredFlywheelVelocity(0);
     hopperFloorSubsystem.setHopperFloorVelocity(0);
     shooterSubsystem.setDesiredTransitionVoltage(0);
   }

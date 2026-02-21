@@ -16,6 +16,9 @@ public class HoodHomingCommand extends Command {
 
   public HoodHomingCommand(HoodSubsystem hoodSubsystem) {
     this.hoodSubsystem = hoodSubsystem;
+    stageOneComplete = false;
+    stageTwoComplete = false;
+    stageThreeComplete = false;
     addRequirements(hoodSubsystem);
   }
 
@@ -35,17 +38,22 @@ public class HoodHomingCommand extends Command {
       // Back off
       // TODO tune that angle
       hoodSubsystem.setDesiredAngle(
-          HoodSubsystem.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians(5))));
+          HoodSubsystem.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(5))));
+      if (hoodSubsystem.isRetractedLimitSwitchPressed()) {
+        stageTwoComplete = true;
+      }
     } else {
       // Move slowly towards limit switch and final zero
       hoodSubsystem.setHoodVoltage(HoodSubsystem.SLOW_HOMING_VOLTAGE);
       if (hoodSubsystem.isRetractedLimitSwitchPressed()) {
         hoodSubsystem.zeroHood();
         hoodSubsystem.setDesiredAngle(
-            HoodSubsystem.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians(1))));
+            HoodSubsystem.RETRACTED_POSITION.minus(new Rotation2d(Math.toRadians(1))));
         stageThreeComplete = true;
+        System.out.println("ENDING");
       }
     }
+    System.out.println("HOMING");
   }
 
   // TODO delete?

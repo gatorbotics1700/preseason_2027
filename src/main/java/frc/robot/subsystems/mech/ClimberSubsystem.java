@@ -33,7 +33,7 @@ public class ClimberSubsystem extends SubsystemBase {
   private double desiredPositionInches;
 
   public ClimberSubsystem() {
-    limitSwitch = new DigitalInput(3); // TODO: change to actual value
+    limitSwitch = new DigitalInput(Constants.CLIMBER_LIMIT_SWITCH_PORT);
     motor = new TalonFX(Constants.CLIMBER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     motor.setNeutralMode(NeutralModeValue.Brake);
 

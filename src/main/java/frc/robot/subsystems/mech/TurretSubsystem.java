@@ -26,8 +26,12 @@ public class TurretSubsystem extends SubsystemBase {
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 10;
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
-  private Encoder boreEncoder = new Encoder(7, 3); // TODO real port values
-  private final DigitalInput hallEffect = new DigitalInput(5); // TODO real port values
+  private Encoder boreEncoder =
+      new Encoder(
+          Constants.TURRET_BORE_ENCODER_PORT1,
+          Constants.TURRET_BORE_ENCODER_PORT2); // TODO real port values
+  private final DigitalInput hallEffect =
+      new DigitalInput(Constants.TURRET_HALL_EFFECT_PORT); // TODO real port values
   private final double TURRET_ENCODER_OFFSET = 0.0; // TODO: Find actual offset
   private final double TURRET_HOMING_ANGLE =
       0.0; // TODO: this is the angle for "zeroing" the turret but it might not actually be zero
@@ -94,7 +98,7 @@ public class TurretSubsystem extends SubsystemBase {
                     MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
   }
 
-  public Rotation2d currentAngle() {
+  public Rotation2d getCurrentAngle() {
     double motorPositionRevs = turretMotor.getPosition().getValueAsDouble();
     double turretAngleDegrees =
         motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360;

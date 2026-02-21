@@ -14,20 +14,27 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   public static final double TRANSITION_VOLTAGE = 10;
+
   public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+  private static final double FLYWHEEL_RADIUS = 0.0508;
   public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-  private static final double FLYWHEEL_SLIP = 0.7; // TODO TUNE!!!
+  private static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
+
   private final TalonFX leftFlywheelMotor;
   private final TalonFX rightFlywheelMotor;
   private final TalonFX transitionMotor;
+
   private double desiredFlywheelVelocity; // in revolutions per second
   private double desiredTransitionVoltage;
+
   private static MotionMagicVelocityVoltage m_request;
+
   private static TalonFXConfiguration leftFlywheelTalonFXConfigs;
   private static TalonFXConfiguration rightFlywheelTalonFXConfigs;
+
   private static Slot0Configs leftFlywheelSlot0Configs;
   private static Slot0Configs rightFlywheelSlot0Configs;
-  private static final double FLYWHEEL_RADIUS = 0.0508;
+
   private boolean shouldShoot;
 
   public ShooterSubsystem() {
@@ -119,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
     transitionMotor.setVoltage(desiredTransitionVoltage);
   }
 
-  public void setFlywheelVelocity(double desiredFlywheelVelocity) {
+  public void setDesiredFlywheelVelocity(double desiredFlywheelVelocity) {
     this.desiredFlywheelVelocity = desiredFlywheelVelocity;
   }
 
@@ -164,7 +171,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // surface speed
   }
 
-  public static double calculateFlywheelSpeed(double shotSpeed) {
+  public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
     return shotSpeed / FLYWHEEL_SLIP / 2 / Math.PI / Constants.FLYWHEEL_RADIUS_METERS;
   }
 

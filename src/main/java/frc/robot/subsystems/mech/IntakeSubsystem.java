@@ -48,7 +48,8 @@ public class IntakeSubsystem extends SubsystemBase {
     deployMotor = new TalonFX(Constants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     desiredIntakeVoltage = 0;
-    hallEffect = new DigitalInput(2); // TODO:change port during testing
+    hallEffect =
+        new DigitalInput(Constants.INTAKE_HALL_EFFECT_PORT); // TODO:change port during testing
 
     intakeMotor // TODO see if we actually need to invert
         .getConfigurator()

@@ -22,7 +22,8 @@ public class ShotCalculator {
   public static double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
   public static double MAX_SHOT_HEIGHT = 5; // 2 meters for MSLL
   public static double MAX_SHOT_SPEED =
-      5; // in mps, so calculate using flywheel rps * flywheel radius in meters
+      30; // in mps, so calculate using flywheel rps * 2 * Math.PI * flywheel radius * flywheel slip
+  // kraken x60 max velocity is ~100 rps
   // TODO we may not want this to be another variable
   public static Rotation2d MIN_HOOD_ANGLE = HoodSubsystem.MIN_ANGLE;
   public static Rotation2d MAX_HOOD_ANGLE = HoodSubsystem.RETRACTED_POSITION;

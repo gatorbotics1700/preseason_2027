@@ -74,16 +74,22 @@ public final class Constants {
   public static final Distance ROBOT_RADIUS_WITH_BUMPERS = Centimeters.of(57);
 
   /* MECH */
+  public static final int CLIMBER_MOTOR_CAN_ID = 36;
+  public static final int HOOD_MOTOR_CAN_ID = 17;
+  public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int INTAKE_MOTOR_CAN_ID = 9;
-  public static final int EXTENSION_MOTOR_CAN_ID = 12; // needs changing
+  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10; // needs changing
   public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
   public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
-  public static final int HOOD_MOTOR_CAN_ID = 17;
   public static final int TRANSITION_MOTOR_CAN_ID = 31;
-  public static final int HOPPER_MOTOR_CAN_ID = 16;
   public static final int TURRET_MOTOR_CAN_ID = 14;
-  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10; // needs changing
-  public static final int CLIMBER_MOTOR_CAN_ID = 36;
+
+  public static final int CLIMBER_LIMIT_SWITCH_PORT = 8;
+  public static final int HOOD_LIMIT_SWITCH_PORT = 9;
+  public static final int INTAKE_HALL_EFFECT_PORT = 2;
+  public static final int TURRET_BORE_ENCODER_PORT1 = 7;
+  public static final int TURRET_BORE_ENCODER_PORT2 = 3;
+  public static final int TURRET_HALL_EFFECT_PORT = 5;
 
   public static final int KRAKEN_TICKS_PER_REV = 2048;
   public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
