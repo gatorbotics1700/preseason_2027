@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
@@ -51,11 +52,11 @@ import frc.robot.subsystems.mech.IntakeSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
+import frc.robot.util.MultiStepAutoChooser;
 import frc.robot.util.RobotConfigLoader;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
@@ -67,21 +68,23 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+
   private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+  private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+
   private final GamePieceSimulation gamePieceSimulation = new GamePieceSimulation();
-  private ShotParameters shotParameters;
-  private final TurretSubsystem turretSubsystem;
+  private ShotParameters shotParameters; // TODO: do we need this?
 
   // Controllers
   private CommandXboxController controller = null; // port 0
   private CommandXboxController controller_two = null; // port 3
 
   // Dashboard inputs
-  // private final MultiStepAutoChooser multiStepAutoChooser;
+  private final MultiStepAutoChooser multiStepAutoChooser;
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> chassisSpeeds;
 
@@ -156,12 +159,9 @@ public class RobotContainer {
         () -> {
           return drive.getChassisSpeeds();
         };
-    turretSubsystem = new TurretSubsystem();
-
-    // hoodSubsystem = new HoodSubsystem();
 
     // Set up auto routines with multi-step chooser
-    // multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
+    multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -226,64 +226,6 @@ public class RobotContainer {
       }
 
       // drive over bump
-      // controller
-      //     .a()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //             () -> {
-      //               try {
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(DriveOverBumpCommand.driveOverBump(drive));
-      //               } catch (Exception e) {
-      //                 e.printStackTrace();
-      //               }
-      //             }));
-
-      // // Reset gyro to 0° when B button is pressed
-      // controller
-      //     .b()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //                 () -> {
-      //                   if (DriverStation.getAlliance().isPresent()
-      //                       && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-      //                     drive.setPose(
-      //                         new Pose2d(
-      //                             drive.getPose().getTranslation(),
-      //                             new Rotation2d(Math.toRadians(0))));
-      //                   } else {
-      //                     drive.setPose(
-      //                         new Pose2d(
-      //                             drive.getPose().getTranslation(),
-      //                             new Rotation2d(Math.toRadians(0))));
-      //                   }
-      //                 },
-      //                 drive)
-      //             .ignoringDisable(true));
-
-      // // drive under trench
-      // controller
-      //     .x()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //             () -> {
-      //               try {
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
-      //               } catch (Exception e) {
-      //                 e.printStackTrace();
-      //               }
-      //             }));
-
-      // controller
-      //     .rightBumper()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //             () -> {
-      //               drive.setSlowDrive();
-      //             },
-      //             drive));
-
       controller
           .a()
           .onTrue(
@@ -310,14 +252,29 @@ public class RobotContainer {
 
       // Reset gyro to 0° when B button is pressed
       controller
-          .x()
+          .b()
           .onTrue(
-              new InstantCommand(
-                  () -> {
-                    vision.resetSimulatedTargets();
-                  }));
+              Commands.runOnce(
+                      () -> {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        } else {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        }
+                      },
+                      drive)
+                  .ignoringDisable(true));
+
+      // drive under trench
       controller
-          .y()
+          .x()
           .onTrue(
               new InstantCommand(
                   () -> {
@@ -340,13 +297,15 @@ public class RobotContainer {
                       e.printStackTrace();
                     }
                   }));
+
       controller
-          .b()
+          .rightBumper()
           .onTrue(
-              new InstantCommand(
+              Commands.runOnce(
                   () -> {
-                    drive.setPose(new Pose2d(6, 4, new Rotation2d()));
-                  }));
+                    drive.setSlowDrive();
+                  },
+                  drive));
     }
   }
 
@@ -554,57 +513,12 @@ public class RobotContainer {
       controller_two.y().onTrue(new HoodHomingCommand(hoodSubsystem));
       controller_two.a().onTrue(RunMechWheels());
       controller_two.b().onTrue(MechStop());
-
-      // commented this out because it's using a shot parameters thing we were
-      // calculating in
-      // periodic and idk if we still want that
-      // controller_two
-      // .x()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // hoodSubsystem.setDesiredAngle(
-      // new Rotation2d(Math.PI / 2).minus(shotParameters.hoodAngle));
-      // }));
-
-      // controller_two
-      // .y()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
-      // }));
-
-      // mech buttons
-      // controller_two
-      //     .x()
-      //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-      // controller_two
-      //     .y()
-      //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
-
-      // Schedule a new DriveToFuel command on each press (fresh pose from vision each time)
-      // controller_two
-      //     .a()
-      //     .onTrue(
-      //         new InstantCommand(
-      //             () ->
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(IntakeCommands.DriveToFuel(drive, vision))));
-      // controller_two
-      //     .x()
-      //     .onTrue(
-      //         new InstantCommand(
-      //             () -> {
-      //               drive.setPose(new Pose2d(3, 4, new Rotation2d()));
-      //             }));
     }
   }
 
   public Command getAutonomousCommand() {
     try {
-      // return multiStepAutoChooser.getAutonomousCommand();
-      return Commands.none();
+      return multiStepAutoChooser.getAutonomousCommand();
     } catch (Exception ioe) {
       System.out.println("bad io error");
       return Commands.none();
@@ -613,8 +527,7 @@ public class RobotContainer {
 
   /** Start pose of the currently selected auto (from first path). Empty if no paths. */
   public Optional<Pose2d> getAutoStartPose() {
-    return null;
-    // return multiStepAutoChooser.getAutoStartPose();
+    return multiStepAutoChooser.getAutoStartPose();
   }
 
   public Drive getDriveSubsystem() {
@@ -623,8 +536,7 @@ public class RobotContainer {
 
   private double deadband(double value, double deadband) {
     // If controller reads very tiny value close to zero, we don't want to make the
-    // robot think it
-    // has to move
+    // robot think it has to move
     // Without deadband, robot will think it has to move, and then it will go crazy
     if (Math.abs(value) > deadband) {
       if (value > 0.0) {
@@ -662,6 +574,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     // TODO: currently the comp bot has no turret function, change back
+    // TODO: this doesn't seem to be working on the comp bot right now
     if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)
         || RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.HUANG_HE_SERIAL)) {
       drive.enableTargetPointFacing();
@@ -675,20 +588,11 @@ public class RobotContainer {
     }
 
     // Update multi-step auto chooser options (reads choosers to keep them active)
-    // multiStepAutoChooser.updateChooserOptions();
+    multiStepAutoChooser.updateChooserOptions();
 
     // Print path name to console me thinks
     // String selectedPathName = multiStepAutoChooser.getSelectedPathName();
     System.out.flush(); // Ensure output appears immediately
-
-    // Logger.recordOutput("Buttons/Controller2/A",
-    // controller_two.a().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/B",
-    // controller_two.b().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/X",
-    // controller_two.x().getAsBoolean());
-    // Logger.recordOutput("Buttons/Controller2/Y",
-    // controller_two.y().getAsBoolean());
 
     // Log command scheduler status
     Logger.recordOutput("Commands/SchedulerActive", true);
@@ -708,6 +612,7 @@ public class RobotContainer {
     // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 
+  // TODO: this command doesn't work -- need to fix
   public Command MechStop() {
     return /*
                IntakeCommands.StopIntake(intakeSubsystem)
@@ -729,7 +634,6 @@ public class RobotContainer {
   public Command RunShooterWheels() {
     return new InstantCommand(
         () -> {
-          // shooterSubsystem.setFlywheelVoltage(6);
           shooterSubsystem.setDesiredFlywheelVelocity(ShooterSubsystem.calculateFlywheelSpeed(22));
           shooterSubsystem.setDesiredTransitionVoltage(12);
         });
@@ -738,12 +642,11 @@ public class RobotContainer {
   public Command RunMechWheels() {
     return new InstantCommand(
             () -> {
-              // shooterSubsystem.setFlywheelVoltage(6);
               shooterSubsystem.setDesiredFlywheelVelocity(
                   ShooterSubsystem.calculateFlywheelSpeed(22));
               shooterSubsystem.setDesiredTransitionVoltage(12);
               // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
-              // //TODO uncomment???
+              // TODO uncomment???
             })
         .alongWith(IntakeCommands.RunIntake(intakeSubsystem));
   }

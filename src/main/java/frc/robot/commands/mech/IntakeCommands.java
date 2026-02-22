@@ -50,10 +50,8 @@ public class IntakeCommands {
     @Override
     public void end(boolean interrupted) {
       intakeSubsystem.zeroIntakeDeploy();
-      ;
       intakeSubsystem.setDesiredAngle(
           IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
-      ;
     }
   }
 
@@ -87,5 +85,31 @@ public class IntakeCommands {
 
     return AutoBuilder.pathfindToPose(desiredPose, constraints);
     // return Commands.none();
+  }
+
+  public static class DeployIntakeCommand extends Command {
+
+    private final boolean isRetracting;
+    private final IntakeSubsystem intakeSubsystem;
+
+    public DeployIntakeCommand(boolean isRetracting, IntakeSubsystem intakeSubsystem) {
+      this.isRetracting = isRetracting;
+      this.intakeSubsystem = intakeSubsystem;
+      addRequirements(intakeSubsystem);
+    }
+
+    @Override
+    public void execute() {
+      if (isRetracting) {
+        intakeSubsystem.retractDeployMotor();
+      } else {
+        intakeSubsystem.extendDeployMotor();
+      }
+    }
+
+    @Override
+    public boolean isFinished() {
+      return true; // TODO fix
+    }
   }
 }

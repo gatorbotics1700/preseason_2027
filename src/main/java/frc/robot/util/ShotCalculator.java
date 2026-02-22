@@ -10,24 +10,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShotCalculatorConditions;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 @AutoLog
 public class ShotCalculator {
-  // VALUES YOU WILL WANT TO CHANGE:
-  public static double SHOT_DEADBAND = 0.05; // smallest calculated error we are okay shooting with
-  // shot height measures the highest point of the arc in meters, max should be ceiling height minus
-  // a bit, and min should be just over the target height
-  public static double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
-  public static double MAX_SHOT_HEIGHT = 5; // 2 meters for MSLL
-  public static double MAX_SHOT_SPEED =
-      30; // in mps, so calculate using flywheel rps * 2 * Math.PI * flywheel radius * flywheel slip
-  // kraken x60 max velocity is ~100 rps
-  // TODO we may not want this to be another variable
-  public static Rotation2d MIN_HOOD_ANGLE = HoodConstants.MIN_ANGLE;
-  public static Rotation2d MAX_HOOD_ANGLE = HoodConstants.RETRACTED_POSITION;
-
   // for testing only, used for logging where the calculator expects the ball to hit the target's
   // height ("land" on the target)
   public static Translation3d landingCoords = new Translation3d();
@@ -115,17 +103,18 @@ public class ShotCalculator {
       Translation3d fieldToShooter,
       Translation3d target) {
 
-    double speedRange = MAX_SHOT_SPEED - 0;
+    double speedRange = ShotCalculatorConditions.MAX_SHOT_SPEED - 0;
     int speedIterations = (int) (speedRange / 0.5);
     double speedIncrement = speedRange / (double) speedIterations;
-    double hoodAngleRange = MAX_HOOD_ANGLE.getDegrees() - MIN_HOOD_ANGLE.getDegrees();
+    double hoodAngleRange =
+        HoodConstants.RETRACTED_POSITION.getDegrees() - HoodConstants.MIN_ANGLE.getDegrees();
     int angleIterations = (int) (hoodAngleRange / 1);
     Rotation2d angleIncrement =
         new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
 
     double highestArc = 0;
 
-    Rotation2d testHoodAngle = MIN_HOOD_ANGLE;
+    Rotation2d testHoodAngle = HoodConstants.MIN_ANGLE;
     double testShotSpeed = 0;
     Rotation2d testTurretAngle = new Rotation2d();
 
@@ -134,7 +123,7 @@ public class ShotCalculator {
     double bestShotSpeed = 0;
 
     for (int i = 0; i < speedIterations; i++) {
-      testHoodAngle = MIN_HOOD_ANGLE;
+      testHoodAngle = HoodConstants.MIN_ANGLE;
 
       for (int j = 0; j < angleIterations; j++) {
 
@@ -170,11 +159,11 @@ public class ShotCalculator {
 
         double vertexRange = vertexRange(effectiveRadialVelo, tangentialVelo, apexTime);
 
-        if (vertexHeight >= MIN_SHOT_HEIGHT
-            && vertexHeight <= MAX_SHOT_HEIGHT
+        if (vertexHeight >= ShotCalculatorConditions.MIN_SHOT_HEIGHT
+            && vertexHeight <= ShotCalculatorConditions.MAX_SHOT_HEIGHT
             && vertexRange < compRange
-            && testShotSpeed <= MAX_SHOT_SPEED
-            && Math.abs(error) <= SHOT_DEADBAND
+            && testShotSpeed <= ShotCalculatorConditions.MAX_SHOT_SPEED
+            && Math.abs(error) <= ShotCalculatorConditions.SHOT_DEADBAND
             && vertexHeight > highestArc) {
           bestTurretAngle = testTurretAngle;
           bestHoodAngle = testHoodAngle;

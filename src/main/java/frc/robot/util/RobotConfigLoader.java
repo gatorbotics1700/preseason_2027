@@ -15,7 +15,7 @@ public final class RobotConfigLoader {
   private static final String EXPERIMENTAL_SERIAL = "032BE421";
   private static final String DEFAULT_SIM_SERIAL = "SIMULATION";
 
-  private static final String DEFAULT_CONFIG_FILE = "configFiles/config_sting.properties";
+  private static final String DEFAULT_CONFIG_FILE = "configFiles/config_alecto.properties";
   private static final String SERIAL_PROPERTY_KEY = "robot.serial";
   private static final String SERIAL_ENV_KEY = "ROBOT_SERIAL";
   private static final String CONFIG_PROPERTY_KEY = "robot.config";

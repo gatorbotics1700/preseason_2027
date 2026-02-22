@@ -55,8 +55,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.RobotConfigLoader;
 import java.util.concurrent.locks.Lock;
@@ -146,9 +146,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private boolean shouldFaceTargetPoint = false;
   private Translation2d targetPoint = null;
   private boolean slowDrive;
-
-  private static final Translation2d RED_TARGET_POINT = new Translation2d(13, 4.026);
-  private static final Translation2d BLUE_TARGET_POINT = new Translation2d(4.5, 4.026);
 
   private static final double TRANSLATION_kP = 2.5;
   private static final double ROTATION_kP = 0.1;

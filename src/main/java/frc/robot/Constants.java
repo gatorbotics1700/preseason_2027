@@ -14,30 +14,26 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Centimeters;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.*;
-import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -59,8 +55,6 @@ public final class Constants {
 
   // Robot identification
   public static final String ROBOT_SERIAL_NUMBER;
-
-  // Vision Constants (loaded from config)
 
   static {
     // Load configuration based on roboRIO serial number (auto-loads on first access)
@@ -84,131 +78,6 @@ public final class Constants {
 
   public static final int KRAKEN_TICKS_PER_REV = 2048;
 
-  public static final class ClimberConstants {
-    public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_LIMIT_SWITCH_PORT = 8;
-    public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
-
-    public static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
-    public static final double WINCH_INCHES_PER_REV = (3 / 4) * Math.PI; // TODO get a real number
-    // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
-    public static final double MAX_EXTENSION_INCHES = 30; // TODO get a real number
-    public static final double RETRACTED_HEIGHT_INCHES = 20; // TODO get a real number
-    public static final double HOMING_VOLTAGE = 10; // TODO get a real number
-  }
-
-  public static final class HoodConstants {
-    public static final int HOOD_MOTOR_CAN_ID = 17;
-    public static final int HOOD_LIMIT_SWITCH_PORT = 9;
-
-    // retracted position is the max hood angle, because we measure from vertical
-    public static final Rotation2d RETRACTED_POSITION =
-        new Rotation2d(
-            Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number
-    public static final Rotation2d MIN_ANGLE =
-        new Rotation2d(
-            Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_min_angle_degrees"))); // TODO: check number
-
-    /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
-    public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
-
-    public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
-    // GEAR RATIOS
-    public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
-        RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
-    public static final double HOOD_GEAR_RATIO =
-        RobotConfigLoader.getDouble("mech.hood_gear_ratio");
-  }
-
-  public static final class HopperFloorConstants {
-    public static final int HOPPER_MOTOR_CAN_ID = 16;
-
-    public static final double HOPPER_FLOOR_VELOCITY = 0.5; // TODO find a real number
-  }
-
-  public static final class IntakeConstants {
-    public static final int INTAKE_MOTOR_CAN_ID = 9;
-    public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10;
-    public static final int INTAKE_HALL_EFFECT_PORT = 2;
-
-    public static final int DEPLOY_GEARBOX_RATIO = 9; // TODO find the real value
-    public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
-    public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
-
-    public static final double EXTENDED_ANGLE_DEGREES =
-        85; // TODO figure out if this is from vertical or from retracted position?
-    public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
-
-    public static final Rotation2d EXTENDED_POSITION =
-        new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
-    public static final Rotation2d RETRACTED_POSITION =
-        new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
-
-    public static final double HOMING_VOLTAGE = 10; // TODO tune
-    public static final double INTAKING_VOLTAGE =
-        10; // TODO get a real number (I just picked my favorite)
-  }
-
-  public static final class ShooterConstants {
-    public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
-    public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
-    public static final int TRANSITION_MOTOR_CAN_ID = 31;
-
-    public static final double TRANSITION_VOLTAGE = 10;
-    public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
-    public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-    public static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
-    public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
-
-    public static final Translation3d BOT_TO_SHOOTER =
-        new Translation3d(
-            0.146, 0,
-            0.368); // TODO figure out what part of the shooter to measure from (this is the center
-    // of
-    // the turret plate)
-  }
-
-  public static final class TurretConstants {
-    public static final int TURRET_MOTOR_CAN_ID = 14;
-    public static final int TURRET_BORE_ENCODER_PORT1 = 7;
-    public static final int TURRET_BORE_ENCODER_PORT2 = 3;
-    public static final int TURRET_HALL_EFFECT_PORT = 5;
-
-    public static final double TURRET_DEADBAND = 0.75;
-  }
-
-  public static final class FieldCoordinates {
-    public static final Translation3d BLUE_HUB =
-        new Translation3d(
-            4.625594, 4.034663, 1.83); // z value is the very top of the hub (to make sure we aren't
-    // trying to phase through walls)
-    // hub
-    public static final Translation3d RED_HUB = new Translation3d(11.915394, 4.034663, 1.80);
-    public static final Translation3d BLUE_LEFT_FUNNELING = new Translation3d(2.482, 6.653, 0);
-    public static final Translation3d BLUE_RIGHT_FUNNELING = new Translation3d(2.482, 1.511, 0);
-    public static final Translation3d RED_LEFT_FUNNELING = new Translation3d(14.858, 6.653, 0);
-    public static final Translation3d RED_RIGHT_FUNNELING = new Translation3d(14.858, 1.511, 0);
-
-    public static final Translation2d FIELD_CENTER = new Translation2d(8.270494, 4.034663);
-    public static final double BLUE_BUMP_AND_TRENCH_X = 4.626;
-    public static final double RED_BUMP_AND_TRENCH_X = 11.915;
-
-    // Tower climb positions (extracted from PathPlanner paths)
-    // Blue tower is on the left side of the field (low X), Red tower is on the right (high X)
-    public static final Pose2d BLUE_TOWER_LEFT =
-        new Pose2d(1.177, 4.697, Rotation2d.fromDegrees(180));
-    public static final Pose2d BLUE_TOWER_RIGHT =
-        new Pose2d(1.025, 2.86, Rotation2d.fromDegrees(180));
-    public static final Pose2d RED_TOWER_LEFT =
-        new Pose2d(15.336, 3.446, Rotation2d.fromDegrees(0));
-    public static final Pose2d RED_TOWER_RIGHT =
-        new Pose2d(15.488, 5.179, Rotation2d.fromDegrees(180));
-  }
-
-  // Generated by the Tuner X Swerve Project Generator
-  // https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
   public static final class TunerConstants {
     // Both sets of gains need to be tuned to your individual robot.
 
@@ -489,5 +358,267 @@ public final class Constants {
                 kInvertRightSide,
                 kBackRightSteerMotorInverted,
                 kBackRightEncoderInverted);
+  }
+
+  public static final class VisionConstants {
+    // AprilTag layout
+    public static final AprilTagFieldLayout APRIL_TAG_LAYOUT =
+        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+    // Camera names, must match names configured on coprocessor
+    public static final String CAMERA_0_NAME = RobotConfigLoader.getString("camera.0.name");
+
+    public static final double ROBOT_TO_CAMERA_0_X_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.x_meters");
+    public static final double ROBOT_TO_CAMERA_0_Y_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.y_meters");
+    public static final double ROBOT_TO_CAMERA_0_Z_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.z_meters");
+    public static final double CAMERA_0_ROLL_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.roll_degrees");
+    public static final double CAMERA_0_PITCH_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.pitch_degrees");
+    public static final double ROBOT_TO_CAMERA_0_YAW_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.yaw_degrees");
+
+    public static Transform3d ROBOT_TO_CAMERA_0 = createRobotToCamera0Transform();
+
+    // Camera names, must match names configured on coprocessor
+    public static final String CAMERA_1_NAME = RobotConfigLoader.getString("camera.1.name");
+
+    public static final double ROBOT_TO_CAMERA_1_X_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.x_meters");
+    public static final double ROBOT_TO_CAMERA_1_Y_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.y_meters");
+    public static final double ROBOT_TO_CAMERA_1_Z_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.z_meters");
+    public static final double ROBOT_TO_CAMERA_1_ROLL_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.roll_degrees");
+    public static final double ROBOT_TO_CAMERA_1_PITCH_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.pitch_degrees");
+    public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.yaw_degrees");
+
+    public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera1Transform();
+
+    public static Transform3d[] ROBOT_TO_CAMERA_TRANSFORMS_ARRAY = createCameraTransformsArray();
+
+    // Basic filtering thresholds
+    public static double MAX_AMBIGUITY = RobotConfigLoader.getDouble("photonvision.max_ambiguity");
+    public static double MAX_Z_ERROR = RobotConfigLoader.getDouble("photonvision.max_z_error");
+
+    // Standard deviation baselines, for 1 meter distance and 1 tag
+    // (Adjusted automatically based on distance and # of tags)
+    public static double LINEAR_STD_DEV_BASELINE =
+        RobotConfigLoader.getDouble("photonvision.linear_std_dev_baseline"); // Meters
+    public static double ANGULAR_STD_DEV_BASELINE =
+        RobotConfigLoader.getDouble("photonvision.angular_std_dev_baseline"); // Radians
+
+    // Standard deviation multipliers for each camera
+    // (Adjust to trust some cameras more than others)
+
+    public static double CAMERA_0_STD_DEV_FACTOR =
+        RobotConfigLoader.getDouble("photonvision.camera0_std_dev_factor");
+
+    public static double CAMERA_1_STD_DEV_FACTOR =
+        RobotConfigLoader.getDouble("photonvision.camera1_std_dev_factor");
+
+    public static double[] CAMERA_STD_DEV_FACTORS = createCameraStdDevFactors();
+
+    // Multipliers to apply for PhotonVision multitag observations
+    public static double LINEAR_STD_DEV_MULTITAG_FACTOR =
+        RobotConfigLoader.getDouble(
+            "photonvision.linear_std_dev_multitag_factor"); // More stable than single tag
+    public static double ANGULAR_STD_DEV_MULTITAG_FACTOR =
+        RobotConfigLoader.getDouble("photonvision.angular_std_dev_multitag_factor");
+
+    public static int FUEL_CLASS_ID = 0;
+
+    public static Transform3d createRobotToCamera0Transform() {
+      return createRobotToCameraTransform(
+          ROBOT_TO_CAMERA_0_X_METERS,
+          ROBOT_TO_CAMERA_0_Y_METERS,
+          ROBOT_TO_CAMERA_0_Z_METERS,
+          CAMERA_0_ROLL_DEGREES,
+          CAMERA_0_PITCH_DEGREES,
+          ROBOT_TO_CAMERA_0_YAW_DEGREES);
+    }
+
+    public static Transform3d createRobotToCamera1Transform() {
+      return createRobotToCameraTransform(
+          ROBOT_TO_CAMERA_1_X_METERS,
+          ROBOT_TO_CAMERA_1_Y_METERS,
+          ROBOT_TO_CAMERA_1_Z_METERS,
+          ROBOT_TO_CAMERA_1_ROLL_DEGREES,
+          ROBOT_TO_CAMERA_1_PITCH_DEGREES,
+          ROBOT_TO_CAMERA_1_YAW_DEGREES);
+    }
+
+    public static Transform3d createRobotToCameraTransform(
+        double xMeters,
+        double yMeters,
+        double zMeters,
+        double rollDegrees,
+        double pitchDegrees,
+        double yawDegrees) {
+      return new Transform3d(
+          xMeters,
+          yMeters,
+          zMeters,
+          new Rotation3d(
+              Math.toRadians(rollDegrees),
+              Math.toRadians(pitchDegrees),
+              Math.toRadians(yawDegrees)));
+    }
+
+    public static Transform3d[] createCameraTransformsArray() {
+      Transform3d[] array = {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
+      return array;
+    }
+
+    /** Creates array of camera std dev factors from config values. */
+    public static double[]
+        createCameraStdDevFactors() { // can add more constants if we have more cameras
+      return new double[] {CAMERA_0_STD_DEV_FACTOR, CAMERA_1_STD_DEV_FACTOR};
+    }
+
+    public static final double DISTANCE_DEADBAND_METERS = 0.03;
+    public static final double ROTATION_DEADBAND_DEGREES = 10;
+  }
+
+  public static final class ClimberConstants {
+    public static final int CLIMBER_MOTOR_CAN_ID = 36;
+    public static final int CLIMBER_LIMIT_SWITCH_PORT = 8;
+    public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
+
+    public static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
+    public static final double WINCH_INCHES_PER_REV = (3 / 4) * Math.PI; // TODO get a real number
+    // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
+    public static final double MAX_EXTENSION_INCHES = 30; // TODO get a real number
+    public static final double RETRACTED_HEIGHT_INCHES = 20; // TODO get a real number
+    public static final double HOMING_VOLTAGE = 10; // TODO get a real number
+  }
+
+  public static final class HoodConstants {
+    public static final int HOOD_MOTOR_CAN_ID = 17;
+    public static final int HOOD_LIMIT_SWITCH_PORT = 9;
+
+    // retracted position is the max hood angle, because we measure from vertical
+    public static final Rotation2d RETRACTED_POSITION =
+        new Rotation2d(
+            Math.toRadians(
+                RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number
+    public static final Rotation2d MIN_ANGLE =
+        new Rotation2d(
+            Math.toRadians(
+                RobotConfigLoader.getInt("mech.hood_min_angle_degrees"))); // TODO: check number
+
+    /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
+    public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
+
+    public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
+    // GEAR RATIOS
+    public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
+        RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
+    public static final double HOOD_GEAR_RATIO =
+        RobotConfigLoader.getDouble("mech.hood_gear_ratio");
+  }
+
+  public static final class HopperFloorConstants {
+    public static final int HOPPER_MOTOR_CAN_ID = 16;
+
+    public static final double HOPPER_FLOOR_VELOCITY = 0.5; // TODO find a real number
+  }
+
+  public static final class IntakeConstants {
+    public static final int INTAKE_MOTOR_CAN_ID = 9;
+    public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10;
+    public static final int INTAKE_HALL_EFFECT_PORT = 2;
+
+    public static final int DEPLOY_GEARBOX_RATIO = 9; // TODO find the real value
+    public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
+    public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
+
+    public static final double EXTENDED_ANGLE_DEGREES =
+        85; // TODO figure out if this is from vertical or from retracted position?
+    public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
+
+    public static final Rotation2d EXTENDED_POSITION =
+        new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
+    public static final Rotation2d RETRACTED_POSITION =
+        new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
+
+    public static final double HOMING_VOLTAGE = 10; // TODO tune
+    public static final double INTAKING_VOLTAGE =
+        10; // TODO get a real number (I just picked my favorite)
+  }
+
+  public static final class ShooterConstants {
+    public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
+    public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
+    public static final int TRANSITION_MOTOR_CAN_ID = 31;
+
+    public static final double TRANSITION_VOLTAGE = 10;
+    public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+    public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
+    public static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
+
+    public static final Translation3d BOT_TO_SHOOTER =
+        new Translation3d(
+            0.146, 0,
+            0.368); // TODO figure out what part of the shooter to measure from (this is the center
+    // of the turret plate)
+  }
+
+  public static final class TurretConstants {
+    public static final int TURRET_MOTOR_CAN_ID = 14;
+    public static final int TURRET_BORE_ENCODER_PORT1 = 7;
+    public static final int TURRET_BORE_ENCODER_PORT2 = 3;
+    public static final int TURRET_HALL_EFFECT_PORT = 5;
+
+    public static final double TURRET_DEADBAND = 0.75;
+  }
+
+  public static final class FieldCoordinates {
+    public static final Translation3d BLUE_HUB =
+        new Translation3d(
+            4.625594, 4.034663, 1.83); // z value is the very top of the hub (to make sure we aren't
+    // trying to phase through walls)
+    // hub
+    public static final Translation3d RED_HUB = new Translation3d(11.915394, 4.034663, 1.80);
+    public static final Translation3d BLUE_LEFT_FUNNELING = new Translation3d(2.482, 6.653, 0);
+    public static final Translation3d BLUE_RIGHT_FUNNELING = new Translation3d(2.482, 1.511, 0);
+    public static final Translation3d RED_LEFT_FUNNELING = new Translation3d(14.858, 6.653, 0);
+    public static final Translation3d RED_RIGHT_FUNNELING = new Translation3d(14.858, 1.511, 0);
+
+    public static final Translation2d FIELD_CENTER = new Translation2d(8.270494, 4.034663);
+    public static final double BLUE_BUMP_AND_TRENCH_X = 4.626;
+    public static final double RED_BUMP_AND_TRENCH_X = 11.915;
+
+    // Tower climb positions (extracted from PathPlanner paths)
+    // Blue tower is on the left side of the field (low X), Red tower is on the right (high X)
+    public static final Pose2d BLUE_TOWER_LEFT =
+        new Pose2d(1.177, 4.697, Rotation2d.fromDegrees(180));
+    public static final Pose2d BLUE_TOWER_RIGHT =
+        new Pose2d(1.025, 2.86, Rotation2d.fromDegrees(180));
+    public static final Pose2d RED_TOWER_LEFT =
+        new Pose2d(15.336, 3.446, Rotation2d.fromDegrees(0));
+    public static final Pose2d RED_TOWER_RIGHT =
+        new Pose2d(15.488, 5.179, Rotation2d.fromDegrees(180));
+  }
+
+  public static final class ShotCalculatorConditions {
+    // VALUES YOU WILL WANT TO CHANGE:
+    public static final double SHOT_DEADBAND =
+        0.05; // smallest calculated error we are okay shooting with
+    // shot height measures the highest point of the arc in meters, max should be ceiling height
+    // minus a bit, and min should be just over the target height
+    public static final double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
+    public static final double MAX_SHOT_HEIGHT = 5; // 2 meters for MSLL
+    public static final double MAX_SHOT_SPEED =
+        30; // in mps, so calculate using flywheel rps * 2 * Math.PI * flywheel radius * flywheel
+    // slip
+    // kraken x60 max velocity is ~100 rps
   }
 }

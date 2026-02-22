@@ -168,24 +168,18 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    robotContainer.configureDriverButtonBindings();
-    robotContainer.configureCodriverButtonBindings();
-
     CommandScheduler.getInstance().cancelAll();
+    robotContainer.teleopInit();
     robotContainer.shooterSubsystem.setDesiredFlywheelVelocity(0);
     robotContainer.shooterSubsystem.setDesiredTransitionVoltage(0);
     robotContainer.intakeSubsystem.setIntakeVoltage(0);
     robotContainer.MechStop();
     Elastic.selectTab("Teleoperated");
-    robotContainer.teleopInit();
-    // robotContainer.configureButtonBindings();
 
     // This makes sure that the autonomous stops running when teleop starts
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
-    // container.stopElevator();
   }
 
   /** This function is called periodically during operator control. */

@@ -26,7 +26,7 @@ public class ClimbCommands {
     return new ClimberCommand(climberSubsystem, 0.0);
   }
 
-  private static class HomeClimber extends Command {
+  public static class HomeClimber extends Command {
     private final ClimberSubsystem climberSubsystem;
 
     HomeClimber(ClimberSubsystem climberSubsystem) {
