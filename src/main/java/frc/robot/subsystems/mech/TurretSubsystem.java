@@ -8,9 +8,14 @@ import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.TunerConstants;
+import frc.robot.Constants.TurretConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class TurretSubsystem extends SubsystemBase {
   public final TalonFX turretMotor;
@@ -19,15 +24,25 @@ public class TurretSubsystem extends SubsystemBase {
   private static MotionMagicExpoVoltage m_request;
 
   private final int TURRET_GEARBOX_RATIO = 9;
-  private final int GEAR_REVS_PER_TURRET_REV = 6;
+  private final int GEAR_REVS_PER_TURRET_REV = 10;
+  private final int ENCODER_REVS_PER_TURRET_REV = 10;
+  private Encoder boreEncoder =
+      new Encoder(
+          TurretConstants.TURRET_BORE_ENCODER_PORT1,
+          TurretConstants.TURRET_BORE_ENCODER_PORT2); // TODO real port values
+  private final DigitalInput hallEffect =
+      new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT); // TODO real port values
+  private final double TURRET_ENCODER_OFFSET = 0.0; // TODO: Find actual offset
+  private final double TURRET_HOMING_ANGLE =
+      0.0; // TODO: this is the angle for "zeroing" the turret but it might not actually be zero
+  private final double TURRET_RANGE_DEGREES = 360; // TODO set actual value
+  private final double MIN_TURRET_ANGLE = -180; // TODO: set actual value for min and max
+  private final double MAX_TURRET_ANGLE = MIN_TURRET_ANGLE + TURRET_RANGE_DEGREES;
 
   private Rotation2d desiredAngle;
 
   public TurretSubsystem() {
-    turretMotor =
-        new TalonFX(
-            Constants.TURRET_MOTOR_CAN_ID,
-            ""); // TunerConstants.mechCANBus); // TODO change back to mechCANBus for robot
+    turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     desiredAngle = new Rotation2d(0);
@@ -66,47 +81,27 @@ public class TurretSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+    turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     // Logger.recordOutput("turret/output" + turretMotor.get());
-    System.out.println(desiredAngle.getDegrees());
+    // System.out.println(desiredAngle.getDegrees());
+    Logger.recordOutput("turret/halleEffect", hallEffect.get());
   }
-
-  // TODO need to add something that has the motor switch directions if it reaches a bound (i.e. >
-  // 360, )
 
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
-    // this whole method is a mess so TODO check if there's a better way to wrap the angle
-    if (Math.abs(desiredAngle.getRadians()) >= Math.PI) {
-      // desiredAngle =
-      //     new Rotation2d(
-      //         MathUtil.angleModulus(
-      //             desiredAngle
-      //                 .getRadians())); // TODO check this - trying to wrap the angle so it stays
-      // within -180 and 180
-      int one_eighties =
-          (int)
-              (desiredAngle.getRadians()
-                  / Math.PI); // the number of 180 degrees that fit into the angle
-      if (one_eighties % 2 == 0) {
-        desiredAngle = new Rotation2d(desiredAngle.getRadians() % Math.PI);
-      } else {
-        if (desiredAngle.getRadians() >= Math.PI) {
-          desiredAngle = new Rotation2d(-((Math.PI) - (desiredAngle.getRadians() % Math.PI)));
-        }
-        if (desiredAngle.getRadians() <= -Math.PI) {
-          desiredAngle = new Rotation2d((Math.PI) + (desiredAngle.getRadians() % Math.PI));
-        }
-      }
-    }
-
-    this.desiredAngle = desiredAngle;
+    this.desiredAngle =
+        new Rotation2d(
+            Math.toRadians(
+                MathUtil.inputModulus(
+                    desiredAngle.getDegrees(),
+                    MIN_TURRET_ANGLE,
+                    MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
   }
 
-  public Rotation2d currentAngle() {
+  public Rotation2d getCurrentAngle() {
     double motorPositionRevs = turretMotor.getPosition().getValueAsDouble();
     double turretAngleDegrees =
-        motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360 % 180;
+        motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360;
     return new Rotation2d(
         Math.toRadians(
             turretAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
@@ -115,5 +110,26 @@ public class TurretSubsystem extends SubsystemBase {
 
   public double degreesToRevs(double turretAngleDegrees) {
     return turretAngleDegrees / 360 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
+  }
+
+  public boolean getHallEffectValue() {
+    return hallEffect.get();
+  }
+
+  public void setMotorVoltage(double voltage) {
+    turretMotor.setVoltage(voltage);
+  }
+
+  private double getCurrentToOffsetError() {
+    return boreEncoder.get() - TURRET_ENCODER_OFFSET;
+  }
+
+  public void homeTurret() {
+    turretMotor.setPosition(
+        getCurrentToOffsetError()
+                / ENCODER_REVS_PER_TURRET_REV
+                * TURRET_GEARBOX_RATIO
+                * GEAR_REVS_PER_TURRET_REV
+            + degreesToRevs(TURRET_HOMING_ANGLE));
   }
 }

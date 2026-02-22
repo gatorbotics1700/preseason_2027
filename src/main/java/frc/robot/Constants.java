@@ -13,13 +13,37 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Centimeters;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.*;
+import com.ctre.phoenix6.signals.*;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.ctre.phoenix6.swerve.*;
+import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
+import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.RobotConfigLoader;
 
@@ -54,56 +78,416 @@ public final class Constants {
     REPLAY
   }
 
-  public static final Translation2d FIELD_CENTER = new Translation2d(8.270494, 4.034663);
-  public static final double BLUE_BUMP_AND_TRENCH_X = 4.626;
-  public static final double RED_BUMP_AND_TRENCH_X = 11.915;
-
-  // Tower climb positions (extracted from PathPlanner paths)
-  // Blue tower is on the left side of the field (low X), Red tower is on the right (high X)
-  public static final Pose2d BLUE_TOWER_LEFT =
-      new Pose2d(1.177, 4.697, Rotation2d.fromDegrees(180));
-  public static final Pose2d BLUE_TOWER_RIGHT =
-      new Pose2d(1.025, 2.86, Rotation2d.fromDegrees(180));
-  public static final Pose2d RED_TOWER_LEFT = new Pose2d(15.336, 3.446, Rotation2d.fromDegrees(0));
-  public static final Pose2d RED_TOWER_RIGHT =
-      new Pose2d(15.488, 5.179, Rotation2d.fromDegrees(180));
-
+  // TODO: will we still need this?
   public static final Distance CENTER_TO_BUMPER_OFFSET = Centimeters.of(40);
-  // left and right offsets for the poles on the reef
-  public static final Distance CENTER_TO_POLE_OFFSET = Centimeters.of(16.5);
   public static final Distance ROBOT_RADIUS_WITH_BUMPERS = Centimeters.of(57);
 
-  /* MECH */
-  public static final int INTAKE_MOTOR_CAN_ID = 9; // needs changing
-  public static final int EXTENSION_MOTOR_CAN_ID = 12; // needs changing
-  public static final int FLYWHEEL_MOTOR_CAN_ID = 30;
-  public static final int HOOD_MOTOR_CAN_ID = 17;
-  public static final int TRANSITION_MOTOR_CAN_ID = 31;
-  public static final int HOPPER_MOTOR_CAN_ID = 16;
-  public static final int TURRET_MOTOR_CAN_ID = 14;
-  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 9;
-  public static final int CLIMBER_MOTOR_CAN_ID = 36;
-
   public static final int KRAKEN_TICKS_PER_REV = 2048;
-  public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
-  public static final double TURRET_DEADBAND = 0.75;
+  public static final class ClimberConstants {
+    public static final int CLIMBER_MOTOR_CAN_ID = 36;
+    public static final int CLIMBER_LIMIT_SWITCH_PORT = 8;
+    public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
 
-  public static final int LOW_RUNG_ARM_LENGTH =
-      27; // these are the heights of the rungs from the floor, the inches we want the arm to extend
-  // will likely differ
-  public static final int MID_RUNG_ARM_LENGTH = 18;
-  public static final int HIGH_RUNG_ARM_LENGTH = 18;
-  public static final double HOPPER_FLOOR_SPEED = 9; // TODO find a real number
-  public static final Translation3d BOT_TO_SHOOTER =
-      new Translation3d(
-          0.146, 0,
-          0.368); // TODO figure out what part of the shooter to measure from (this is the center of
-  // the turret plate)
-  public static final Translation3d BLUE_HUB =
-      new Translation3d(
-          4.625594, 4.034663,
-          1.80); // z value is 2 centimeters below the very top of the hub (to make sure we aren't
-  // trying to phase through walls)
-  // hub
+    public static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
+    public static final double WINCH_INCHES_PER_REV = (3 / 4) * Math.PI; // TODO get a real number
+    // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
+    public static final double MAX_EXTENSION_INCHES = 30; // TODO get a real number
+    public static final double RETRACTED_HEIGHT_INCHES = 20; // TODO get a real number
+    public static final double HOMING_VOLTAGE = 10; // TODO get a real number
+  }
+
+  public static final class HoodConstants {
+    public static final int HOOD_MOTOR_CAN_ID = 17;
+    public static final int HOOD_LIMIT_SWITCH_PORT = 9;
+
+    // retracted position is the max hood angle, because we measure from vertical
+    public static final Rotation2d RETRACTED_POSITION =
+        new Rotation2d(
+            Math.toRadians(
+                RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number
+    public static final Rotation2d MIN_ANGLE =
+        new Rotation2d(
+            Math.toRadians(
+                RobotConfigLoader.getInt("mech.hood_min_angle_degrees"))); // TODO: check number
+
+    /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
+    public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
+
+    public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
+    // GEAR RATIOS
+    public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
+        RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
+    public static final double HOOD_GEAR_RATIO =
+        RobotConfigLoader.getDouble("mech.hood_gear_ratio");
+  }
+
+  public static final class HopperFloorConstants {
+    public static final int HOPPER_MOTOR_CAN_ID = 16;
+
+    public static final double HOPPER_FLOOR_VELOCITY = 0.5; // TODO find a real number
+  }
+
+  public static final class IntakeConstants {
+    public static final int INTAKE_MOTOR_CAN_ID = 9;
+    public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10;
+    public static final int INTAKE_HALL_EFFECT_PORT = 2;
+
+    public static final int DEPLOY_GEARBOX_RATIO = 9; // TODO find the real value
+    public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
+    public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
+
+    public static final double EXTENDED_ANGLE_DEGREES =
+        85; // TODO figure out if this is from vertical or from retracted position?
+    public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
+
+    public static final Rotation2d EXTENDED_POSITION =
+        new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
+    public static final Rotation2d RETRACTED_POSITION =
+        new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
+
+    public static final double HOMING_VOLTAGE = 10; // TODO tune
+    public static final double INTAKING_VOLTAGE =
+        10; // TODO get a real number (I just picked my favorite)
+  }
+
+  public static final class ShooterConstants {
+    public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
+    public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
+    public static final int TRANSITION_MOTOR_CAN_ID = 31;
+
+    public static final double TRANSITION_VOLTAGE = 10;
+    public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+    public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
+    public static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
+
+    public static final Translation3d BOT_TO_SHOOTER =
+        new Translation3d(
+            0.146, 0,
+            0.368); // TODO figure out what part of the shooter to measure from (this is the center
+    // of
+    // the turret plate)
+  }
+
+  public static final class TurretConstants {
+    public static final int TURRET_MOTOR_CAN_ID = 14;
+    public static final int TURRET_BORE_ENCODER_PORT1 = 7;
+    public static final int TURRET_BORE_ENCODER_PORT2 = 3;
+    public static final int TURRET_HALL_EFFECT_PORT = 5;
+
+    public static final double TURRET_DEADBAND = 0.75;
+  }
+
+  public static final class FieldCoordinates {
+    public static final Translation3d BLUE_HUB =
+        new Translation3d(
+            4.625594, 4.034663, 1.83); // z value is the very top of the hub (to make sure we aren't
+    // trying to phase through walls)
+    // hub
+    public static final Translation3d RED_HUB = new Translation3d(11.915394, 4.034663, 1.80);
+    public static final Translation3d BLUE_LEFT_FUNNELING = new Translation3d(2.482, 6.653, 0);
+    public static final Translation3d BLUE_RIGHT_FUNNELING = new Translation3d(2.482, 1.511, 0);
+    public static final Translation3d RED_LEFT_FUNNELING = new Translation3d(14.858, 6.653, 0);
+    public static final Translation3d RED_RIGHT_FUNNELING = new Translation3d(14.858, 1.511, 0);
+
+    public static final Translation2d FIELD_CENTER = new Translation2d(8.270494, 4.034663);
+    public static final double BLUE_BUMP_AND_TRENCH_X = 4.626;
+    public static final double RED_BUMP_AND_TRENCH_X = 11.915;
+
+    // Tower climb positions (extracted from PathPlanner paths)
+    // Blue tower is on the left side of the field (low X), Red tower is on the right (high X)
+    public static final Pose2d BLUE_TOWER_LEFT =
+        new Pose2d(1.177, 4.697, Rotation2d.fromDegrees(180));
+    public static final Pose2d BLUE_TOWER_RIGHT =
+        new Pose2d(1.025, 2.86, Rotation2d.fromDegrees(180));
+    public static final Pose2d RED_TOWER_LEFT =
+        new Pose2d(15.336, 3.446, Rotation2d.fromDegrees(0));
+    public static final Pose2d RED_TOWER_RIGHT =
+        new Pose2d(15.488, 5.179, Rotation2d.fromDegrees(180));
+  }
+
+  // Generated by the Tuner X Swerve Project Generator
+  // https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
+  public static final class TunerConstants {
+    // Both sets of gains need to be tuned to your individual robot.
+
+    // The steer motor uses any SwerveModule.SteerRequestType control request with the
+    // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
+    private static final Slot0Configs steerGains =
+        new Slot0Configs()
+            .withKP(RobotConfigLoader.getDouble("tuner.steer_kp"))
+            .withKI(RobotConfigLoader.getDouble("tuner.steer_ki"))
+            .withKD(RobotConfigLoader.getDouble("tuner.steer_kd"))
+            .withKS(RobotConfigLoader.getDouble("tuner.steer_ks"))
+            .withKV(RobotConfigLoader.getDouble("tuner.steer_kv"))
+            .withKA(RobotConfigLoader.getDouble("tuner.steer_ka"))
+            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    // When using closed-loop control, the drive motor uses the control
+    // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
+    private static final Slot0Configs driveGains =
+        new Slot0Configs()
+            .withKP(RobotConfigLoader.getDouble("tuner.drive_kp"))
+            .withKI(RobotConfigLoader.getDouble("tuner.drive_ki"))
+            .withKD(RobotConfigLoader.getDouble("tuner.drive_kd"))
+            .withKS(RobotConfigLoader.getDouble("tuner.drive_ks"))
+            .withKV(RobotConfigLoader.getDouble("tuner.drive_kv"));
+
+    // The closed-loop output type to use for the steer motors;
+    // This affects the PID/FF gains for the steer motors
+    private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
+    // The closed-loop output type to use for the drive motors;
+    // This affects the PID/FF gains for the drive motors
+    private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
+
+    // The type of motor used for the drive motor
+    private static final DriveMotorArrangement kDriveMotorType =
+        DriveMotorArrangement.TalonFX_Integrated;
+    // The type of motor used for the drive motor
+    private static final SteerMotorArrangement kSteerMotorType =
+        SteerMotorArrangement.TalonFX_Integrated;
+
+    // The remote sensor feedback type to use for the steer motors;
+    // When not Pro-licensed, Fused*/Sync* automatically fall back to Remote*
+    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
+
+    // The stator current at which the wheels start to slip;
+    // This needs to be tuned to your individual robot
+    private static final Current kSlipCurrent =
+        Amps.of(RobotConfigLoader.getDouble("tuner.slip_current_amps"));
+
+    // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
+    // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
+    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+    private static final TalonFXConfiguration steerInitialConfigs =
+        new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    // Swerve azimuth does not require much torque output, so we can set a
+                    // relatively
+                    // low
+                    // stator current limit to help avoid brownouts without impacting performance.
+                    .withStatorCurrentLimit(
+                        Amps.of(RobotConfigLoader.getDouble("tuner.stator_current_limit_amps")))
+                    .withStatorCurrentLimitEnable(true));
+    private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
+    // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
+    private static final Pigeon2Configuration pigeonConfigs = null;
+
+    // CAN bus that the devices are located on;
+    // All swerve devices must share the same CAN bus
+    public static final CANBus driveCANBus =
+        new CANBus(
+            RobotConfigLoader.getString("tuner.drive_canbus_name").equals("null")
+                ? ""
+                : RobotConfigLoader.getString("tuner.drive_canbus_name"),
+            "./logs/example.hoot");
+
+    // Mechanism CAN bus - reuses driveCANBus if they're the same physical bus
+    public static final CANBus mechCANBus;
+
+    static {
+      String driveBusName = driveCANBus.getName();
+      String mechBusName =
+          RobotConfigLoader.getString("tuner.mech_canbus_name").equals("null")
+              ? ""
+              : RobotConfigLoader.getString("tuner.mech_canbus_name");
+
+      // If both buses have the same name, reuse the same object
+      if (driveBusName.equals(mechBusName)) {
+        mechCANBus = driveCANBus;
+      } else {
+        mechCANBus = new CANBus(mechBusName, "./logs/example.hoot");
+      }
+    }
+
+    // Theoretical free speed (m/s) at 12 V applied output;
+    // This needs to be tuned to your individual robot
+    public static final LinearVelocity kSpeedAt12Volts =
+        MetersPerSecond.of(RobotConfigLoader.getDouble("tuner.speed_at_12_volts_meters_per_sec"));
+
+    // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
+    // This may need to be tuned to your individual robot
+    private static final double kCoupleRatio = RobotConfigLoader.getDouble("tuner.couple_ratio");
+
+    private static final double kDriveGearRatio =
+        RobotConfigLoader.getDouble("tuner.drive_gear_ratio");
+    private static final double kSteerGearRatio =
+        RobotConfigLoader.getDouble("tuner.steer_gear_ratio");
+    private static final Distance kWheelRadius =
+        Inches.of(RobotConfigLoader.getDouble("tuner.wheel_radius_inches"));
+
+    private static final boolean kInvertLeftSide = false;
+    private static final boolean kInvertRightSide = true;
+
+    private static final int kPigeonId = RobotConfigLoader.getInt("tuner.pigeon_id");
+
+    // These are only used for simulation
+    private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
+    private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
+    // Simulated voltage necessary to overcome friction
+    private static final Voltage kSteerFrictionVoltage = Volts.of(0.2);
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
+
+    public static final SwerveDrivetrainConstants DrivetrainConstants =
+        new SwerveDrivetrainConstants()
+            .withCANBusName(driveCANBus.getName())
+            .withPigeon2Id(kPigeonId)
+            .withPigeon2Configs(pigeonConfigs);
+
+    private static final SwerveModuleConstantsFactory<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        ConstantCreator =
+            new SwerveModuleConstantsFactory<
+                    TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>()
+                .withDriveMotorGearRatio(kDriveGearRatio)
+                .withSteerMotorGearRatio(kSteerGearRatio)
+                .withCouplingGearRatio(kCoupleRatio)
+                .withWheelRadius(kWheelRadius)
+                .withSteerMotorGains(steerGains)
+                .withDriveMotorGains(driveGains)
+                .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
+                .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
+                .withSlipCurrent(kSlipCurrent)
+                .withSpeedAt12Volts(kSpeedAt12Volts)
+                .withDriveMotorType(kDriveMotorType)
+                .withSteerMotorType(kSteerMotorType)
+                .withFeedbackSource(kSteerFeedbackType)
+                .withDriveMotorInitialConfigs(driveInitialConfigs)
+                .withSteerMotorInitialConfigs(steerInitialConfigs)
+                .withEncoderInitialConfigs(encoderInitialConfigs)
+                .withSteerInertia(kSteerInertia)
+                .withDriveInertia(kDriveInertia)
+                .withSteerFrictionVoltage(kSteerFrictionVoltage)
+                .withDriveFrictionVoltage(kDriveFrictionVoltage);
+
+    // Front Left
+    private static final int kFrontLeftDriveMotorId =
+        RobotConfigLoader.getInt("tuner.front_left_drive_motor_id");
+    private static final int kFrontLeftSteerMotorId =
+        RobotConfigLoader.getInt("tuner.front_left_steer_motor_id");
+    private static final int kFrontLeftEncoderId =
+        RobotConfigLoader.getInt("tuner.front_left_encoder_id");
+    private static final Angle kFrontLeftEncoderOffset =
+        Rotations.of(RobotConfigLoader.getDouble("tuner.front_left_encoder_offset_rotations"));
+    private static final boolean kFrontLeftSteerMotorInverted =
+        RobotConfigLoader.getBoolean("tuner.front_left_steer_motor_inverted");
+    private static final boolean kFrontLeftEncoderInverted =
+        RobotConfigLoader.getBoolean("tuner.front_left_steer_encoder_inverted");
+
+    private static final Distance kFrontLeftXPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.front_left_pos.x_inches"));
+    private static final Distance kFrontLeftYPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.front_left_pos.y_inches"));
+
+    // Front Right
+    private static final int kFrontRightDriveMotorId =
+        RobotConfigLoader.getInt("tuner.front_right_drive_motor_id");
+    private static final int kFrontRightSteerMotorId =
+        RobotConfigLoader.getInt("tuner.front_right_steer_motor_id");
+    private static final int kFrontRightEncoderId =
+        RobotConfigLoader.getInt("tuner.front_right_encoder_id");
+    private static final Angle kFrontRightEncoderOffset =
+        Rotations.of(RobotConfigLoader.getDouble("tuner.front_right_encoder_offset_rotations"));
+    private static final boolean kFrontRightSteerMotorInverted =
+        RobotConfigLoader.getBoolean("tuner.front_right_steer_motor_inverted");
+    private static final boolean kFrontRightEncoderInverted =
+        RobotConfigLoader.getBoolean("tuner.front_right_steer_encoder_inverted");
+
+    private static final Distance kFrontRightXPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.front_right_pos.x_inches"));
+    private static final Distance kFrontRightYPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.front_right_pos.y_inches"));
+
+    // Back Left
+    private static final int kBackLeftDriveMotorId =
+        RobotConfigLoader.getInt("tuner.back_left_drive_motor_id");
+    private static final int kBackLeftSteerMotorId =
+        RobotConfigLoader.getInt("tuner.back_left_steer_motor_id");
+    private static final int kBackLeftEncoderId =
+        RobotConfigLoader.getInt("tuner.back_left_encoder_id");
+    private static final Angle kBackLeftEncoderOffset =
+        Rotations.of(RobotConfigLoader.getDouble("tuner.back_left_encoder_offset_rotations"));
+    private static final boolean kBackLeftSteerMotorInverted =
+        RobotConfigLoader.getBoolean("tuner.back_left_steer_motor_inverted");
+    private static final boolean kBackLeftEncoderInverted =
+        RobotConfigLoader.getBoolean("tuner.back_left_steer_encoder_inverted");
+
+    private static final Distance kBackLeftXPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.back_left_pos.y_inches"));
+    private static final Distance kBackLeftYPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.back_left_pos.y_inches"));
+
+    // Back Right
+    private static final int kBackRightDriveMotorId =
+        RobotConfigLoader.getInt("tuner.back_right_drive_motor_id");
+    private static final int kBackRightSteerMotorId =
+        RobotConfigLoader.getInt("tuner.back_right_steer_motor_id");
+    private static final int kBackRightEncoderId =
+        RobotConfigLoader.getInt("tuner.back_right_encoder_id");
+    private static final Angle kBackRightEncoderOffset =
+        Rotations.of(RobotConfigLoader.getDouble("tuner.back_right_encoder_offset_rotations"));
+    private static final boolean kBackRightSteerMotorInverted =
+        RobotConfigLoader.getBoolean("tuner.back_right_steer_motor_inverted");
+    private static final boolean kBackRightEncoderInverted =
+        RobotConfigLoader.getBoolean("tuner.back_right_steer_encoder_inverted");
+
+    private static final Distance kBackRightXPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.y_inches"));
+    private static final Distance kBackRightYPos =
+        Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.y_inches"));
+
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        FrontLeft =
+            ConstantCreator.createModuleConstants(
+                kFrontLeftSteerMotorId,
+                kFrontLeftDriveMotorId,
+                kFrontLeftEncoderId,
+                kFrontLeftEncoderOffset,
+                kFrontLeftXPos,
+                kFrontLeftYPos,
+                kInvertLeftSide,
+                kFrontLeftSteerMotorInverted,
+                kFrontLeftEncoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        FrontRight =
+            ConstantCreator.createModuleConstants(
+                kFrontRightSteerMotorId,
+                kFrontRightDriveMotorId,
+                kFrontRightEncoderId,
+                kFrontRightEncoderOffset,
+                kFrontRightXPos,
+                kFrontRightYPos,
+                kInvertRightSide,
+                kFrontRightSteerMotorInverted,
+                kFrontRightEncoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        BackLeft =
+            ConstantCreator.createModuleConstants(
+                kBackLeftSteerMotorId,
+                kBackLeftDriveMotorId,
+                kBackLeftEncoderId,
+                kBackLeftEncoderOffset,
+                kBackLeftXPos,
+                kBackLeftYPos,
+                kInvertLeftSide,
+                kBackLeftSteerMotorInverted,
+                kBackLeftEncoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        BackRight =
+            ConstantCreator.createModuleConstants(
+                kBackRightSteerMotorId,
+                kBackRightDriveMotorId,
+                kBackRightEncoderId,
+                kBackRightEncoderOffset,
+                kBackRightXPos,
+                kBackRightYPos,
+                kInvertRightSide,
+                kBackRightSteerMotorInverted,
+                kBackRightEncoderInverted);
+  }
 }

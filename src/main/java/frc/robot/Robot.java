@@ -19,13 +19,12 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-// PLEASE NOTE THIS IS NOT THE FIRST LOGGER OPTION VS CODE SUGGESTS IMPORTING
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -152,6 +151,8 @@ public class Robot extends LoggedRobot {
               robotContainer.getDriveSubsystem().setPose(startPose);
             });
 
+    robotContainer.HomeMechanisms();
+
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
@@ -171,6 +172,10 @@ public class Robot extends LoggedRobot {
     robotContainer.configureCodriverButtonBindings();
 
     CommandScheduler.getInstance().cancelAll();
+    robotContainer.shooterSubsystem.setDesiredFlywheelVelocity(0);
+    robotContainer.shooterSubsystem.setDesiredTransitionVoltage(0);
+    robotContainer.intakeSubsystem.setIntakeVoltage(0);
+    robotContainer.MechStop();
     Elastic.selectTab("Teleoperated");
     robotContainer.teleopInit();
     // robotContainer.configureButtonBindings();

@@ -192,7 +192,6 @@ public class MultiStepAutoChooser {
     return "None";
   }
 
-  // TODO: make sure this follows the right naming conventions we ultimately decide on
   private String buildAutoFileName(
       String alliance, String startPos, String dest1, String dest2, String dest3, boolean climb) {
     StringBuilder fileName = new StringBuilder();

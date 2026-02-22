@@ -7,7 +7,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.FieldCoordinates;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.ClimberSubsystem;
 import java.io.IOException;
@@ -15,16 +16,42 @@ import org.json.simple.parser.ParseException;
 
 public class ClimbCommands {
 
-  private static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
-
   private ClimbCommands() {}
 
   public static Command ExtendClimber(ClimberSubsystem climberSubsystem) {
-    return new ClimberCommand(climberSubsystem, L1_EXTENSION_INCHES);
+    return new ClimberCommand(climberSubsystem, ClimberConstants.L1_EXTENSION_INCHES);
   }
 
   public static Command RetractClimber(ClimberSubsystem climberSubsystem) {
     return new ClimberCommand(climberSubsystem, 0.0);
+  }
+
+  private static class HomeClimber extends Command {
+    private final ClimberSubsystem climberSubsystem;
+
+    HomeClimber(ClimberSubsystem climberSubsystem) {
+      this.climberSubsystem = climberSubsystem;
+      addRequirements(climberSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+      climberSubsystem.setClimberVoltage(ClimberConstants.HOMING_VOLTAGE);
+    }
+
+    @Override
+    public void execute() {}
+
+    @Override
+    public boolean isFinished() {
+      return climberSubsystem.limitSwitchPressed();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      climberSubsystem.zeroClimber();
+      climberSubsystem.setDesiredPositionInches(ClimberConstants.RETRACTED_HEIGHT_INCHES + 0.25);
+    }
   }
 
   // teleop version - uses pose and logic
@@ -36,69 +63,6 @@ public class ClimbCommands {
   public static Command DriveToTower(Drive drive, String alliance) {
     return new DriveToTowerCommand(drive, alliance);
   }
-
-  // /** Teleop version - determines alliance from current pose */
-  // public static Command DriveToTower(Drive drive) throws IOException, ParseException {
-  //   Pose2d pose = drive.getPose();
-  //   boolean isBlue = pose.getX() <= Constants.FIELD_CENTER.getX();
-  //   return DriveToTower(drive, isBlue ? "B" : "R");
-  // }
-
-  // /** Auto version - uses the alliance from the chooser */
-  // public static Command DriveToTower(Drive drive, String alliance)
-  //     throws IOException, ParseException {
-  //   PathConstraints constraints =
-  //       new PathConstraints(4, 4, Units.degreesToRadians(500), Units.degreesToRadians(800));
-
-  //   Pose2d pose = drive.getPose();
-
-  //   // alliance selections
-  //   if (alliance.equals("B")) { // blue
-  //     if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
-  //         && pose.getY() <= Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("B AR to Tower Right"),
-  //           constraints); // TODO: alliance zone bottem
-  //     } else if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
-  //         && pose.getY() > Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("B AL to Tower Left"),
-  //           constraints); // TODO: alliance zone top
-  //     } else if (pose.getX() >= Constants.BLUE_BUMP_AND_TRENCH_X
-  //         && pose.getY() <= Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("B NR to Tower Right"),
-  //           constraints); // TODO: neutral zone bottem
-
-  //     } else {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("B NL to Tower Left"),
-  //           constraints); // TODO: neutral zone top
-  //     }
-
-  //   } else { // red
-
-  //     if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
-  //         && pose.getY() <= Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("R NL to Tower Left"), constraints); // neutral zone
-  // bottem
-  //     } else if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
-  //         && pose.getY() > Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("R NR to Tower Right"),
-  //           constraints); // TODO: neutral zone top
-  //     } else if (pose.getX() >= Constants.RED_BUMP_AND_TRENCH_X
-  //         && pose.getY() <= Constants.FIELD_CENTER.getY()) {
-  //       return AutoBuilder.pathfindThenFollowPath(
-  //           PathPlannerPath.fromPathFile("R AL to Tower Left"),
-  //           constraints); // TODO: alliance zone bottem
-
-  //     } else {
-  //       return Commands.none();
-  //     }
-  //   }
-  // }
 
   /** Teleop version - determines alliance from current pose */
   public static Command Climb(Drive drive, ClimberSubsystem climberSubsystem)
@@ -144,26 +108,26 @@ public class ClimbCommands {
       // Determine alliance - use chooser value for auto or determine from pose for teleop
       String allianceToUse = allianceFromChooser;
       if (allianceToUse == null) {
-        boolean isBlue = pose.getX() <= Constants.FIELD_CENTER.getX();
+        boolean isBlue = pose.getX() <= FieldCoordinates.FIELD_CENTER.getX();
         allianceToUse = isBlue ? "B" : "R";
       }
 
       try {
         if (allianceToUse.equals("B")) { // blue
-          if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
-              && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+          if (pose.getX() <= FieldCoordinates.BLUE_BUMP_AND_TRENCH_X
+              && pose.getY() <= FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("B AR to Tower Right"),
                     constraints); // alliance zone bottom
-          } else if (pose.getX() <= Constants.BLUE_BUMP_AND_TRENCH_X
-              && pose.getY() > Constants.FIELD_CENTER.getY()) {
+          } else if (pose.getX() <= FieldCoordinates.BLUE_BUMP_AND_TRENCH_X
+              && pose.getY() > FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("B AL to Tower Left"),
                     constraints); // alliance zone top
-          } else if (pose.getX() >= Constants.BLUE_BUMP_AND_TRENCH_X
-              && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+          } else if (pose.getX() >= FieldCoordinates.BLUE_BUMP_AND_TRENCH_X
+              && pose.getY() <= FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("B NR to Tower Right"),
@@ -175,20 +139,20 @@ public class ClimbCommands {
                     constraints); // neutral zone top
           }
         } else { // red
-          if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
-              && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+          if (pose.getX() <= FieldCoordinates.RED_BUMP_AND_TRENCH_X
+              && pose.getY() <= FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("R NL to Tower Left"),
                     constraints); // neutral zone bottom
-          } else if (pose.getX() <= Constants.RED_BUMP_AND_TRENCH_X
-              && pose.getY() > Constants.FIELD_CENTER.getY()) {
+          } else if (pose.getX() <= FieldCoordinates.RED_BUMP_AND_TRENCH_X
+              && pose.getY() > FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("R NR to Tower Right"),
                     constraints); // neutral zone top
-          } else if (pose.getX() >= Constants.RED_BUMP_AND_TRENCH_X
-              && pose.getY() <= Constants.FIELD_CENTER.getY()) {
+          } else if (pose.getX() >= FieldCoordinates.RED_BUMP_AND_TRENCH_X
+              && pose.getY() <= FieldCoordinates.FIELD_CENTER.getY()) {
             pathCommand =
                 AutoBuilder.pathfindThenFollowPath(
                     PathPlannerPath.fromPathFile("R AL to Tower Left"),

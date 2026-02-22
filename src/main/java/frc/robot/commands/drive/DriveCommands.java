@@ -299,6 +299,10 @@ public class DriveCommands {
                     })));
   }
 
+  /**
+   * Field relative drive command that automatically uses joystickDriveAtAngle when a desired angle
+   * is set, otherwise uses regular joystickDrive.
+   */
   public static Command joystickDriveWithAutoRotation(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -307,9 +311,9 @@ public class DriveCommands {
     // Create PID controller for automatic rotation control (only used when desiredAngle is set)
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            ANGLE_KP * 3,
+            6,
             0.0,
-            ANGLE_KD,
+            0.3,
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY * 12, ANGLE_MAX_ACCELERATION * 12));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
