@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -32,10 +33,14 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.Calculations;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
@@ -43,6 +48,8 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
   private final List<Pose3d> tagPoses = new LinkedList<>();
+  private boolean hasTargetInSim;
+  private ArrayList<Translation2d> simulatedTargets = new ArrayList<Translation2d>();
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -61,6 +68,9 @@ public class Vision extends SubsystemBase {
           new Alert(
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+
+    hasTargetInSim = false;
+    resetSimulatedTargets();
   }
 
   /**
@@ -72,49 +82,194 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  public Pose2d getFuelPose(Pose3d robotPose) {
-    Pose2d fuelPose = new Pose2d();
-    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-      var result = io[cameraIndex].getCamera().getLatestResult();
+  public Pose2d getFuelPose(Pose2d robotPose) {
+    Pose3d robotPose3d = new Pose3d(robotPose);
+    Pose2d fuelPose = null;
+    double maxArea = 0;
+    for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
+      PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
-      double maxArea = 0;
-      if (target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
+      if (target != null && target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
         if (target.getArea() > maxArea) {
           maxArea = target.getArea();
 
           Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
-          // photonvision gives us pitch in degrees, the rotation3d in robotToCamera gives us pitch
-          // in radians
-          Distance cameraToTargetDistance =
-              getCameraToTargetDistance(
-                  target.getPitch(),
-                  robotToCamera.getRotation().getY(),
-                  robotToCamera.getMeasureZ());
-          fuelPose =
-              robotPose
-                  .transformBy(robotToCamera)
-                  .transformBy(
-                      new Transform3d(
-                          new Translation3d(),
-                          new Rotation3d(0, target.getPitch(), target.getYaw())))
+          Pose3d cameraInFieldSpace =
+              robotPose3d.transformBy(
+                  robotToCamera); // TODO: log robotpose and camera pose in advantagescope and spin,
+          // testing for accuracy
+          List<TargetCorner> corners = target.getMinAreaRectCorners();
+          double sumX = 0, sumY = 0;
+          for (TargetCorner c : corners) {
+            sumX += c.x;
+            sumY += c.y;
+          }
+          double targetPixelsX = sumX / 4.0;
+          double targetPixelsY = sumY / 4.0;
+          // both pitch and yaw are using right hand coordinate system
+          double targetPitchDegrees = (targetPixelsY - 240) / 480 * 52.5;
+          double targetYawDegrees =
+              -(targetPixelsX - 320)
+                  / 640
+                  * 70; // TODO: lens distortion might ruin this, so make table with real life
+          // values for yaw and pitch
+          Logger.recordOutput("Odometry/targetPixelsX", targetPixelsX);
+          Logger.recordOutput("Odometry/targetPixelsY", targetPixelsY);
+
+          Logger.recordOutput("Odometry/vivien's made up fuel pitch", targetPitchDegrees);
+          Logger.recordOutput("Odometry/vivien's made up fuel yaw", targetYawDegrees);
+
+          cameraInFieldSpace =
+              cameraInFieldSpace.transformBy(
+                  new Transform3d(
+                      new Translation3d(),
+                      new Rotation3d(
+                          0,
+                          Math.toRadians(targetPitchDegrees),
+                          Math.toRadians(targetYawDegrees))));
+          Translation3d towardFuelInRobotSpace =
+              cameraInFieldSpace
                   .transformBy(
                       new Transform3d(
                           new Translation3d(
-                              cameraToTargetDistance, Centimeters.of(0), Centimeters.of(0)),
+                              Centimeters.of(155), Centimeters.of(0), Centimeters.of(0)),
                           new Rotation3d()))
-                  .toPose2d();
+                  .getTranslation();
+          double a =
+              towardFuelInRobotSpace.getX()
+                  - cameraInFieldSpace.getX(); // TODO: change these names a,b,c
+          double b = towardFuelInRobotSpace.getY() - cameraInFieldSpace.getY();
+          double c = towardFuelInRobotSpace.getZ() - cameraInFieldSpace.getZ();
+          System.out.println("a,b,c: " + a + " " + b + " " + c);
+          Distance fuelPoseX = // TODO: change 7.5 to constant
+              (Centimeters.of(7.5).minus(cameraInFieldSpace.getMeasureZ()))
+                  .div(c)
+                  .times(a)
+                  .plus(cameraInFieldSpace.getMeasureX());
+          Distance fuelPoseY =
+              (Centimeters.of(7.5).minus(cameraInFieldSpace.getMeasureZ()))
+                  .div(c)
+                  .times(b)
+                  .plus(cameraInFieldSpace.getMeasureY());
+          fuelPose = new Pose2d(fuelPoseX, fuelPoseY, new Rotation2d());
         }
       }
     }
+    // System.out.println("fuelPose before rotation stuff: " + fuelPose);
+    if (fuelPose == null) {
+      return null;
+    }
+    double deltaX = fuelPose.getX() - robotPose.getX();
+    double deltaY = fuelPose.getY() - robotPose.getY();
+    // Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
+
+    fuelPose =
+        new Pose2d(
+            fuelPose.getMeasureX(),
+            fuelPose.getMeasureY(),
+            Calculations.angleToPoint(deltaX, deltaY)
+                .rotateBy(
+                    new Rotation2d(
+                        Math.toRadians(
+                            90)))); // TODO: make the 90 a constant based on where the intake is
+    // which is 180
+    // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
     return fuelPose;
   }
 
-  private Distance getCameraToTargetDistance(
-      double pitchInDegrees, double cameraAngleInRadians, Distance height) {
-    // TODO: this logic assumes that roll of the camera is 0
-    return height
-        .minus(Centimeters.of(15))
-        .div(Math.cos(Math.abs(cameraAngleInRadians) + Math.toRadians(pitchInDegrees)));
+  public Pose2d tempGetFuelPoseInSim(Pose2d robotPose) {
+
+    // System.out.println("fuelPose before rotation stuff: " + fuelPose);
+    // if (!hasTargetInSim) {
+    //   return null;
+    // }
+    int closestFuelIndex = getValidFuelIndexSim(robotPose);
+    Pose2d closestFuelPose = null;
+    if (closestFuelIndex != -1) {
+      closestFuelPose = new Pose2d(simulatedTargets.get(closestFuelIndex), new Rotation2d());
+    } else {
+      return closestFuelPose;
+    }
+
+    double deltaX = closestFuelPose.getX() - robotPose.getX();
+    double deltaY = closestFuelPose.getY() - robotPose.getY();
+    // Logger.recordOutput("Odometry/fuel Pose Z", fuelPose.getZ());
+
+    closestFuelPose =
+        new Pose2d(
+            closestFuelPose.getMeasureX(),
+            closestFuelPose.getMeasureY(),
+            Calculations.angleToPoint(deltaX, deltaY)
+                .rotateBy(
+                    new Rotation2d(
+                        Math.toRadians(
+                            180)))); // TODO: make the 90 a constant based on where the intake is
+    // which is 180
+    // System.out.println("fuelPose before rotation stuff again: " + fuelPose);
+    return closestFuelPose;
+  }
+
+  private int getValidFuelIndexSim(Pose2d robotPose) {
+    double minDistInMeters = 16;
+    int closestFuelIndex = -1;
+    for (int t = 0; t < simulatedTargets.size(); t++) {
+      Translation2d target = simulatedTargets.get(t);
+      Pose2d targetPose = new Pose2d(target, new Rotation2d());
+      // Logger.recordOutput("Odometry/simuatedTarget" + t, targetPose);
+      double robotToTargetDist = Calculations.distanceToPoseInMeters(robotPose, targetPose);
+      if (canSeeSimulatedTarget(robotPose, target) && robotToTargetDist < minDistInMeters) {
+        minDistInMeters = robotToTargetDist;
+        closestFuelIndex = t;
+      }
+    }
+    return closestFuelIndex;
+  }
+
+  public void deleteClosestSimulatedTarget(Pose2d robotPose) {
+    int index = getValidFuelIndexSim(robotPose);
+    if (index != -1) {
+      simulatedTargets.remove(getValidFuelIndexSim(robotPose));
+    }
+  }
+
+  public void resetSimulatedTargets() {
+    simulatedTargets.clear();
+    simulatedTargets.add(new Translation2d(6.711, 5.71));
+    simulatedTargets.add(new Translation2d(8.356, 3.22));
+    simulatedTargets.add(new Translation2d(7.331, 0.896));
+    simulatedTargets.add(new Translation2d(9.614, 5.085));
+    simulatedTargets.add(new Translation2d(9.501, 6.622));
+  }
+
+  public boolean canSeeSimulatedTarget(Pose2d robotPose, Translation2d fuelPosition) {
+    final double SIMULATED_CAMERA_FOV_DEGREES = 70;
+    robotPose =
+        new Pose2d(
+            robotPose.getTranslation(),
+            robotPose.getRotation().rotateBy(new Rotation2d(Math.toRadians(180))));
+    Rotation2d leftSlope =
+        robotPose
+            .getRotation()
+            .rotateBy(new Rotation2d(Math.toRadians(SIMULATED_CAMERA_FOV_DEGREES / 2)));
+    Rotation2d rightSlope =
+        robotPose
+            .getRotation()
+            .rotateBy(new Rotation2d(Math.toRadians(-SIMULATED_CAMERA_FOV_DEGREES / 2)));
+    Rotation2d toTargetSlope =
+        Calculations.angleToPoint(
+            fuelPosition.getX() - robotPose.getX(), fuelPosition.getY() - robotPose.getY());
+    if (leftSlope.getDegrees() < SIMULATED_CAMERA_FOV_DEGREES) {
+      if (toTargetSlope.getDegrees() < leftSlope.getDegrees()
+          || toTargetSlope.getDegrees() > rightSlope.getDegrees()) {
+        return true;
+      }
+    } else {
+      if (toTargetSlope.getDegrees() < leftSlope.getDegrees()
+          && toTargetSlope.getDegrees() > rightSlope.getDegrees()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -233,6 +388,13 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+
+    Logger.recordOutput("DriveToFuel/hasTargetInSim", hasTargetInSim);
+    for (int t = 0; t < simulatedTargets.size(); t++) {
+      Translation2d target = simulatedTargets.get(t);
+      Pose2d targetPose = new Pose2d(target, new Rotation2d());
+      Logger.recordOutput("DriveToFuel/simuatedTarget" + t, targetPose);
+    }
   }
 
   @FunctionalInterface
@@ -268,5 +430,9 @@ public class Vision extends SubsystemBase {
   public void takePicture() {
     System.out.println("taking picture for camera ");
     io[0].getCamera().takeInputSnapshot();
+  }
+
+  public void toggleSimHasTarget() {
+    hasTargetInSim = !hasTargetInSim;
   }
 }

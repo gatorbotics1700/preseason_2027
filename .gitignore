@@ -188,3 +188,4 @@ compile_commands.json
 
 # Generated build constants (gversion plugin)
 src/main/java/frc/robot/BuildConstants.java
+

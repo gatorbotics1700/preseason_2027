@@ -33,9 +33,9 @@ public class VisionConstants {
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.y_meters");
   public static final double ROBOT_TO_CAMERA_0_Z_METERS =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.z_meters");
-  public static final double ROBOT_TO_CAMERA_0_ROLL_DEGREES =
+  public static final double CAMERA_0_ROLL_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.roll_degrees");
-  public static final double ROBOT_TO_CAMERA_0_PITCH_DEGREES =
+  public static final double CAMERA_0_PITCH_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.pitch_degrees");
   public static final double ROBOT_TO_CAMERA_0_YAW_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_0.yaw_degrees");
@@ -58,7 +58,7 @@ public class VisionConstants {
   public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
       RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.yaw_degrees");
 
-  public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera0Transform();
+  public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera1Transform();
 
   public static Transform3d[] ROBOT_TO_CAMERA_TRANSFORMS_ARRAY = createCameraTransformsArray();
 
@@ -94,25 +94,38 @@ public class VisionConstants {
   public static int FUEL_CLASS_ID = 0;
 
   public static Transform3d createRobotToCamera0Transform() {
-    return new Transform3d(
+    return createRobotToCameraTransform(
         ROBOT_TO_CAMERA_0_X_METERS,
         ROBOT_TO_CAMERA_0_Y_METERS,
         ROBOT_TO_CAMERA_0_Z_METERS,
-        new Rotation3d(
-            Math.toRadians(ROBOT_TO_CAMERA_0_ROLL_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_0_PITCH_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_0_YAW_DEGREES)));
+        CAMERA_0_ROLL_DEGREES,
+        CAMERA_0_PITCH_DEGREES,
+        ROBOT_TO_CAMERA_0_YAW_DEGREES);
   }
 
   public static Transform3d createRobotToCamera1Transform() {
-    return new Transform3d(
+    return createRobotToCameraTransform(
         ROBOT_TO_CAMERA_1_X_METERS,
         ROBOT_TO_CAMERA_1_Y_METERS,
         ROBOT_TO_CAMERA_1_Z_METERS,
+        ROBOT_TO_CAMERA_1_ROLL_DEGREES,
+        ROBOT_TO_CAMERA_1_PITCH_DEGREES,
+        ROBOT_TO_CAMERA_1_YAW_DEGREES);
+  }
+
+  public static Transform3d createRobotToCameraTransform(
+      double xMeters,
+      double yMeters,
+      double zMeters,
+      double rollDegrees,
+      double pitchDegrees,
+      double yawDegrees) {
+    return new Transform3d(
+        xMeters,
+        yMeters,
+        zMeters,
         new Rotation3d(
-            Math.toRadians(ROBOT_TO_CAMERA_1_ROLL_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_1_PITCH_DEGREES),
-            Math.toRadians(ROBOT_TO_CAMERA_1_YAW_DEGREES)));
+            Math.toRadians(rollDegrees), Math.toRadians(pitchDegrees), Math.toRadians(yawDegrees)));
   }
 
   public static Transform3d[] createCameraTransformsArray() {
@@ -125,4 +138,7 @@ public class VisionConstants {
       createCameraStdDevFactors() { // can add more constants if we have more cameras
     return new double[] {CAMERA_0_STD_DEV_FACTOR, CAMERA_1_STD_DEV_FACTOR};
   }
+
+  public static final double DISTANCE_DEADBAND_METERS = 0.03;
+  public static final double ROTATION_DEADBAND_DEGREES = 10;
 }

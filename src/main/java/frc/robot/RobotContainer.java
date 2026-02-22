@@ -14,10 +14,9 @@
 // TODO: add mech commands into auto stuff
 package frc.robot;
 
-// import frc.robot.commands.AutoDriveCommand;
-// import frc.robot.commands.TeleopDriveCommand;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -38,6 +37,7 @@ import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.HoodHomingCommand;
 import frc.robot.commands.mech.HoodRetractCommand;
+import frc.robot.commands.drive.DriveToFuelCommand;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
 import frc.robot.subsystems.drive.Drive;
@@ -59,7 +59,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
 import frc.robot.util.RobotConfigLoader;
-import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -162,54 +161,6 @@ public class RobotContainer {
 
     // hoodSubsystem = new HoodSubsystem();
 
-    // Named Commands
-    // NamedCommands.registerCommand(
-    //     "Shooter Command",
-    //     new InstantCommand(
-    //         () -> {
-    //           CommandScheduler.getInstance().schedule(Commands.none());
-    //         }));
-
-    // // intake commands
-
-    // NamedCommands.registerCommand(
-    //     "Intake Command",
-    //     new InstantCommand(
-    //         () -> {
-    //           CommandScheduler.getInstance()
-    //               .schedule(
-    //                   IntakeCommands.DeployIntake(intakeSubsystem)
-    //                       .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
-    //         }));
-
-    // NamedCommands.registerCommand(
-    //     "Stop Kicker Command",
-    //     new InstantCommand(
-    //         () -> {
-    //           CommandScheduler.getInstance().schedule(Commands.none());
-    //         }));
-
-    // // CLIMB COMMAND
-
-    // NamedCommands.registerCommand(
-    //     "Climb Command",
-    //     new InstantCommand(
-    //         () -> {
-    //           try {
-    //             CommandScheduler.getInstance()
-    //                 .schedule(ClimbCommands.Climb(drive, climberSubsystem));
-    //           } catch (Exception e) {
-    //             e.printStackTrace();
-    //           }
-    //         }));
-
-    // mech buttons
-    // new Trigger(controller_two::getXButtonPressed)
-    // .onTrue(new HoodCommand(hoodSubsystem, false, 15));
-    // new Trigger(controller_two::getYButtonPressed).onTrue(new
-    // HoodCommand(hoodSubsystem, false,
-    // 0));
-
     // Set up auto routines with multi-step chooser
     // multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
 
@@ -230,10 +181,7 @@ public class RobotContainer {
     // "Drive SysId (Dynamic Forward)",
     // drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    // "Drive SysId (Dynamic Reverse)",
-    // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // Configure the button bindings
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
@@ -279,12 +227,68 @@ public class RobotContainer {
       }
 
       // drive over bump
+      // controller
+      //     .a()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //             () -> {
+      //               try {
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(DriveOverBumpCommand.driveOverBump(drive));
+      //               } catch (Exception e) {
+      //                 e.printStackTrace();
+      //               }
+      //             }));
+
+      // // Reset gyro to 0° when B button is pressed
+      // controller
+      //     .b()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //                 () -> {
+      //                   if (DriverStation.getAlliance().isPresent()
+      //                       && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      //                     drive.setPose(
+      //                         new Pose2d(
+      //                             drive.getPose().getTranslation(),
+      //                             new Rotation2d(Math.toRadians(0))));
+      //                   } else {
+      //                     drive.setPose(
+      //                         new Pose2d(
+      //                             drive.getPose().getTranslation(),
+      //                             new Rotation2d(Math.toRadians(0))));
+      //                   }
+      //                 },
+      //                 drive)
+      //             .ignoringDisable(true));
+
+      // // drive under trench
+      // controller
+      //     .x()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //             () -> {
+      //               try {
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(DriveUnderTrenchCommand.driveUnderTrench(drive));
+      //               } catch (Exception e) {
+      //                 e.printStackTrace();
+      //               }
+      //             }));
+
+      // controller
+      //     .rightBumper()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //             () -> {
+      //               drive.setSlowDrive();
+      //             },
+      //             drive));
       controller
           .a()
           .onTrue(
               Commands.runOnce(
-                  () -> {
-                    try {
+                  () ->
                       CommandScheduler.getInstance()
                           .schedule(DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem));
                     } catch (Exception e) {
@@ -294,31 +298,16 @@ public class RobotContainer {
 
       // Reset gyro to 0° when B button is pressed
       controller
-          .b()
-          .onTrue(
-              Commands.runOnce(
-                      () -> {
-                        if (DriverStation.getAlliance().isPresent()
-                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-                          drive.setPose(
-                              new Pose2d(
-                                  drive.getPose().getTranslation(),
-                                  new Rotation2d(Math.toRadians(0))));
-                        } else {
-                          drive.setPose(
-                              new Pose2d(
-                                  drive.getPose().getTranslation(),
-                                  new Rotation2d(Math.toRadians(0))));
-                        }
-                      },
-                      drive)
-                  .ignoringDisable(true));
-
-      // drive under trench
-      controller
           .x()
           .onTrue(
-              Commands.runOnce(
+              new InstantCommand(
+                  () -> {
+                    vision.resetSimulatedTargets();
+                  }));
+      controller
+          .y()
+          .onTrue(
+              new InstantCommand(
                   () -> {
                     try {
                       CommandScheduler.getInstance()
@@ -339,15 +328,13 @@ public class RobotContainer {
                       e.printStackTrace();
                     }
                   }));
-
       controller
-          .rightBumper()
+          .b()
           .onTrue(
-              Commands.runOnce(
+              new InstantCommand(
                   () -> {
-                    drive.setSlowDrive();
-                  },
-                  drive));
+                    drive.setPose(new Pose2d(6, 4, new Rotation2d()));
+                  }));
     }
   }
 
@@ -361,6 +348,7 @@ public class RobotContainer {
       } else {
         controller_two = new CommandXboxController(3);
       }
+    }
 
       if (Constants.currentMode == Constants.Mode.SIM) {
         controller_two
@@ -576,8 +564,29 @@ public class RobotContainer {
         // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
         // }));
 
-      }
-    }
+    // mech buttons
+    // controller_two
+    //     .x()
+    //     .onTrue(new HoodCommand(hoodSubsystem, false, 15));
+    // controller_two
+    //     .y()
+    //     .onTrue(new HoodCommand(hoodSubsystem, false, 0));
+
+    // Schedule a new DriveToFuel command on each press (fresh pose from vision each time)
+    // controller_two
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 CommandScheduler.getInstance()
+    //                     .schedule(IntakeCommands.DriveToFuel(drive, vision))));
+    // controller_two
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.setPose(new Pose2d(3, 4, new Rotation2d()));
+    //             }));
   }
 
   public Command getAutonomousCommand() {
@@ -680,6 +689,7 @@ public class RobotContainer {
 
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
+    Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
 
     // shotParameters =
     // ShotCalculator.calculateShot(
