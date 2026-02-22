@@ -83,8 +83,10 @@ public class ShootingCommand extends Command {
     }
     ShotParameters params =
         ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
-    // System.out.println("PARAMS SHOT SPEED: " + params.shotSpeed);
 
+    Logger.recordOutput("Mech/ShotCalculator/target", target);
+    Logger.recordOutput("Mech/ShotCalculator/drivetrainPose", drivetrainPose.get());
+    Logger.recordOutput("Mech/ShotCalculator/drivetrainVelocity", drivetrainVelocity.get());
     Logger.recordOutput("Mech/ShotCalculator/validShot", params.shotSpeed != 0);
     Logger.recordOutput("Mech/ShotCalculator/shotSpeed", params.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/hoodAngle", params.hoodAngle);

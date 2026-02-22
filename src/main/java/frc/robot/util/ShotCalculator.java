@@ -177,6 +177,12 @@ public class ShotCalculator {
       testShotSpeed += speedIncrement;
     }
 
+    if (bestShotSpeed == 0) {
+      System.out.println("NO VALID SHOT");
+    } else {
+      System.out.println("VALID SHOT CALCULATED");
+    }
+
     return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);
   }
 
