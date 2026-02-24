@@ -28,10 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
   private Encoder boreEncoder =
       new Encoder(
-          TurretConstants.TURRET_BORE_ENCODER_PORT1,
-          TurretConstants.TURRET_BORE_ENCODER_PORT2);
-  private final DigitalInput hallEffect =
-      new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
+          TurretConstants.TURRET_BORE_ENCODER_PORT1, TurretConstants.TURRET_BORE_ENCODER_PORT2);
+  private final DigitalInput hallEffect = new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
 
   private Rotation2d desiredAngle;
 
@@ -89,16 +87,15 @@ public class TurretSubsystem extends SubsystemBase {
                 MathUtil.inputModulus(
                     desiredAngle.getDegrees(),
                     TurretConstants.MIN_TURRET_ANGLE,
-                    TurretConstants.MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
+                    TurretConstants
+                        .MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = turretMotor.getPosition().getValueAsDouble();
     double turretAngleDegrees =
         motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360;
-    return new Rotation2d(
-        Math.toRadians(
-            turretAngleDegrees));
+    return new Rotation2d(Math.toRadians(turretAngleDegrees));
   }
 
   public double degreesToRevs(double turretAngleDegrees) {

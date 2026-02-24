@@ -646,7 +646,8 @@ public class RobotContainer {
     // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 
-  // TODO: this command doesn't work -- need to fix (test this by commenting out the way we do this manually in Robot.java)
+  // TODO: this command doesn't work -- need to fix (test this by commenting out the way we do this
+  // manually in Robot.java)
   public Command MechStop() {
     return /*
                IntakeCommands.StopIntake(intakeSubsystem)

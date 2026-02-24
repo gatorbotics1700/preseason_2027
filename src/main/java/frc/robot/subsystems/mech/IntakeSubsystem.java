@@ -136,9 +136,7 @@ public class IntakeSubsystem extends SubsystemBase {
             / IntakeConstants.DEPLOY_PULLEY_TWO_GEAR_RATIO
             * 360.0
             % 360; // TODO check if we multiply or divide by the gear ratio
-    return new Rotation2d(
-        Math.toRadians(
-            deployAngleDegrees));
+    return new Rotation2d(Math.toRadians(deployAngleDegrees));
   }
 
   public double degreesToRevs(double deployAngleDegrees) {

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX leftFlywheelMotor;
@@ -29,6 +30,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Slot0Configs rightFlywheelSlot0Configs;
 
   private boolean shouldShoot;
+  public static LoggedNetworkNumber flyWheelSlip =
+      new LoggedNetworkNumber("/Tuning/flywheelSlip", 1);
 
   public ShooterSubsystem() {
     leftFlywheelMotor =
@@ -117,9 +120,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getFlywheelVelocity() {
-    return rightFlywheelMotor
-        .getRotorVelocity()
-        .getValueAsDouble();
+    return rightFlywheelMotor.getRotorVelocity().getValueAsDouble();
   }
 
   public void setDesiredTransitionVoltage(double desiredTransitionVoltage) {
@@ -127,7 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getExitVelocity() {
-    return ShooterConstants.FLYWHEEL_SLIP
+    return flyWheelSlip.get()
         * getFlywheelVelocity()
         * 2
         * Math.PI

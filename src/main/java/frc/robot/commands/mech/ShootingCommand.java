@@ -80,13 +80,13 @@ public class ShootingCommand extends Command {
     ShotParameters params =
         ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
 
-    Logger.recordOutput("Mech/ShotCalculator/target", target);
-    Logger.recordOutput("Mech/ShotCalculator/drivetrainPose", drivetrainPose.get());
-    Logger.recordOutput("Mech/ShotCalculator/drivetrainVelocity", drivetrainVelocity.get());
     Logger.recordOutput("Mech/ShotCalculator/validShot", params.shotSpeed != 0);
     Logger.recordOutput("Mech/ShotCalculator/shotSpeed", params.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/hoodAngle", params.hoodAngle);
     Logger.recordOutput("Mech/ShotCalculator/turretAngle", params.turretAngle);
+    Logger.recordOutput("Mech/ShotCalculator/currentPose", drivetrainPose.get());
+    Logger.recordOutput("Mech/ShotCalculator/chassisSpeeds", drivetrainVelocity.get());
+    Logger.recordOutput("Mech/ShotCalculator/target", target);
 
     // if should be shooting
     // set flywheel speed to the last non-zero flywheel speed
@@ -114,36 +114,37 @@ public class ShootingCommand extends Command {
     // and default to shooting in our zone, but then the toggle can change that behavior
     // i (phoenix) can't currently think of a better way to constantly be scheduling this command
     // automatically, but if people have ideas that would be great! */
-    // if (shooterSubsystem.getShouldShoot()) { // if we want to shoot //TODO: commented out for testing -- likely don't leave it this way, but see above block comment
-      System.out.println("WE WANT TO SHOOT");
-      if (params.shotSpeed != 0) { // and if we have a valid shot
-        double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
-        System.out.println("VALID SHOT VALID SHOT");
-        shooterSubsystem.setDesiredFlywheelVelocity(
-            desiredFlywheelSpeed); // set velocity to our desired velocity
-        hopperFloorSubsystem.setDesiredHopperFloorVelocity(
-            HopperFloorConstants.HOPPER_FLOOR_VELOCITY);
-        if (Math.abs(shooterSubsystem.getFlywheelVelocity() - desiredFlywheelSpeed)
-            < ShooterConstants
-                .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
-          // velocity
-          System.out.println("SHOOTING SHOOTING SHOOTING");
-          shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
-        }
-      } else { // if we dont have a valid shot
-        System.out.println("INVALID SHOT INVALID SHOT");
-        hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
-        shooterSubsystem.setDesiredTransitionVoltage(0);
+    // if (shooterSubsystem.getShouldShoot()) { // if we want to shoot //TODO: commented out for
+    // testing -- likely don't leave it this way, but see above block comment
+    System.out.println("WE WANT TO SHOOT");
+    if (params.shotSpeed != 0) { // and if we have a valid shot
+      double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
+      System.out.println("VALID SHOT VALID SHOT");
+      shooterSubsystem.setDesiredFlywheelVelocity(
+          desiredFlywheelSpeed); // set velocity to our desired velocity
+      hopperFloorSubsystem.setDesiredHopperFloorVelocity(
+          HopperFloorConstants.HOPPER_FLOOR_VELOCITY);
+      if (Math.abs(shooterSubsystem.getFlywheelVelocity() - desiredFlywheelSpeed)
+          < ShooterConstants
+              .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
+        // velocity
+        System.out.println("SHOOTING SHOOTING SHOOTING");
+        shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
       }
-      hoodSubsystem.setDesiredAngle(params.hoodAngle);
-      turretSubsystem.setDesiredAngle(params.turretAngle);
+    } else { // if we dont have a valid shot
+      System.out.println("INVALID SHOT INVALID SHOT");
+      hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
+      shooterSubsystem.setDesiredTransitionVoltage(0);
+    }
+    hoodSubsystem.setDesiredAngle(params.hoodAngle);
+    turretSubsystem.setDesiredAngle(params.turretAngle);
     /* } /*else {
-        System.out.println("WE DONT WANT TO SHOOT");
-        shooterSubsystem.setDesiredFlywheelVelocity(0);
-        // shooterSubsystem.setFlywheelVoltage(0);
-        shooterSubsystem.setDesiredTransitionVoltage(0);
-        hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
-      } */
+      System.out.println("WE DONT WANT TO SHOOT");
+      shooterSubsystem.setDesiredFlywheelVelocity(0);
+      // shooterSubsystem.setFlywheelVoltage(0);
+      shooterSubsystem.setDesiredTransitionVoltage(0);
+      hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
+    } */
 
     // TODO add drivetrain angle things here instead of the turret angle for testing on sting
   }
