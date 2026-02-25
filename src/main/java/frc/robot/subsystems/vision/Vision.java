@@ -105,8 +105,8 @@ public class Vision extends SubsystemBase {
           // Logger.recordOutput("Odometry/targetPixelsX", targetPixelsX);
           // Logger.recordOutput("Odometry/targetPixelsY", targetPixelsY);
 
-          Logger.recordOutput("Odometry/vivien's made up fuel pitch", targetPitchDegrees);
-          Logger.recordOutput("Odometry/vivien's made up fuel yaw", targetYawDegrees);
+          Logger.recordOutput("DriveToFuel/vivien's made up fuel pitch", targetPitchDegrees);
+          Logger.recordOutput("DriveToFuel/vivien's made up fuel yaw", targetYawDegrees);
 
           cameraInFieldSpace =
               cameraInFieldSpace.transformBy(
@@ -124,6 +124,7 @@ public class Vision extends SubsystemBase {
                               Centimeters.of(100), Centimeters.of(0), Centimeters.of(0)),
                           new Rotation3d()))
                   .getTranslation();
+          Logger.recordOutput("DriveToFuel/towardFuelInRobotSpace", towardFuelInRobotSpace);
           double deltaX = towardFuelInRobotSpace.getX() - cameraInFieldSpace.getX();
           double deltaY = towardFuelInRobotSpace.getY() - cameraInFieldSpace.getY();
           double deltaZ = towardFuelInRobotSpace.getZ() - cameraInFieldSpace.getZ();

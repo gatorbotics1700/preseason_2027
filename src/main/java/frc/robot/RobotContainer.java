@@ -647,6 +647,6 @@ public class RobotContainer {
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
 
-    Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
+    Logger.recordOutput("DriveToFuel/Fuel", vision.getFuelPose(drive.getPose()));
   }
 }
