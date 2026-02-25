@@ -150,7 +150,7 @@ public final class Constants {
             RobotConfigLoader.getString("tuner.drive_canbus_name").equals("null")
                 ? ""
                 : RobotConfigLoader.getString("tuner.drive_canbus_name"),
-            "./logs/example.hoot");
+            "");
 
     // Mechanism CAN bus - reuses driveCANBus if they're the same physical bus
     public static final CANBus mechCANBus;
