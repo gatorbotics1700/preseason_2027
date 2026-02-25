@@ -551,8 +551,7 @@ public final class Constants {
         new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
 
     public static final double HOMING_VOLTAGE = 10; // TODO tune
-    public static final double INTAKING_VOLTAGE =
-        10; // TODO get a real number (I just picked my favorite)
+    public static final double INTAKING_VOLTAGE = 10;
   }
 
   public static final class ShooterConstants {
