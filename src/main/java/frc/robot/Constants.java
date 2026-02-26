@@ -560,9 +560,9 @@ public final class Constants {
     public static final int TRANSITION_MOTOR_CAN_ID = 31;
 
     public static final double TRANSITION_VOLTAGE = 10;
-    public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+    public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-    public static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_SLIP = 0.27; // 0.7; // TODO TUNE!!!
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER =

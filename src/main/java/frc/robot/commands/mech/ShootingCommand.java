@@ -79,11 +79,14 @@ public class ShootingCommand extends Command {
     }
     ShotParameters params =
         ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
+    double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
 
     Logger.recordOutput("Mech/ShotCalculator/validShot", params.shotSpeed != 0);
     Logger.recordOutput("Mech/ShotCalculator/shotSpeed", params.shotSpeed);
-    Logger.recordOutput("Mech/ShotCalculator/hoodAngle", params.hoodAngle);
-    Logger.recordOutput("Mech/ShotCalculator/turretAngle", params.turretAngle);
+    Logger.recordOutput("Mech/ShotCalculator/flyWheelSpeed", desiredFlywheelSpeed);
+
+    Logger.recordOutput("Mech/ShotCalculator/hoodAngle", params.hoodAngle.getDegrees());
+    Logger.recordOutput("Mech/ShotCalculator/turretAngle", params.turretAngle.getDegrees());
     Logger.recordOutput("Mech/ShotCalculator/currentPose", drivetrainPose.get());
     Logger.recordOutput("Mech/ShotCalculator/chassisSpeeds", drivetrainVelocity.get());
     Logger.recordOutput("Mech/ShotCalculator/target", target);
@@ -96,11 +99,11 @@ public class ShootingCommand extends Command {
     // if shouldnt be shooting
     // stop everything including flywheel //TODO: is this the logic we actually want? i dont think
     // we want to stop the flywheel
-    if (params.shotSpeed != 0) { // if we have a valid shot
-      lastVelocity =
-          ShooterSubsystem.calculateFlywheelSpeed(
-              params.shotSpeed); // update our last velocity / set our desired velocity
-    }
+    // if (params.shotSpeed != 0) { // if we have a valid shot
+    //   lastVelocity =
+    //       ShooterSubsystem.calculateFlywheelSpeed(
+    //           params.shotSpeed); // update our last velocity / set our desired velocity
+    // }
 
     /*  TODO: get should shoot hasn't been working/setting properly -- we probably want the logic to
     // set better and automatically, but need to test further
@@ -118,7 +121,7 @@ public class ShootingCommand extends Command {
     // testing -- likely don't leave it this way, but see above block comment
     System.out.println("WE WANT TO SHOOT");
     if (params.shotSpeed != 0) { // and if we have a valid shot
-      double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
+
       System.out.println("VALID SHOT VALID SHOT");
       shooterSubsystem.setDesiredFlywheelVelocity(
           desiredFlywheelSpeed); // set velocity to our desired velocity

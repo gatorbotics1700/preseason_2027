@@ -141,11 +141,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
-    return shotSpeed
-        / ShooterConstants.FLYWHEEL_SLIP
-        / 2
-        / Math.PI
-        / ShooterConstants.FLYWHEEL_RADIUS_METERS;
+    return shotSpeed / flyWheelSlip.get() / 2 / Math.PI / ShooterConstants.FLYWHEEL_RADIUS_METERS;
   }
 
   public boolean getShouldShoot() {

@@ -170,9 +170,9 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     CommandScheduler.getInstance().cancelAll();
     robotContainer.teleopInit();
-    robotContainer.getShooterSubsystem().setDesiredFlywheelVelocity(0);
-    robotContainer.getShooterSubsystem().setDesiredTransitionVoltage(0);
-    robotContainer.getIntakeSubsystem().setIntakeVoltage(0);
+    // robotContainer.getShooterSubsystem().setDesiredFlywheelVelocity(0);
+    // robotContainer.getShooterSubsystem().setDesiredTransitionVoltage(0);
+    // robotContainer.getIntakeSubsystem().setIntakeVoltage(0);
     robotContainer.MechStop();
     Elastic.selectTab("Teleoperated");
 
