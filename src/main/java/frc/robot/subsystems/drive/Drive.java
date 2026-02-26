@@ -151,6 +151,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private static final double ROTATION_kP = 0.1;
   private final double TRANSLATION_MIN_SPEED = 0.5;
   private final double ROTATION_MIN_SPEED = 0.3;
+  private final double TRANSLATION_MAX_SPEED = 1.8;
 
   public Drive(
       GyroIO gyroIO,
@@ -550,12 +551,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     double rotationSpeed =
         Math.max(Math.abs(rotationError * ROTATION_kP), ROTATION_MIN_SPEED)
             * Math.signum(rotationError);
-    if (xSpeed >= 1.8) {
-      xSpeed = 1.8;
-    }
-    if (ySpeed >= 1.8) {
-      ySpeed = 1.8;
-    }
+    xSpeed = Math.min(xSpeed, TRANSLATION_MAX_SPEED);
+    ySpeed = Math.min(ySpeed, TRANSLATION_MAX_SPEED);
+
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xSpeed, ySpeed, rotationSpeed, currentPose.getRotation()));

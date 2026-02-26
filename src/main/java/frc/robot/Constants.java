@@ -72,10 +72,6 @@ public final class Constants {
     REPLAY
   }
 
-  // TODO: will we still need this?
-  public static final Distance CENTER_TO_BUMPER_OFFSET = Centimeters.of(40);
-  public static final Distance ROBOT_RADIUS_WITH_BUMPERS = Centimeters.of(57);
-
   public static final int KRAKEN_TICKS_PER_REV = 2048;
 
   public static final class TunerConstants {
@@ -484,6 +480,17 @@ public final class Constants {
 
     public static final double DISTANCE_DEADBAND_METERS = 0.03;
     public static final double ROTATION_DEADBAND_DEGREES = 10;
+
+    public static final double TARGET_ANGLE_SCALAR = 1.28054;
+  }
+
+  public static final class DriveToFuelConstants {
+    public static final double BLIND_SPOT_DEADBAND = 0.5; // TODO change
+    public static final double MAX_IDLE_MILLISECONDS =
+        2000; // TODO change based off real world maybe?
+
+    public static final double ROTATING_SPEED_RADIANS_PER_SECOND =
+        2.5; // TODO change based off real life
   }
 
   public static final class ClimberConstants {
@@ -551,6 +558,8 @@ public final class Constants {
     public static final double HOMING_VOLTAGE = 10; // TODO tune
     public static final double INTAKING_VOLTAGE =
         10; // TODO get a real number (I just picked my favorite)
+    public static final double ROBOT_TO_INTAKE_YAW_DEGREES =
+        RobotConfigLoader.getDouble("mech.robot_to_intake_yaw_degrees");
   }
 
   public static final class ShooterConstants {
