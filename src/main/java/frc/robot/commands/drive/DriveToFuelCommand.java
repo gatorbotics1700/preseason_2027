@@ -8,6 +8,7 @@ import frc.robot.Constants.DriveToFuelConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Calculations;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToFuelCommand extends Command {
@@ -17,23 +18,24 @@ public class DriveToFuelCommand extends Command {
 
   private Pose2d desiredPose;
   private double validTargetSeenTime;
+  private Supplier<Pose2d> currentPose;
 
   // constructor
-  public DriveToFuelCommand(Drive drive, Vision vision) {
+  public DriveToFuelCommand(Drive drive, Vision vision, Supplier<Pose2d> currentPose) {
     this.drive = drive;
     this.vision = vision;
+    this.currentPose = currentPose;
     validTargetSeenTime = System.currentTimeMillis();
     addRequirements(drive, vision);
   }
 
   @Override
   public void execute() {
-    Pose2d currentPose = drive.getPose();
     Pose2d newFuelPose;
     if (Constants.currentMode == Constants.Mode.SIM) {
-      newFuelPose = vision.tempGetFuelPoseInSim(currentPose);
+      newFuelPose = vision.tempGetFuelPoseInSim(currentPose.get());
     } else {
-      newFuelPose = vision.getFuelPose(currentPose);
+      newFuelPose = vision.getFuelPose(currentPose.get());
     }
 
     if (newFuelPose != null) {
@@ -44,7 +46,7 @@ public class DriveToFuelCommand extends Command {
       // if we no longer see fuel and it's far enough away, we can safely assume somebody else stole
       // it so we should stop trying to go there
       if (desiredPose != null
-          && Calculations.distanceToPoseInMeters(currentPose, desiredPose)
+          && Calculations.distanceToPoseInMeters(currentPose.get(), desiredPose)
               > DriveToFuelConstants.BLIND_SPOT_DEADBAND) {
         desiredPose = null;
       }
@@ -52,12 +54,12 @@ public class DriveToFuelCommand extends Command {
     boolean atDesiredPose = false;
 
     if (desiredPose != null) {
-      double xError = drive.calculateDistanceError(currentPose.getX(), desiredPose.getX());
-      double yError = drive.calculateDistanceError(currentPose.getY(), desiredPose.getY());
+      double xError = drive.calculateDistanceError(currentPose.get().getX(), desiredPose.getX());
+      double yError = drive.calculateDistanceError(currentPose.get().getY(), desiredPose.getY());
       atDesiredPose = xError == 0.0 && yError == 0.0;
       if (Constants.currentMode == Constants.Mode.SIM) {
         if (atDesiredPose) {
-          vision.deleteClosestSimulatedTarget(currentPose);
+          vision.deleteClosestSimulatedTarget(currentPose.get());
         }
       }
     }
@@ -75,7 +77,7 @@ public class DriveToFuelCommand extends Command {
       drive.stop();
     }
     Logger.recordOutput("DriveToFuel/Desired Pose", desiredPose);
-    Logger.recordOutput("DriveToFuel/Current Pose", currentPose);
+    Logger.recordOutput("DriveToFuel/Current Pose", currentPose.get());
     Logger.recordOutput("DriveToFuel/Time Since Target Seen", timeSinceValidTargetSeen);
   }
 

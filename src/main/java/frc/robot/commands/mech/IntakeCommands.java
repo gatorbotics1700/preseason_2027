@@ -69,24 +69,6 @@ public class IntakeCommands {
         });
   }
 
-  public static Command DriveToFuel(Drive drive, Vision vision) {
-    PathConstraints constraints =
-        new PathConstraints(1, 2, Units.degreesToRadians(700), Units.degreesToRadians(1000));
-
-    Pose2d currentPose = drive.getPose();
-    Pose2d desiredPose = vision.getFuelPose(currentPose);
-    Logger.recordOutput("Odometry/Desired Pose in Intake", desiredPose);
-    Logger.recordOutput("Odometry/Current Pose in Intake", currentPose);
-    // Pose2d desiredPose = new Pose2d(5, 7, new Rotation2d());
-    System.out.println("this is the desired pose here u go: " + desiredPose);
-    if (desiredPose == null) {
-      return Commands.none();
-    }
-
-    return AutoBuilder.pathfindToPose(desiredPose, constraints);
-    // return Commands.none();
-  }
-
   public static class DeployIntakeCommand extends Command {
 
     private final boolean isRetracting;

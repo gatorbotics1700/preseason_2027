@@ -39,6 +39,8 @@ import frc.robot.util.Calculations;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -78,11 +80,11 @@ public class Vision extends SubsystemBase {
     for (int cameraIndex = 0; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
       PhotonPipelineResult result = io[cameraIndex].getCamera().getLatestResult();
       PhotonTrackedTarget target = result.getBestTarget();
+      Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
       if (target != null && target.getDetectedObjectClassID() == VisionConstants.FUEL_CLASS_ID) {
         if (target.getArea() > maxArea) {
           maxArea = target.getArea();
 
-          Transform3d robotToCamera = VisionConstants.ROBOT_TO_CAMERA_TRANSFORMS_ARRAY[cameraIndex];
           Pose3d cameraInFieldSpace =
               robotPose3d.transformBy(
                   robotToCamera); // TODO: log robotpose and camera pose in advantagescope and spin,
@@ -90,11 +92,8 @@ public class Vision extends SubsystemBase {
           double targetPitchDegrees = -target.getPitch() * VisionConstants.TARGET_ANGLE_SCALAR;
           double targetYawDegrees = -target.getYaw() * VisionConstants.TARGET_ANGLE_SCALAR;
           // values for yaw and pitch
-
           Logger.recordOutput("DriveToFuel/Altered Target Pitcb", targetPitchDegrees);
           Logger.recordOutput("DriveToFuel/Altered Target Yaw", targetYawDegrees);
-          Logger.recordOutput("DriveToFuel/Camera Pose", robotToCamera);
-
           cameraInFieldSpace =
               cameraInFieldSpace.transformBy(
                   new Transform3d(
@@ -128,12 +127,14 @@ public class Vision extends SubsystemBase {
           fuelPose = new Pose2d(fuelPoseX, fuelPoseY, new Rotation2d());
         }
       }
+      Logger.recordOutput("DriveToFuel/Camera Pose", robotToCamera);
     }
+
     if (fuelPose == null) {
       return null;
     }
-    double deltaX = fuelPose.getX() - robotPose.getX();
-    double deltaY = fuelPose.getY() - robotPose.getY();
+    double deltaX = fuelPose.getX() - robotPose3d.getX();
+    double deltaY = fuelPose.getY() - robotPose3d.getY();
 
     fuelPose =
         new Pose2d(
