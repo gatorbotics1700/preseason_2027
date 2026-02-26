@@ -565,7 +565,6 @@ public class RobotContainer {
     }
   }
 
-  /** Start pose of the currently selected auto (from first path). Empty if no paths. */
   public Optional<Pose2d> getAutoStartPose() {
     return multiStepAutoChooser.getAutoStartPose();
   }
@@ -627,7 +626,6 @@ public class RobotContainer {
       gamePieceSimulation.updateBalls();
     }
 
-    // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
     // Print path name to console me thinks

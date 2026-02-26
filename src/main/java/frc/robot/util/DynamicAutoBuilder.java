@@ -77,10 +77,8 @@ public class DynamicAutoBuilder {
     return alliance + " " + convertedFrom + " to " + to;
   }
 
-  /** Returns true if the robot is in the alliance zone (not past bump/trench). */
   private boolean isInAllianceZone() {
     double x = robotPose.get().getX();
-    // Robot is in alliance zone if NOT between the bump/trench boundaries
     return x <= FieldCoordinates.BLUE_BUMP_AND_TRENCH_X
         || x >= FieldCoordinates.RED_BUMP_AND_TRENCH_X;
   }
@@ -112,23 +110,17 @@ public class DynamicAutoBuilder {
     return new TurretHomingCommand(turretSubsystem).alongWith(new HoodHomingCommand(hoodSubsystem));
   }
 
-  /**
-   * Gets action for destination. For fuel pile, adds hood retract while in trench. Intake and
-   * shooting are handled globally in buildAuto, not per-destination.
-   */
+  
   private Command getActionForDestination(String destination) {
     if (destination == null || destination.equals("None")) {
       return Commands.none();
     }
 
-    // Going to fuel pile: need to retract hood while in the trench area (skip in sim)
     if (destination.startsWith("Fuel Pile") && RobotBase.isReal()) {
-      // Keep hood retracted while NOT in alliance zone (i.e., while in the trench area)
       return new HoodRetractCommand(hoodSubsystem).onlyWhile(() -> !isInAllianceZone());
     }
 
-    // Other destinations don't need special per-destination actions
-    // (intake and shooting are handled globally)
+   
     return Commands.none();
   }
 
