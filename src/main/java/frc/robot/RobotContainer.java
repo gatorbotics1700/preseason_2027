@@ -28,12 +28,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
+import frc.robot.commands.mech.TurretHomingCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -84,26 +86,27 @@ public class RobotContainer {
   private Supplier<ChassisSpeeds> chassisSpeeds;
   private BooleanSupplier shouldShoot;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
 
     // Set up robot depending on mode
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight),
-                (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0));
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight),
+            (pose) -> {
+            });
+        vision = new Vision(
+            drive,
+            new VisionIOPhotonVision(
+                VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0));
         // new VisionIOPhotonVision(
         // VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
         // TODO bring the second camera back yayyy -anne
@@ -111,51 +114,54 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight),
-                (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CAMERA_0_NAME,
-                    VisionConstants.ROBOT_TO_CAMERA_0,
-                    drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.CAMERA_1_NAME,
-                    VisionConstants.ROBOT_TO_CAMERA_1,
-                    drive::getPose));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight),
+            (pose) -> {
+            });
+        vision = new Vision(
+            drive,
+            new VisionIOPhotonVisionSim(
+                VisionConstants.CAMERA_0_NAME,
+                VisionConstants.ROBOT_TO_CAMERA_0,
+                drive::getPose),
+            new VisionIOPhotonVisionSim(
+                VisionConstants.CAMERA_1_NAME,
+                VisionConstants.ROBOT_TO_CAMERA_1,
+                drive::getPose));
         DriverStation.silenceJoystickConnectionWarning(true);
         break;
 
       default: // TODO: should the default be real as a safety for matches? to be discussed
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            (pose) -> {
+            });
         vision = new Vision(drive);
 
         break;
     }
 
-    robotPose =
-        () -> {
-          return drive.getPose();
-        };
-    chassisSpeeds =
-        () -> {
-          return drive.getChassisSpeeds();
-        };
+    robotPose = () -> {
+      return drive.getPose();
+    };
+    chassisSpeeds = () -> {
+      return drive.getChassisSpeeds();
+    };
 
     shouldShoot =
         // () -> {
@@ -182,13 +188,16 @@ public class RobotContainer {
     // "Drive SysId (Dynamic Forward)",
     // drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // "Drive SysId (Dynamic Reverse)",
+    // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   public void configureDriverButtonBindings() {
@@ -201,12 +210,10 @@ public class RobotContainer {
       }
 
       // Default command, normal field-relative drive
-      Trigger driverControl =
-          new Trigger(
-              () ->
-                  Math.abs(controller.getLeftY()) > 0.1
-                      || Math.abs(controller.getLeftX()) > 0.1
-                      || Math.abs(controller.getRightX()) > 0.1);
+      Trigger driverControl = new Trigger(
+          () -> Math.abs(controller.getLeftY()) > 0.1
+              || Math.abs(controller.getLeftX()) > 0.1
+              || Math.abs(controller.getRightX()) > 0.1);
       if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
         driverControl
             .whileTrue(
@@ -257,21 +264,21 @@ public class RobotContainer {
           .b()
           .onTrue(
               Commands.runOnce(
-                      () -> {
-                        if (DriverStation.getAlliance().isPresent()
-                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-                          drive.setPose(
-                              new Pose2d(
-                                  drive.getPose().getTranslation(),
-                                  new Rotation2d(Math.toRadians(0))));
-                        } else {
-                          drive.setPose(
-                              new Pose2d(
-                                  drive.getPose().getTranslation(),
-                                  new Rotation2d(Math.toRadians(0))));
-                        }
-                      },
-                      drive)
+                  () -> {
+                    if (DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                      drive.setPose(
+                          new Pose2d(
+                              drive.getPose().getTranslation(),
+                              new Rotation2d(Math.toRadians(0))));
+                    } else {
+                      drive.setPose(
+                          new Pose2d(
+                              drive.getPose().getTranslation(),
+                              new Rotation2d(Math.toRadians(0))));
+                    }
+                  },
+                  drive)
                   .ignoringDisable(true));
 
       // drive under trench
@@ -325,127 +332,127 @@ public class RobotContainer {
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       // controller_two
-      //     .a()
-      //     .onTrue(
-      //         new InstantCommand(
-      //             () -> {
-      //               // Use current pose and chassis speeds at this instant so all values match.
-      //               Pose2d pose = drive.getPose();
+      // .a()
+      // .onTrue(
+      // new InstantCommand(
+      // () -> {
+      // // Use current pose and chassis speeds at this instant so all values match.
+      // Pose2d pose = drive.getPose();
 
-      //               ChassisSpeeds cs = drive.getChassisSpeeds();
-      //               ShotParameters params =
-      //                   ShotCalculator.calculateShot(pose, cs, FieldCoordinates.BLUE_HUB);
+      // ChassisSpeeds cs = drive.getChassisSpeeds();
+      // ShotParameters params =
+      // ShotCalculator.calculateShot(pose, cs, FieldCoordinates.BLUE_HUB);
 
-      //               gamePieceSimulation.launchFuelBall(
-      //                   ShotCalculator.getFieldToShooter(pose, ShooterConstants.BOT_TO_SHOOTER),
-      //                   cs,
-      //                   drive.getRotation(),
-      //                   params.shotSpeed,
-      //                   params.turretAngle,
-      //                   params.hoodAngle);
-      //             }));
+      // gamePieceSimulation.launchFuelBall(
+      // ShotCalculator.getFieldToShooter(pose, ShooterConstants.BOT_TO_SHOOTER),
+      // cs,
+      // drive.getRotation(),
+      // params.shotSpeed,
+      // params.turretAngle,
+      // params.hoodAngle);
+      // }));
       // controller_two
-      //     .b()
-      //     .onTrue(
-      //         AutoBuilder.pathfindToPose(
-      //                 new Pose2d(1, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
-      //                 new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
-      //             .andThen(
-      //                 Commands.parallel(
-      //                     AutoBuilder.pathfindToPose(
-      //                         new Pose2d(3, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
-      //                         new PathConstraints(
-      //                             1, 12, Math.toRadians(700), Math.toRadians(1000))),
-      //                     Commands.waitSeconds(0.2)
-      //                         .andThen(
-      //                             Commands.runOnce(
-      //                                 () -> {
-      //                                   // Use current pose and chassis speeds at this instant so
-      //                                   // all
-      //                                   // values
-      //                                   // match.
-      //                                   Pose2d pose = drive.getPose();
+      // .b()
+      // .onTrue(
+      // AutoBuilder.pathfindToPose(
+      // new Pose2d(1, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
+      // new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+      // .andThen(
+      // Commands.parallel(
+      // AutoBuilder.pathfindToPose(
+      // new Pose2d(3, FieldCoordinates.BLUE_HUB.getY(), new Rotation2d()),
+      // new PathConstraints(
+      // 1, 12, Math.toRadians(700), Math.toRadians(1000))),
+      // Commands.waitSeconds(0.2)
+      // .andThen(
+      // Commands.runOnce(
+      // () -> {
+      // // Use current pose and chassis speeds at this instant so
+      // // all
+      // // values
+      // // match.
+      // Pose2d pose = drive.getPose();
 
-      //                                   ChassisSpeeds cs = drive.getChassisSpeeds();
-      //                                   ShotParameters params =
-      //                                       ShotCalculator.calculateShot(
-      //                                           pose, cs, FieldCoordinates.BLUE_HUB);
+      // ChassisSpeeds cs = drive.getChassisSpeeds();
+      // ShotParameters params =
+      // ShotCalculator.calculateShot(
+      // pose, cs, FieldCoordinates.BLUE_HUB);
 
-      //                                   gamePieceSimulation.launchFuelBall(
-      //                                       ShotCalculator.getFieldToShooter(
-      //                                           pose, ShooterConstants.BOT_TO_SHOOTER),
-      //                                       cs,
-      //                                       pose.getRotation(),
-      //                                       params.shotSpeed,
-      //                                       params.turretAngle,
-      //                                       params.hoodAngle);
-      //                                 })))));
+      // gamePieceSimulation.launchFuelBall(
+      // ShotCalculator.getFieldToShooter(
+      // pose, ShooterConstants.BOT_TO_SHOOTER),
+      // cs,
+      // pose.getRotation(),
+      // params.shotSpeed,
+      // params.turretAngle,
+      // params.hoodAngle);
+      // })))));
       // controller_two
-      //     .x()
-      //     .onTrue(
-      //         AutoBuilder.pathfindToPose(
-      //                 new Pose2d(1, FieldCoordinates.BLUE_HUB.getY() + 1, new Rotation2d()),
-      //                 new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
-      //             .andThen(
-      //                 Commands.parallel(
-      //                     AutoBuilder.pathfindToPose(
-      //                         new Pose2d(1, FieldCoordinates.BLUE_HUB.getY() + 2, new
+      // .x()
+      // .onTrue(
+      // AutoBuilder.pathfindToPose(
+      // new Pose2d(1, FieldCoordinates.BLUE_HUB.getY() + 1, new Rotation2d()),
+      // new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+      // .andThen(
+      // Commands.parallel(
+      // AutoBuilder.pathfindToPose(
+      // new Pose2d(1, FieldCoordinates.BLUE_HUB.getY() + 2, new
       // Rotation2d()),
-      //                         new PathConstraints(
-      //                             3, 12, Math.toRadians(700), Math.toRadians(1000))),
-      //                     Commands.waitSeconds(0.2)
-      //                         .andThen(
-      //                             Commands.runOnce(
-      //                                 () -> {
-      //                                   // Use current pose and chassis speeds at this instant so
-      //                                   // all
-      //                                   // values
-      //                                   // match.
-      //                                   Pose2d pose = drive.getPose();
+      // new PathConstraints(
+      // 3, 12, Math.toRadians(700), Math.toRadians(1000))),
+      // Commands.waitSeconds(0.2)
+      // .andThen(
+      // Commands.runOnce(
+      // () -> {
+      // // Use current pose and chassis speeds at this instant so
+      // // all
+      // // values
+      // // match.
+      // Pose2d pose = drive.getPose();
 
-      //                                   ChassisSpeeds cs = drive.getChassisSpeeds();
-      //                                   ShotParameters params =
-      //                                       ShotCalculator.calculateShot(
-      //                                           pose, cs, FieldCoordinates.BLUE_HUB);
+      // ChassisSpeeds cs = drive.getChassisSpeeds();
+      // ShotParameters params =
+      // ShotCalculator.calculateShot(
+      // pose, cs, FieldCoordinates.BLUE_HUB);
 
-      //                                   gamePieceSimulation.launchFuelBall(
-      //                                       ShotCalculator.getFieldToShooter(
-      //                                           pose, ShooterConstants.BOT_TO_SHOOTER),
-      //                                       cs,
-      //                                       pose.getRotation(),
-      //                                       params.shotSpeed,
-      //                                       params.turretAngle,
-      //                                       params.hoodAngle);
-      //                                 })))));
+      // gamePieceSimulation.launchFuelBall(
+      // ShotCalculator.getFieldToShooter(
+      // pose, ShooterConstants.BOT_TO_SHOOTER),
+      // cs,
+      // pose.getRotation(),
+      // params.shotSpeed,
+      // params.turretAngle,
+      // params.hoodAngle);
+      // })))));
       // controller_two
-      //     .x()
-      //     .onTrue(
-      //         AutoBuilder.pathfindToPose(
-      //                 new Pose2d(16.516, 4.281, new Rotation2d()),
-      //                 new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
-      //             .andThen(
-      //                 Commands.runOnce(
-      //                     () -> {
-      //                       // Use current pose and chassis speeds at this instant so
-      //                       // all
-      //                       // values
-      //                       // match.
-      //                       System.out.println("SHOOTING FROM RED TEST POSE");
-      //                       Pose2d pose = drive.getPose();
+      // .x()
+      // .onTrue(
+      // AutoBuilder.pathfindToPose(
+      // new Pose2d(16.516, 4.281, new Rotation2d()),
+      // new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
+      // .andThen(
+      // Commands.runOnce(
+      // () -> {
+      // // Use current pose and chassis speeds at this instant so
+      // // all
+      // // values
+      // // match.
+      // System.out.println("SHOOTING FROM RED TEST POSE");
+      // Pose2d pose = drive.getPose();
 
-      //                       ChassisSpeeds cs = drive.getChassisSpeeds();
-      //                       ShotParameters params =
-      //                           ShotCalculator.calculateShot(pose, cs, FieldCoordinates.RED_HUB);
+      // ChassisSpeeds cs = drive.getChassisSpeeds();
+      // ShotParameters params =
+      // ShotCalculator.calculateShot(pose, cs, FieldCoordinates.RED_HUB);
 
-      //                       gamePieceSimulation.launchFuelBall(
-      //                           ShotCalculator.getFieldToShooter(
-      //                               pose, ShooterConstants.BOT_TO_SHOOTER),
-      //                           cs,
-      //                           pose.getRotation(),
-      //                           params.shotSpeed,
-      //                           params.turretAngle,
-      //                           params.hoodAngle);
-      //                     })));
+      // gamePieceSimulation.launchFuelBall(
+      // ShotCalculator.getFieldToShooter(
+      // pose, ShooterConstants.BOT_TO_SHOOTER),
+      // cs,
+      // pose.getRotation(),
+      // params.shotSpeed,
+      // params.turretAngle,
+      // params.hoodAngle);
+      // })));
 
       controller_two
           .a()
@@ -469,105 +476,73 @@ public class RobotContainer {
     } else {
       // TODO INTAKE TESTING BUTTONS - uncomment for use
 
-      // controller_two
-      // .x()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // intakeSubsystem.setIntakeVoltage(0);
-      // }));
-
-      // controller_two
-      // .y()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // intakeSubsystem.setIntakeVoltage(10);
-      // }));
-
-      // controller_two
-      // .a()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // intakeSubsystem.setDesiredAngle(intakeSubsystem.EXTENDED_POSITION);
-      // }));
-
-      // TODO: SHOOTER TESTING BUTTONS - uncomment for use
-
-      // controller_two
-      //     .b()
-      //     .onTrue(
-      //         new InstantCommand(
-      //                 () -> {
-      //                   shooterSubsystem.setFlywheelVoltage(10);
-      //                 })
-      //             /* .alongWith(new WaitCommand(3))*/
-      //             .alongWith(
-      //                 new InstantCommand(
-      //                     () -> {
-      //                       shooterSubsystem.setTransitionVoltage(10);
-      //                     })));
       controller_two
           .a()
           .onTrue(
               new InstantCommand(
                   () -> {
-                    shooterSubsystem.toggleShouldShoot();
+                    intakeSubsystem.setDesiredAngle(IntakeConstants.EXTENDED_POSITION);
+                  }));
+
+      controller_two
+          .b()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    intakeSubsystem.setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
                   }));
 
       controller_two
           .x()
           .onTrue(
-              new ShootingCommand(
-                  shooterSubsystem,
-                  hoodSubsystem,
-                  turretSubsystem,
-                  transitionSubsystem,
-                  robotPose,
-                  chassisSpeeds));
+              new InstantCommand(
+                  () -> {
+                    intakeSubsystem.toggleIntake();
+                  }));
+
+      controller_two
+          .y()
+          .onTrue(
+              new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 
       // TODO TURRET TESTING BUTTONS - uncomment for use
 
       // controller_two
-      // .x()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
-      // }));
+      //     .x()
+      //     .onTrue(
+      //         new InstantCommand(
+      //             () -> {
+      //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(10)));
+      //             }));
 
       // controller_two
-      // .a()
-      // .onTrue(
-      // new InstantCommand(
-      // () -> {
-      // turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
-      // }));
+      //     .a()
+      //     .onTrue(
+      //         new TurretHomingCommand(turretSubsystem));
 
       // TODO HOOD TESTING BUTTONS - uncomment for use
 
-      controller_two
-          .rightBumper()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(70.0)));
-                  }));
+      // controller_two
+      // .rightBumper()
+      // .onTrue(
+      // new InstantCommand(
+      // () -> {
+      // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(70.0)));
+      // }));
 
-      controller_two
-          .leftBumper()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(77.0)));
-                  }));
-      controller_two
-          .y()
-          .onTrue(
-              HoodCommands.HomeHood(
-                  hoodSubsystem)); // TODO: test and make sure this still works (calling it
-      // differently)
+      // controller_two
+      // .leftBumper()
+      // .onTrue(
+      // new InstantCommand(
+      // () -> {
+      // hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(77.0)));
+      // }));
+      // controller_two
+      // .y()
+      // .onTrue(
+      // HoodCommands.HomeHood(
+      // hoodSubsystem)); // TODO: test and make sure this still works (calling it
+      // // differently)
       // controller_two.a().onTrue(RunMechWheels());
       controller_two.b().onTrue(MechStop());
     }
@@ -582,7 +557,10 @@ public class RobotContainer {
     }
   }
 
-  /** Start pose of the currently selected auto (from first path). Empty if no paths. */
+  /**
+   * Start pose of the currently selected auto (from first path). Empty if no
+   * paths.
+   */
   public Optional<Pose2d> getAutoStartPose() {
     return multiStepAutoChooser.getAutoStartPose();
   }
@@ -611,10 +589,9 @@ public class RobotContainer {
     value = deadband(value, 0.025);
 
     // Square the axis
-    value =
-        Math.copySign(
-            RobotConfigLoader.getDouble("container.joystick_scale_factor") * Math.pow(value, 2),
-            value);
+    value = Math.copySign(
+        RobotConfigLoader.getDouble("container.joystick_scale_factor") * Math.pow(value, 2),
+        value);
 
     if (drive.getSlowDrive()) {
       return 0.5 * value;
@@ -666,23 +643,26 @@ public class RobotContainer {
     // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 
-  // TODO: this command doesn't work -- need to fix (test this by commenting out the way we do this
+  // TODO: this command doesn't work -- need to fix (test this by commenting out
+  // the way we do this
   // manually in Robot.java)
   public Command MechStop() {
     return /*
-               IntakeCommands.StopIntake(intakeSubsystem)
-                   .andThen(IntakeCommands.RetractIntake(intakeSubsystem)))
-           .alongWith(*/ new InstantCommand(
-            () -> {
-              turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
-              shooterSubsystem.setDesiredFlywheelVelocity(0);
-              transitionSubsystem.setDesiredHopperFloorVelocity(0);
-              shooterSubsystem.setDesiredTransitionVoltage(0);
-              hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
-              hoodSubsystem.setHoodVoltage(0);
-            }
-            // )
-            )
+            * IntakeCommands.StopIntake(intakeSubsystem)
+            * .andThen(IntakeCommands.RetractIntake(intakeSubsystem)))
+            * .alongWith(
+            */ new InstantCommand(
+        () -> {
+          turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
+          shooterSubsystem.setDesiredFlywheelVelocity(0);
+          transitionSubsystem.setDesiredHopperFloorVelocity(0);
+          shooterSubsystem.setDesiredTransitionVoltage(0);
+          hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
+          hoodSubsystem.setHoodVoltage(0);
+          // TODO add climber
+        }
+    // )
+    )
         .alongWith(IntakeCommands.StopIntake(intakeSubsystem));
   }
 
@@ -696,13 +676,13 @@ public class RobotContainer {
 
   public Command RunMechWheels() {
     return new InstantCommand(
-            () -> {
-              shooterSubsystem.setDesiredFlywheelVelocity(
-                  ShooterSubsystem.calculateFlywheelSpeed(22));
-              shooterSubsystem.setDesiredTransitionVoltage(12);
-              // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
-              // TODO uncomment???
-            })
+        () -> {
+          shooterSubsystem.setDesiredFlywheelVelocity(
+              ShooterSubsystem.calculateFlywheelSpeed(22));
+          shooterSubsystem.setDesiredTransitionVoltage(12);
+          // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
+          // TODO uncomment???
+        })
         .alongWith(IntakeCommands.RunIntake(intakeSubsystem));
   }
 

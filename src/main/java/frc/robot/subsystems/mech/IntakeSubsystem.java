@@ -117,6 +117,8 @@ public class IntakeSubsystem extends SubsystemBase {
     deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
   }
 
+
+
   public void setDeployVoltage(double voltage) {
     desiredDeployVoltage = voltage;
     deployMotor.setVoltage(desiredDeployVoltage);
@@ -153,5 +155,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public boolean hallEffectTriggered() {
     return hallEffect.get(); // TODO figure out what this actually returns
+  }
+
+  public void toggleIntake(){
+    if(Math.abs(getCurrentAngle().getDegrees() - IntakeConstants.RETRACTED_ANGLE_DEGREES) < IntakeConstants.POSITION_DEADBAND){
+      setDesiredAngle(IntakeConstants.EXTENDED_POSITION);
+      setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
+    } else {
+      setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
+      setIntakeVoltage(0);
+    }
   }
 }

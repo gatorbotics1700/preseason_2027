@@ -107,6 +107,9 @@ public class ClimberSubsystem extends SubsystemBase {
         * ClimberConstants.CLIMBER_GEAR_RATIO;
   }
 
+    
+
+
   public void zeroClimber() {
     // TODO if we decide we want to measure current position from the floor we will need to change
     // this so current position doesn't become zero, but whatever the retracted height is off the
@@ -118,4 +121,7 @@ public class ClimberSubsystem extends SubsystemBase {
     positionControl = false;
     motor.setVoltage(0); // TODO figure out if this actually works?
   }
+
+
+
 }

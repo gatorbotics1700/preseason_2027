@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class IntakeCommands {
 
-  private IntakeCommands() {}
+  public IntakeCommands() {}
 
   public static Command RetractIntake(IntakeSubsystem intakeSubsystem) {
     return new DeployIntakeCommand(true, intakeSubsystem);
@@ -29,7 +29,7 @@ public class IntakeCommands {
   public static class HomeIntakeDeploy extends Command {
     private final IntakeSubsystem intakeSubsystem;
 
-    HomeIntakeDeploy(IntakeSubsystem intakeSubsystem) {
+    public HomeIntakeDeploy(IntakeSubsystem intakeSubsystem) {
       this.intakeSubsystem = intakeSubsystem;
       addRequirements(intakeSubsystem);
     }
