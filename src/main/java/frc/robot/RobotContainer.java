@@ -19,6 +19,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -307,6 +308,11 @@ public class RobotContainer {
                       e.printStackTrace();
                     }
                   }));
+      PathConstraints constraints =
+          new PathConstraints(1, 1, Units.degreesToRadians(700), Units.degreesToRadians(1000));
+      controller
+          .y()
+          .onTrue(AutoBuilder.pathfindToPose(new Pose2d(6.5, 4, new Rotation2d()), constraints));
 
       controller
           .rightBumper()

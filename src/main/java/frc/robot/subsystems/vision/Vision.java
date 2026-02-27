@@ -15,14 +15,12 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -83,9 +81,7 @@ public class Vision extends SubsystemBase {
         if (target.getArea() > maxArea) {
           maxArea = target.getArea();
 
-          Pose3d cameraInFieldSpace =
-              robotPose3d.transformBy(
-                  robotToCamera);
+          Pose3d cameraInFieldSpace = robotPose3d.transformBy(robotToCamera);
           double targetPitchDegrees = -target.getPitch() * VisionConstants.TARGET_ANGLE_SCALAR;
           double targetYawDegrees = -target.getYaw() * VisionConstants.TARGET_ANGLE_SCALAR;
           // values for yaw and pitch
@@ -200,7 +196,10 @@ public class Vision extends SubsystemBase {
     robotPose =
         new Pose2d(
             robotPose.getTranslation(),
-            robotPose.getRotation().rotateBy(new Rotation2d(Math.toRadians(-IntakeConstants.ROBOT_TO_INTAKE_YAW_DEGREES))));
+            robotPose
+                .getRotation()
+                .rotateBy(
+                    new Rotation2d(Math.toRadians(-IntakeConstants.ROBOT_TO_INTAKE_YAW_DEGREES))));
     Rotation2d leftSlope =
         robotPose
             .getRotation()

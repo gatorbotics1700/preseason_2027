@@ -119,10 +119,10 @@ public class ShootingCommand extends Command {
     // i (phoenix) can't currently think of a better way to constantly be scheduling this command
     // automatically, but if people have ideas that would be great!
     if (shooterSubsystem.getShouldShoot()) { // if we want to shoot
-      System.out.println("WE WANT TO SHOOT");
+      // System.out.println("WE WANT TO SHOOT");
       if (params.shotSpeed != 0) { // and if we have a valid shot
         double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
-        System.out.println("VALID SHOT VALID SHOT");
+        // System.out.println("VALID SHOT VALID SHOT");
         shooterSubsystem.setDesiredFlywheelVelocity(
             desiredFlywheelSpeed); // set velocity to our desired velocity
         hopperFloorSubsystem.setDesiredHopperFloorVelocity(
@@ -131,11 +131,11 @@ public class ShootingCommand extends Command {
             < ShooterConstants
                 .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
           // velocity
-          System.out.println("SHOOTING SHOOTING SHOOTING");
+          // System.out.println("SHOOTING SHOOTING SHOOTING");
           shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
         }
       } else { // if we dont have a valid shot
-        System.out.println("INVALID SHOT INVALID SHOT");
+        // System.out.println("INVALID SHOT INVALID SHOT");
         hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
         shooterSubsystem.setDesiredTransitionVoltage(0);
       }
