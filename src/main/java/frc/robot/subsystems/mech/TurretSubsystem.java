@@ -88,12 +88,11 @@ public class TurretSubsystem extends SubsystemBase {
         MathUtil.inputModulus(
             desiredAngle.getDegrees(),
             TurretConstants.MIN_TURRET_ANGLE,
-            TurretConstants.MIN_TURRET_ANGLE
-                + 360); // TODO check this - trying to wrap the angle so it
+            TurretConstants.MIN_TURRET_ANGLE + 360);
     double alternateDesiredAngleDegrees =
         MathUtil.inputModulus(
             desiredAngleDegrees,
-            TurretConstants.MAX_TURRET_ANGLE-360,
+            TurretConstants.MAX_TURRET_ANGLE - 360,
             TurretConstants.MAX_TURRET_ANGLE);
     if (Math.abs(desiredAngleDegrees - getCurrentAngle().getDegrees())
         < Math.abs(alternateDesiredAngleDegrees - getCurrentAngle().getDegrees())) {

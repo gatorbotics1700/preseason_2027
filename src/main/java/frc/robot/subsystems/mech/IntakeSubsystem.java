@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.TunerConstants;
-
 import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -84,9 +82,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     intakeMotor.setVoltage(0);
 
-    isDeployed = () -> {
-            return false;
-          };
+    isDeployed =
+        () -> {
+          return false;
+        };
   }
 
   @Override

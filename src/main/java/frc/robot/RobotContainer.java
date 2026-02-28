@@ -498,25 +498,19 @@ public class RobotContainer {
         //               intakeSubsystem.setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
         //             }));
 
-        // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               IntakeCommands.ToggleIntake(intakeSubsystem);
-        //             }));
+        controller_two.x().onTrue(IntakeCommands.ToggleIntake(intakeSubsystem));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 
         // TODO TURRET TESTING BUTTONS - uncomment for use
 
-        controller_two
-            .x()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(125)));
-                    }));
+        // controller_two
+        //     .x()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(125)));
+        //             }));
 
         // controller_two.y().onTrue(new TurretHomingCommand(turretSubsystem));
 
