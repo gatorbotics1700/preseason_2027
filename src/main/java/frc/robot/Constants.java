@@ -563,6 +563,8 @@ public final class Constants {
     public static final double INTAKING_VOLTAGE = 10;
 
     public static final double POSITION_DEADBAND = 2;
+
+    public static final double ROBOT_TO_INTAKE_YAW_DEGREES = 180;
   }
 
   public static final class ShooterConstants {

@@ -167,8 +167,11 @@ public class ShooterSubsystem extends SubsystemBase {
    * Sets a supplier for the desired angle. This allows the desired angle to be calculated
    * dynamically each cycle. The supplier will be called each time getDesiredAngle() is called.
    */
-  public void setShouldShoot(BooleanSupplier shouldShoot) {
-    this.shouldShoot = shouldShoot;
+  public void setShouldShoot(boolean desiredShouldShootValue) {
+    shouldShoot =
+        () -> {
+          return desiredShouldShootValue;
+        };
   }
 
   /** Returns the desired angle, or null if no angle is set. */

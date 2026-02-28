@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.commands.mech.ClimbCommands;
-import frc.robot.commands.mech.HoodHomingCommand;
-import frc.robot.commands.mech.HoodRetractCommand;
+import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
 import frc.robot.commands.mech.TurretHomingCommand;
@@ -107,7 +106,7 @@ public class DynamicAutoBuilder {
       System.out.println("  Skipping homing commands in simulation");
       return Commands.none();
     }
-    return new TurretHomingCommand(turretSubsystem).alongWith(new HoodHomingCommand(hoodSubsystem));
+    return new TurretHomingCommand(turretSubsystem).alongWith(HoodCommands.HomeHood(hoodSubsystem));
   }
 
   private Command getActionForDestination(String destination) {
@@ -116,7 +115,8 @@ public class DynamicAutoBuilder {
     }
 
     if (destination.startsWith("Fuel Pile") && RobotBase.isReal()) {
-      return new HoodRetractCommand(hoodSubsystem).onlyWhile(() -> !isInAllianceZone());
+      return new HoodCommands.HoodRetractCommand(hoodSubsystem)
+          .onlyWhile(() -> !isInAllianceZone());
     }
 
     return Commands.none();
