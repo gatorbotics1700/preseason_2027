@@ -12,7 +12,7 @@ public class IntakeCommands {
 
   public static Command ToggleIntake(IntakeSubsystem intakeSubsystem) {
     intakeSubsystem.toggleIntake();
-    if (intakeSubsystem.getIsDeployed()) {
+    if (intakeSubsystem.getIsDeployed().getAsBoolean()) {
       return new DeployIntakeCommand(intakeSubsystem).withName("Deploy Intake");
     } else {
       return new RetractIntakeCommand(intakeSubsystem).withName("Retract Intake");

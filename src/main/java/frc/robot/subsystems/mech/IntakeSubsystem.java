@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.TunerConstants;
+
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -27,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private Rotation2d desiredAngle = new Rotation2d();
   private double desiredIntakeVoltage;
   private double desiredDeployVoltage;
-  private boolean isDeployed;
+  private BooleanSupplier isDeployed;
 
   public IntakeSubsystem() {
     intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
@@ -81,7 +84,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     intakeMotor.setVoltage(0);
 
-    isDeployed = false;
+    isDeployed = () -> {
+            return false;
+          };
   }
 
   @Override
@@ -92,7 +97,7 @@ public class IntakeSubsystem extends SubsystemBase {
         "Mech/Intake/Desired Deploy Voltage", desiredDeployVoltage); // only gets set for homing
     Logger.recordOutput("Mech/Intake/Current Deploy Motor Output", deployMotor.get());
     Logger.recordOutput("Mech/Intake/Intake Hall Effect", isHallEffectTriggered());
-    Logger.recordOutput("Mech/Intake/IsDeployed", isDeployed);
+    Logger.recordOutput("Mech/Intake/IsDeployed", isDeployed.getAsBoolean());
 
     Logger.recordOutput("Mech/Intake/Current Intake Motor Output", intakeMotor.get());
     Logger.recordOutput("Mech/Intake/Desired Intake Voltage", desiredIntakeVoltage);
@@ -159,10 +164,20 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void toggleIntake() {
-    isDeployed = !isDeployed;
+    if (isDeployed.getAsBoolean()) {
+      isDeployed =
+          () -> {
+            return false;
+          };
+    } else {
+      isDeployed =
+          () -> {
+            return true;
+          };
+    }
   }
 
-  public boolean getIsDeployed() {
+  public BooleanSupplier getIsDeployed() {
     return isDeployed;
   }
 }
