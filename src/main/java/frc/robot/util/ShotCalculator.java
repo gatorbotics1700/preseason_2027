@@ -169,7 +169,7 @@ public class ShotCalculator {
           bestHoodAngle = testHoodAngle;
           bestShotSpeed = testShotSpeed;
           highestArc = vertexHeight;
-          System.out.println(bestHoodAngle.getDegrees() + ", " + highestArc);
+          // System.out.println(bestHoodAngle.getDegrees() + ", " + highestArc);
         }
 
         testHoodAngle = testHoodAngle.plus(angleIncrement);
@@ -178,9 +178,9 @@ public class ShotCalculator {
     }
 
     if (bestShotSpeed == 0) {
-      System.out.println("NO VALID SHOT");
+      // System.out.println("NO VALID SHOT");
     } else {
-      System.out.println("VALID SHOT CALCULATED");
+      // System.out.println("VALID SHOT CALCULATED");
     }
 
     return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);

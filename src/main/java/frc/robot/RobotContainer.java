@@ -164,7 +164,17 @@ public class RobotContainer {
     // };
 
     // Set up auto routines with multi-step chooser
-    multiStepAutoChooser = new MultiStepAutoChooser(intakeSubsystem, drive, climberSubsystem);
+    multiStepAutoChooser =
+        new MultiStepAutoChooser(
+            intakeSubsystem,
+            drive,
+            climberSubsystem,
+            hoodSubsystem,
+            shooterSubsystem,
+            turretSubsystem,
+            transitionSubsystem,
+            robotPose,
+            chassisSpeeds);
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -248,7 +258,8 @@ public class RobotContainer {
                                           turretSubsystem,
                                           transitionSubsystem,
                                           robotPose,
-                                          chassisSpeeds)));
+                                          chassisSpeeds))
+                                  .withName("DriveOverBump"));
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -296,7 +307,8 @@ public class RobotContainer {
                                           turretSubsystem,
                                           transitionSubsystem,
                                           robotPose,
-                                          chassisSpeeds)));
+                                          chassisSpeeds))
+                                  .withName("DriveUnderTrench"));
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -562,7 +574,6 @@ public class RobotContainer {
     }
   }
 
-  /** Start pose of the currently selected auto (from first path). Empty if no paths. */
   public Optional<Pose2d> getAutoStartPose() {
     return multiStepAutoChooser.getAutoStartPose();
   }
@@ -621,7 +632,6 @@ public class RobotContainer {
       gamePieceSimulation.updateBalls();
     }
 
-    // Update multi-step auto chooser options (reads choosers to keep them active)
     multiStepAutoChooser.updateChooserOptions();
 
     // Print path name to console me thinks
@@ -639,6 +649,11 @@ public class RobotContainer {
 
     // Log if commands are running
     Logger.recordOutput("Commands/DriveCommandActive", driveCmd != null);
+    Logger.recordOutput(
+        "Commands/DriveToFuelActive",
+        driveCmd != null ? driveCmd.getName().equals("DriveToFuel") : false);
+
+    Logger.recordOutput("DriveToFuel/Fuel", vision.getFuelPose(drive.getPose()));
     Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
 
     // shotParameters =

@@ -131,3 +131,21 @@ public class LineupCommand {
     return AutoBuilder.pathfindToPose(desiredPose, constraints);
   }
 }
+
+// public Pose2d getLineupPose(int tagId, boolean isLeftPipe) {
+//     AprilTagFieldLayout layout = VisionConstants.APRIL_TAG_LAYOUT;
+//     Pose3d tagPose = layout.getTagPose(tagId).get();
+//     Distance lineupXOffset = Centimeters.of(45.72);
+//     Distance lineupYOffset = Centimeters.of(-10);
+//     if (isLeftPipe) {
+//       lineupYOffset = Centimeters.of(10);
+//     }
+//     Transform3d lineup =
+//         new Transform3d(lineupXOffset, lineupYOffset, Centimeters.of(0.0), new Rotation3d());
+//     Pose2d fieldRelativePose =
+//         tagPose
+//             .transformBy(lineup)
+//             .toPose2d()
+//             .transformBy(new Transform2d(0, 0, new Rotation2d(Degrees.of(90))));
+//     return fieldRelativePose;
+//   }

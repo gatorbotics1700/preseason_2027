@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import org.json.simple.parser.ParseException;
 
-// TODO: make sure we have field avoidance file
 public class DriveOverBumpCommand {
 
   public static Command driveOverBump(Drive drive, ShooterSubsystem shooterSubsystem)
@@ -38,53 +37,52 @@ public class DriveOverBumpCommand {
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B BR N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("B BR A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B BL N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("B BL A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B BL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("B BL N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B BR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("B BR N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       }
     } else { // RED
       if (pose.getY() < FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R BL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("R BL N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R BR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("R BR N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.RED_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R BR N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("R BR A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R BL N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("R BL A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       }
     }
-    return pathToFollow; // TODO: stop shooting and then path to follow -- need to add part to stop
-    // shooting
+    return pathToFollow.withName("DriveOverBump");
   }
 }

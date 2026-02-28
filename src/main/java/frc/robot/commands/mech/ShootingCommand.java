@@ -110,11 +110,11 @@ public class ShootingCommand extends Command {
             < ShooterConstants
                 .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
           // velocity
-          System.out.println("SHOOTING SHOOTING SHOOTING");
+          // System.out.println("SHOOTING SHOOTING SHOOTING");
           shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
         }
       } else { // if we dont have a valid shot
-        System.out.println("INVALID SHOT INVALID SHOT");
+        // System.out.println("INVALID SHOT INVALID SHOT");
         hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
         shooterSubsystem.setDesiredTransitionVoltage(0);
       }

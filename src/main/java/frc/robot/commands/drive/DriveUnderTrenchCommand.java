@@ -38,53 +38,52 @@ public class DriveUnderTrenchCommand {
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B TR N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("B TR A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B TL N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("B TL A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B TL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("B TL N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("B TR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("B TR N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       }
     } else { // RED
       if (pose.getY() < FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R TL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("R TL N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R TR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootFalse);
+                PathPlannerPath.fromPathFile("R TR N to A"), constraints);
+        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.RED_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R TR N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("R TR A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathFile("R TL N to A"), constraints);
-        shooterSubsystem.setShouldShoot(shouldShootTrue);
+                PathPlannerPath.fromPathFile("R TL A to N"), constraints);
+        shooterSubsystem.setShouldShoot(true);
       }
     }
-    return pathToFollow; // TODO: stop shooting, retract hood, and then follow path -- add the stop
-    // shooting part
+    return pathToFollow.withName("DriveUnderTrench");
   }
 }

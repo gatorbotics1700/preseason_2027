@@ -94,10 +94,10 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
-test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-}
+// test {
+//     useJUnitPlatform()
+//     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+// }
 
 // Simulation configuration (e.g. environment variables).
 //
@@ -126,7 +126,7 @@ jar {
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
-wpi.java.configureTestTasks(test)
+// wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {

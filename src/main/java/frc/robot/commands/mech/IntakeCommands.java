@@ -1,18 +1,10 @@
 package frc.robot.commands.mech;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.IntakeSubsystem;
-import frc.robot.subsystems.vision.Vision;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakeCommands {
 
