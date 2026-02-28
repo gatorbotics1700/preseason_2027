@@ -13,6 +13,7 @@ public class TurretHomingCommand extends Command {
   public TurretHomingCommand(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
     addRequirements(turretSubsystem);
+    setName("Turret Homing Command");
   }
 
   @Override
@@ -21,7 +22,7 @@ public class TurretHomingCommand extends Command {
   @Override
   public void execute() {
     // TODO: CHECK IF SENSOR IS ON OR OFF WHEN SENSED
-    if (!turretSubsystem.getHallEffectValue()) {
+    if (!turretSubsystem.isHallEffectTriggered()) {
       turretSubsystem.setMotorVoltage(homingVoltage);
     }
   }
@@ -33,6 +34,6 @@ public class TurretHomingCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.getHallEffectValue();
+    return turretSubsystem.isHallEffectTriggered();
   }
 }

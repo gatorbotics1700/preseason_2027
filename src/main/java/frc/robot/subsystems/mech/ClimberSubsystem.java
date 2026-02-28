@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 public class ClimberSubsystem extends SubsystemBase {
   private boolean positionControl = true; // if false use voltage control
 
-  public final TalonFX motor;
+  private final TalonFX motor;
   private final DigitalInput limitSwitch;
 
   private static TalonFXConfiguration talonFXConfigs;
@@ -35,7 +35,6 @@ public class ClimberSubsystem extends SubsystemBase {
     talonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-    // TODO: make tuneable constants
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
     slot0Configs.kG =
@@ -64,10 +63,11 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void periodic() {
     Logger.recordOutput("Mech/Climber/desiredPositionInches", desiredPositionInches);
-    Logger.recordOutput("Mech/Climber/currentPositionInches", currentPositionInches());
+    Logger.recordOutput("Mech/Climber/currentPositionInches", getCurrentPositionInches());
     Logger.recordOutput("Mech/Climber/Motor Output", motor.get());
     Logger.recordOutput(
         "Mech/Climber/Control Mode", positionControl ? "position control" : "voltage control");
+    Logger.recordOutput("Mech/Climber/Limit Switch", limitSwitchPressed());
     if (!limitSwitchPressed() && positionControl) {
       motor.setControl(m_request.withPosition(inchesToRevs(desiredPositionInches)));
     } else {
@@ -91,10 +91,14 @@ public class ClimberSubsystem extends SubsystemBase {
         .get(); // TODO confirm that normally closed limit switch is true when pressed?
   }
 
-  public double currentPositionInches() {
+  public double getCurrentPositionInches() {
     return motor.getPosition().getValueAsDouble()
         / ClimberConstants.CLIMBER_GEAR_RATIO
         * ClimberConstants.WINCH_INCHES_PER_REV;
+  }
+
+  public double getDesiredPositionInches() {
+    return desiredPositionInches;
   }
 
   public double inchesToRevs(double positionInches) {
@@ -107,16 +111,11 @@ public class ClimberSubsystem extends SubsystemBase {
     // TODO if we decide we want to measure current position from the floor we will need to change
     // this so current position doesn't become zero, but whatever the retracted height is off the
     // floor
-    double motorPositionRevs = motor.getPosition().getValueAsDouble();
-    double offset = inchesToRevs(ClimberConstants.RETRACTED_HEIGHT_INCHES);
-    // if we assume the limit switch triggers at the retracted position, then we are calling this
-    // method when the current position is the retracted position. therefore we want zero to be
-    // wherever we are right now minus the retracted position
-    motor.setPosition((motorPositionRevs - offset) % 1);
+    motor.setPosition(inchesToRevs(ClimberConstants.RETRACTED_HEIGHT_INCHES));
   }
 
   public void setClimberVoltage(double voltage) {
     positionControl = false;
-    motor.setVoltage(0); // TODO figure out if this actually works?
+    motor.setVoltage(voltage); // TODO figure out if this actually works?
   }
 }

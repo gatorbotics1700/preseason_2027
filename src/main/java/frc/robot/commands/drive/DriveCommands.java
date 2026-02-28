@@ -311,7 +311,7 @@ public class DriveCommands {
     // Create PID controller for automatic rotation control (only used when desiredAngle is set)
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            6,
+            12,
             0.0,
             0.3,
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY * 12, ANGLE_MAX_ACCELERATION * 12));

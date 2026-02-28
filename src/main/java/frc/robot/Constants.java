@@ -146,7 +146,7 @@ public final class Constants {
             RobotConfigLoader.getString("tuner.drive_canbus_name").equals("null")
                 ? ""
                 : RobotConfigLoader.getString("tuner.drive_canbus_name"),
-            "./logs/example.hoot");
+            "");
 
     // Mechanism CAN bus - reuses driveCANBus if they're the same physical bus
     public static final CANBus mechCANBus;
@@ -495,15 +495,17 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_LIMIT_SWITCH_PORT = 8;
+    public static final int CLIMBER_LIMIT_SWITCH_PORT =
+        7; // TODO is this a limit switch or hall effect
     public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
 
-    public static final int CLIMBER_GEAR_RATIO = 81; // TODO get a real number
-    public static final double WINCH_INCHES_PER_REV = (3 / 4) * Math.PI; // TODO get a real number
+    public static final int CLIMBER_GEAR_RATIO = 25; // TODO get a real number
+    public static final double WINCH_INCHES_PER_REV = (0.75) * Math.PI; // diameter in inches * pi
     // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
     public static final double MAX_EXTENSION_INCHES = 30; // TODO get a real number
     public static final double RETRACTED_HEIGHT_INCHES = 20; // TODO get a real number
     public static final double HOMING_VOLTAGE = 10; // TODO get a real number
+    public static final double POSITION_DEADBAND = 0.5; // TODO get a real number
   }
 
   public static final class HoodConstants {
@@ -519,6 +521,8 @@ public final class Constants {
         new Rotation2d(
             Math.toRadians(
                 RobotConfigLoader.getInt("mech.hood_min_angle_degrees"))); // TODO: check number
+
+    public static final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
     /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
     public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
@@ -540,14 +544,14 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int INTAKE_MOTOR_CAN_ID = 9;
     public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10;
-    public static final int INTAKE_HALL_EFFECT_PORT = 2;
+    public static final int INTAKE_HALL_EFFECT_PORT = 0;
 
-    public static final int DEPLOY_GEARBOX_RATIO = 9; // TODO find the real value
+    public static final int DEPLOY_GEARBOX_RATIO = 5; // TODO find the real value
     public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
     public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
     public static final double EXTENDED_ANGLE_DEGREES =
-        85; // TODO figure out if this is from vertical or from retracted position?
+        80; // TODO figure out if this is from vertical or from retracted position?
     public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
 
     public static final Rotation2d EXTENDED_POSITION =
@@ -555,11 +559,10 @@ public final class Constants {
     public static final Rotation2d RETRACTED_POSITION =
         new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
 
-    public static final double HOMING_VOLTAGE = 10; // TODO tune
-    public static final double INTAKING_VOLTAGE =
-        10; // TODO get a real number (I just picked my favorite)
-    public static final double ROBOT_TO_INTAKE_YAW_DEGREES =
-        RobotConfigLoader.getDouble("mech.robot_to_intake_yaw_degrees");
+    public static final double HOMING_VOLTAGE = -1; // TODO tune
+    public static final double INTAKING_VOLTAGE = 10;
+
+    public static final double POSITION_DEADBAND = 2;
   }
 
   public static final class ShooterConstants {
@@ -568,9 +571,9 @@ public final class Constants {
     public static final int TRANSITION_MOTOR_CAN_ID = 31;
 
     public static final double TRANSITION_VOLTAGE = 10;
-    public static final double FLYWHEEL_SPEED_DEADBAND = 0.1;
+    public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-    public static final double FLYWHEEL_SLIP = 1; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_SLIP = 0.27; // 0.7; // TODO TUNE!!!
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER =
@@ -582,11 +585,15 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final int TURRET_MOTOR_CAN_ID = 14;
-    public static final int TURRET_BORE_ENCODER_PORT1 = 7;
-    public static final int TURRET_BORE_ENCODER_PORT2 = 3;
-    public static final int TURRET_HALL_EFFECT_PORT = 5;
+    public static final int TURRET_BORE_ENCODER_PORT = 2;
+    public static final int TURRET_HALL_EFFECT_PORT = 8;
 
     public static final double TURRET_DEADBAND = 0.75;
+
+    public static final double TURRET_ENCODER_OFFSET = 0.690;
+    public static final double TURRET_HOMING_ANGLE = 0.0;
+    public static final double MIN_TURRET_ANGLE = -250;
+    public static final double MAX_TURRET_ANGLE = 160;
   }
 
   public static final class FieldCoordinates {

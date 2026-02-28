@@ -11,14 +11,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.TurretConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretSubsystem extends SubsystemBase {
-  public final TalonFX turretMotor;
+  private final TalonFX turretMotor;
 
   private static TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
@@ -26,18 +26,9 @@ public class TurretSubsystem extends SubsystemBase {
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 10;
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
-  private Encoder boreEncoder =
-      new Encoder(
-          TurretConstants.TURRET_BORE_ENCODER_PORT1,
-          TurretConstants.TURRET_BORE_ENCODER_PORT2); // TODO real port values
-  private final DigitalInput hallEffect =
-      new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT); // TODO real port values
-  private final double TURRET_ENCODER_OFFSET = 0.0; // TODO: Find actual offset
-  private final double TURRET_HOMING_ANGLE =
-      0.0; // TODO: this is the angle for "zeroing" the turret but it might not actually be zero
-  private final double TURRET_RANGE_DEGREES = 360; // TODO set actual value
-  private final double MIN_TURRET_ANGLE = -180; // TODO: set actual value for min and max
-  private final double MAX_TURRET_ANGLE = MIN_TURRET_ANGLE + TURRET_RANGE_DEGREES;
+  private DutyCycleEncoder boreEncoder =
+      new DutyCycleEncoder(TurretConstants.TURRET_BORE_ENCODER_PORT);
+  private final DigitalInput hallEffect = new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
 
   private Rotation2d desiredAngle;
 
@@ -82,9 +73,13 @@ public class TurretSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
-    // Logger.recordOutput("turret/output" + turretMotor.get());
+    Logger.recordOutput("Mech/Turret/boreEncoder", boreEncoder.get());
+    Logger.recordOutput("Mech/Turret/boreEncoder isConnected", boreEncoder.isConnected());
+    Logger.recordOutput("Mech/Turret/currentAngle", getCurrentAngle().getDegrees());
+    Logger.recordOutput("Mech/Turret/desiredAngle", desiredAngle.getDegrees());
+
     // System.out.println(desiredAngle.getDegrees());
-    Logger.recordOutput("turret/halleEffect", hallEffect.get());
+    Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
   }
 
   public void setDesiredAngle(
@@ -94,26 +89,24 @@ public class TurretSubsystem extends SubsystemBase {
             Math.toRadians(
                 MathUtil.inputModulus(
                     desiredAngle.getDegrees(),
-                    MIN_TURRET_ANGLE,
-                    MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
+                    TurretConstants.MIN_TURRET_ANGLE,
+                    TurretConstants
+                        .MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
   }
 
   public Rotation2d getCurrentAngle() {
     double motorPositionRevs = turretMotor.getPosition().getValueAsDouble();
     double turretAngleDegrees =
         motorPositionRevs / TURRET_GEARBOX_RATIO / GEAR_REVS_PER_TURRET_REV * 360;
-    return new Rotation2d(
-        Math.toRadians(
-            turretAngleDegrees)); // TODO: figure out how to use the fromDegrees method because it
-    // seems nicer :/
+    return new Rotation2d(Math.toRadians(turretAngleDegrees));
   }
 
   public double degreesToRevs(double turretAngleDegrees) {
     return turretAngleDegrees / 360 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
   }
 
-  public boolean getHallEffectValue() {
-    return hallEffect.get();
+  public boolean isHallEffectTriggered() {
+    return !hallEffect.get();
   }
 
   public void setMotorVoltage(double voltage) {
@@ -121,7 +114,7 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   private double getCurrentToOffsetError() {
-    return boreEncoder.get() - TURRET_ENCODER_OFFSET;
+    return boreEncoder.get() - TurretConstants.TURRET_ENCODER_OFFSET;
   }
 
   public void homeTurret() {
@@ -130,6 +123,6 @@ public class TurretSubsystem extends SubsystemBase {
                 / ENCODER_REVS_PER_TURRET_REV
                 * TURRET_GEARBOX_RATIO
                 * GEAR_REVS_PER_TURRET_REV
-            + degreesToRevs(TURRET_HOMING_ANGLE));
+            + degreesToRevs(TurretConstants.TURRET_HOMING_ANGLE));
   }
 }

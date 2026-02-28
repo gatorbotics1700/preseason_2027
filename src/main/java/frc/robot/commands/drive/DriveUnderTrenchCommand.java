@@ -10,6 +10,7 @@ import frc.robot.Constants.FieldCoordinates;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import org.json.simple.parser.ParseException;
 
 public class DriveUnderTrenchCommand {
@@ -19,6 +20,14 @@ public class DriveUnderTrenchCommand {
     PathConstraints constraints =
         new PathConstraints(8, 8, Units.degreesToRadians(700), Units.degreesToRadians(1000));
 
+    BooleanSupplier shouldShootTrue =
+        () -> {
+          return true;
+        };
+    BooleanSupplier shouldShootFalse =
+        () -> {
+          return false;
+        };
     Pose2d pose = drive.getPose();
     System.out.println("*********************DRIVE UNDER TRENCH COMMAND*******************");
 

@@ -43,17 +43,16 @@ public class ClimbCommands {
     }
 
     @Override
-    public void execute() {}
-
-    @Override
     public boolean isFinished() {
       return climberSubsystem.limitSwitchPressed();
     }
 
     @Override
     public void end(boolean interrupted) {
-      climberSubsystem.zeroClimber();
-      climberSubsystem.setDesiredPositionInches(ClimberConstants.RETRACTED_HEIGHT_INCHES + 0.25);
+      // TODO return this to its real state!
+      // climberSubsystem.zeroClimber();
+      // climberSubsystem.setDesiredPositionInches(ClimberConstants.RETRACTED_HEIGHT_INCHES + 0.25);
+      climberSubsystem.setDesiredPositionInches(climberSubsystem.getCurrentPositionInches() + 0.1);
     }
   }
 
@@ -188,11 +187,11 @@ public class ClimbCommands {
     }
 
     @Override
-    public void execute() {}
-
-    @Override
     public boolean isFinished() {
-      if (climberSubsystem.currentPositionInches() == 0) { // TODO probably add a deadband here?
+      if (Math.abs(
+              climberSubsystem.getCurrentPositionInches()
+                  - climberSubsystem.getDesiredPositionInches())
+          <= ClimberConstants.POSITION_DEADBAND) {
         return true;
       }
       return false;

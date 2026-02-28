@@ -10,7 +10,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX leftFlywheelMotor;
@@ -28,7 +30,10 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Slot0Configs leftFlywheelSlot0Configs;
   private static Slot0Configs rightFlywheelSlot0Configs;
 
-  private boolean shouldShoot;
+  private BooleanSupplier shouldShoot;
+
+  public static LoggedNetworkNumber flyWheelSlip =
+      new LoggedNetworkNumber("/Tuning/flywheelSlip", 1);
 
   public ShooterSubsystem() {
     leftFlywheelMotor =
@@ -47,7 +52,6 @@ public class ShooterSubsystem extends SubsystemBase {
     leftFlywheelTalonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
-    // TODO: make tuneable constants
     leftFlywheelSlot0Configs = leftFlywheelTalonFXConfigs.Slot0;
 
     leftFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
@@ -70,7 +74,6 @@ public class ShooterSubsystem extends SubsystemBase {
     rightFlywheelTalonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-    // TODO: make tuneable constants
     rightFlywheelSlot0Configs = rightFlywheelTalonFXConfigs.Slot0;
 
     rightFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
@@ -93,7 +96,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     m_request = new MotionMagicVelocityVoltage(0);
 
-    shouldShoot = false;
+    shouldShoot =
+        () -> {
+          return false;
+        };
   }
 
   public void periodic() {
@@ -108,9 +114,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Mech/Shooter/Should Be Shooting", shouldShoot);
 
-    // TODO: decide if we want to only make these lines run if the shooter command is running. I
-    // (Elise) think we can run these lines and just set the desiredFlyWheelVelocity to zero when we
-    // don't want to shoot, but if you have a compelling reason feel free to change it!
     leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
     rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
 
@@ -122,35 +125,15 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getFlywheelVelocity() {
-    return rightFlywheelMotor
-        .getRotorVelocity()
-        .getValueAsDouble(); // TODO figure out if we want getRotorVelocity() or getVelocity()
+    return rightFlywheelMotor.getRotorVelocity().getValueAsDouble();
   }
 
   public void setDesiredTransitionVoltage(double desiredTransitionVoltage) {
     this.desiredTransitionVoltage = desiredTransitionVoltage;
   }
 
-  // TODO decide if we need this—I (Elise) think we should stick to the motion magic velo control!
-  // public void setShooterVoltages(double flywheelVoltage, double transitionVoltage) {
-  //   leftFlywheelMotor.setVoltage(flywheelVoltage);
-  //   rightFlywheelMotor.setVoltage(flywheelVoltage);
-  //   Logger.recordOutput(
-  //       "flywheelMotor velocity", leftFlywheelMotor.getVelocity().getValueAsDouble());
-  //   transitionMotor.setVoltage(transitionVoltage);
-  // }
-
-  // public void setFlywheelVoltage(double voltage) {
-  //   leftFlywheelMotor.setVoltage(voltage);
-  //   rightFlywheelMotor.setVoltage(voltage);
-  // }
-
-  public void setTransitionVoltage(double voltage) {
-    transitionMotor.setVoltage(voltage);
-  }
-
   public double getExitVelocity() {
-    return ShooterConstants.FLYWHEEL_SLIP
+    return flyWheelSlip.get()
         * getFlywheelVelocity()
         * 2
         * Math.PI
@@ -163,18 +146,33 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
-    return shotSpeed
-        / ShooterConstants.FLYWHEEL_SLIP
-        / 2
-        / Math.PI
-        / ShooterConstants.FLYWHEEL_RADIUS_METERS;
+    return shotSpeed / flyWheelSlip.get() / 2 / Math.PI / ShooterConstants.FLYWHEEL_RADIUS_METERS;
   }
 
-  public boolean getShouldShoot() {
-    return shouldShoot;
+  public void toggleShouldShoot() {
+    if (shouldShoot.getAsBoolean()) {
+      shouldShoot =
+          () -> {
+            return false;
+          };
+    } else {
+      shouldShoot =
+          () -> {
+            return true;
+          };
+    }
   }
 
-  public void setShouldShoot(boolean shouldShoot) {
+  /**
+   * Sets a supplier for the desired angle. This allows the desired angle to be calculated
+   * dynamically each cycle. The supplier will be called each time getDesiredAngle() is called.
+   */
+  public void setShouldShoot(BooleanSupplier shouldShoot) {
     this.shouldShoot = shouldShoot;
+  }
+
+  /** Returns the desired angle, or null if no angle is set. */
+  public BooleanSupplier getShouldShoot() {
+    return shouldShoot;
   }
 }

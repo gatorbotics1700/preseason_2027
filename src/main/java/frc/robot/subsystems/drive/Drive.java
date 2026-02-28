@@ -486,15 +486,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   private Translation2d getAllianceTargetPoint() {
-    // TODO: this needs to be reset to target the hubs eventually
     if (DriverStation.getAlliance().isPresent()) {
       return DriverStation.getAlliance().get() == Alliance.Red
           ? FieldCoordinates.RED_HUB.toTranslation2d()
           : FieldCoordinates.BLUE_HUB.toTranslation2d();
     }
     return null;
-
-    // return new Translation2d(3.734, 0);
   }
 
   public void disableTargetPointFacing() {

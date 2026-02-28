@@ -23,7 +23,6 @@ public class HoodSubsystem extends SubsystemBase {
   private boolean positionControl = true;
 
   private Rotation2d desiredAngle = HoodConstants.RETRACTED_POSITION;
-  public final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
   private final TalonFX hoodMotor =
       new TalonFX(HoodConstants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);

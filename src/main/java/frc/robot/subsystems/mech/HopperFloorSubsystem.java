@@ -13,7 +13,7 @@ import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class HopperFloorSubsystem extends SubsystemBase {
-  public final TalonFX hopperMotor;
+  private final TalonFX hopperMotor;
   private double desiredHopperVelocity;
   private static TalonFXConfiguration talonFXConfigs;
   private static Slot0Configs slot0Configs;
