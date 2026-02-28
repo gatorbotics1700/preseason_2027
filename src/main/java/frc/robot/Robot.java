@@ -191,6 +191,7 @@ public class Robot extends LoggedRobot {
     // robotContainer.getShooterSubsystem().setDesiredTransitionVoltage(0);
     // robotContainer.getIntakeSubsystem().setIntakeVoltage(0);
     robotContainer.MechStop();
+    robotContainer.HomeMechanisms();//TODO we don't want to actually do this in comps
     Elastic.selectTab("Teleoperated");
 
     // This makes sure that the autonomous stops running when teleop starts

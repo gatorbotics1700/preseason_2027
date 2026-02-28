@@ -36,7 +36,7 @@ public class TurretSubsystem extends SubsystemBase {
     turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    desiredAngle = new Rotation2d(0);
+    desiredAngle = getCurrentAngle();
 
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
@@ -124,5 +124,6 @@ public class TurretSubsystem extends SubsystemBase {
                 * TURRET_GEARBOX_RATIO
                 * GEAR_REVS_PER_TURRET_REV
             + degreesToRevs(TurretConstants.TURRET_HOMING_ANGLE));
+    setDesiredAngle(getCurrentAngle());
   }
 }
