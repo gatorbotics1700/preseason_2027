@@ -84,14 +84,23 @@ public class TurretSubsystem extends SubsystemBase {
 
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
-    this.desiredAngle =
-        new Rotation2d(
-            Math.toRadians(
-                MathUtil.inputModulus(
-                    desiredAngle.getDegrees(),
-                    TurretConstants.MIN_TURRET_ANGLE,
-                    TurretConstants
-                        .MAX_TURRET_ANGLE))); // TODO check this - trying to wrap the angle so it
+    double desiredAngleDegrees =
+        MathUtil.inputModulus(
+            desiredAngle.getDegrees(),
+            TurretConstants.MIN_TURRET_ANGLE,
+            TurretConstants.MIN_TURRET_ANGLE
+                + 360); // TODO check this - trying to wrap the angle so it
+    double alternateDesiredAngleDegrees =
+        MathUtil.inputModulus(
+            desiredAngleDegrees,
+            TurretConstants.MAX_TURRET_ANGLE-360,
+            TurretConstants.MAX_TURRET_ANGLE);
+    if (Math.abs(desiredAngleDegrees - getCurrentAngle().getDegrees())
+        < Math.abs(alternateDesiredAngleDegrees - getCurrentAngle().getDegrees())) {
+      this.desiredAngle = new Rotation2d(Math.toRadians(desiredAngleDegrees));
+    } else {
+      this.desiredAngle = new Rotation2d(Math.toRadians(alternateDesiredAngleDegrees));
+    }
   }
 
   public Rotation2d getCurrentAngle() {

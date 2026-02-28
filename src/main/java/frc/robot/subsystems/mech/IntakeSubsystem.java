@@ -80,6 +80,8 @@ public class IntakeSubsystem extends SubsystemBase {
     m_request = new MotionMagicExpoVoltage(0);
 
     intakeMotor.setVoltage(0);
+
+    isDeployed = false;
   }
 
   @Override
@@ -157,15 +159,10 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void toggleIntake() {
-    if (Math.abs(getCurrentAngle().getDegrees() - IntakeConstants.RETRACTED_ANGLE_DEGREES)
-        < IntakeConstants.POSITION_DEADBAND) {
-      setDesiredAngle(IntakeConstants.EXTENDED_POSITION);
-      setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
-      isDeployed = true;
-    } else {
-      setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
-      setIntakeVoltage(0);
-      isDeployed = false;
-    }
+    isDeployed = !isDeployed;
+  }
+
+  public boolean getIsDeployed() {
+    return isDeployed;
   }
 }

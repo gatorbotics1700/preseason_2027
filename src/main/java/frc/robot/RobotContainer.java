@@ -503,7 +503,7 @@ public class RobotContainer {
         //     .onTrue(
         //         new InstantCommand(
         //             () -> {
-        //               intakeSubsystem.toggleIntake();
+        //               IntakeCommands.ToggleIntake(intakeSubsystem);
         //             }));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
@@ -518,14 +518,14 @@ public class RobotContainer {
                       turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(125)));
                     }));
 
-        controller_two.y().onTrue(new TurretHomingCommand(turretSubsystem));
+        // controller_two.y().onTrue(new TurretHomingCommand(turretSubsystem));
 
         controller_two
             .a()
             .onTrue(
                 new InstantCommand(
                     () -> {
-                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-200)));
+                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-190)));
                     }));
 
         controller_two
@@ -533,7 +533,7 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () -> {
-                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
+                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(200)));
                     }));
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
@@ -705,7 +705,9 @@ public class RobotContainer {
   }
 
   public Command HomeMechanisms() { // TODO: add any other homing commands with alongWith
-    return HoodCommands.HomeHood(hoodSubsystem).alongWith(new TurretHomingCommand(turretSubsystem));
+    return HoodCommands.HomeHood(hoodSubsystem)
+        .alongWith(new TurretHomingCommand(turretSubsystem))
+        .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
   }
 
   public IntakeSubsystem getIntakeSubsystem() {
