@@ -70,38 +70,47 @@ public class ShotCalculator {
     double tangentialVelo = trajectoryRelativeShooterVelo.getY();
     double radialVelo = trajectoryRelativeShooterVelo.getX();
 
-    double uncompRange = get2dDistance(fieldToShooter, target);
+    // double uncompRange = get2dDistance(fieldToShooter, target);
 
     double shooterToHubHeight = target.getZ() - fieldToShooter.getZ();
 
-    ShotParameters params =
+    ShotParameters fieldRelativeParams =
         sweepTrajectories(
-            tangentialVelo,
-            radialVelo,
-            uncompRange,
-            drivetrainPose,
-            uncompTurretToTargetAngle,
-            shooterToHubHeight,
-            fieldRelativeShooterVelo,
-            fieldToShooter,
-            target);
+            // tangentialVelo,
+            // radialVelo,
+            // uncompRange,
+            // drivetrainPose,
+            // uncompTurretToTargetAngle,
+            // shooterToHubHeight,
+            fieldRelativeShooterVelo, fieldToShooter, target);
 
-    Logger.recordOutput("shotCalculator/turretAngle", params.turretAngle);
+    ShotParameters botRelativeParams =
+        new ShotParameters(
+            fieldRelativeParams.turretAngle.minus(drivetrainPose.getRotation()),
+            fieldRelativeParams.hoodAngle,
+            fieldRelativeParams.shotSpeed);
+    Logger.recordOutput("shotCalculator/turretAngle", botRelativeParams.turretAngle);
     Logger.recordOutput("shotCalculator/landingCoords", landingCoords);
 
-    return params;
+    return botRelativeParams;
   }
 
   public static ShotParameters sweepTrajectories(
-      double tangentialVelo,
-      double radialVelo,
-      double uncompRange,
-      Pose2d drivetrainPose,
-      Rotation2d uncompTurretToTargetAngle,
-      double shooterToHubHeight,
-      Translation2d fieldRelativeShooterVelo,
-      Translation3d fieldToShooter,
-      Translation3d target) {
+      // double tangentialVelo,
+      // double radialVelo,
+      // double uncompRange,
+      // Pose2d drivetrainPose,
+      // Rotation2d uncompTurretToTargetAngle,
+      // double shooterToHubHeight,
+      Translation2d fieldRelativeShooterVelo, Translation3d fieldToShooter, Translation3d target) {
+
+    Rotation2d uncompTurretToTargetAngle = getFieldRelativeYaw(fieldToShooter, target);
+    double uncompRange = get2dDistance(fieldToShooter, target);
+    double shooterToHubHeight = target.getZ() - fieldToShooter.getZ();
+    Translation2d trajectoryRelativeShooterVelo =
+        rotateFrameOfReference(fieldRelativeShooterVelo, uncompTurretToTargetAngle.unaryMinus());
+    double tangentialVelo = trajectoryRelativeShooterVelo.getY();
+    double radialVelo = trajectoryRelativeShooterVelo.getX();
 
     double speedRange = ShotCalculatorConditions.MAX_SHOT_SPEED - 0;
     int speedIterations = (int) (speedRange / 0.5);
@@ -139,7 +148,7 @@ public class ShotCalculator {
         Rotation2d compTurretToTargetAngle =
             uncompTurretToTargetAngle.plus(turretAdjust); // field relative
         testTurretAngle =
-            compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
+            compTurretToTargetAngle; // .minus(drivetrainPose.getRotation()); // robot relative
 
         double error =
             getTrajectoryError(
