@@ -26,6 +26,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private static TalonFXConfiguration leftFlywheelTalonFXConfigs;
   private static TalonFXConfiguration rightFlywheelTalonFXConfigs;
+  private static TalonFXConfiguration transitionMotorConfigs;
 
   private static Slot0Configs leftFlywheelSlot0Configs;
   private static Slot0Configs rightFlywheelSlot0Configs;
@@ -33,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private BooleanSupplier shouldShoot;
 
   public static LoggedNetworkNumber flyWheelSlip =
-      new LoggedNetworkNumber("/Tuning/flywheelSlip", 1);
+      new LoggedNetworkNumber("/Tuning/flywheelSlip", 0.27);
 
   public ShooterSubsystem() {
     leftFlywheelMotor =
@@ -91,8 +92,14 @@ public class ShooterSubsystem extends SubsystemBase {
         400; // Target acceleration of 400 rps/s (0.25 seconds to max)
     rightMotionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0/1 seconds)
 
+    transitionMotorConfigs = new TalonFXConfiguration();
+
+    transitionMotorConfigs.withMotorOutput(
+        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+
     leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
     rightFlywheelMotor.getConfigurator().apply(rightFlywheelTalonFXConfigs);
+    transitionMotor.getConfigurator().apply(transitionMotorConfigs);
 
     m_request = new MotionMagicVelocityVoltage(0);
 

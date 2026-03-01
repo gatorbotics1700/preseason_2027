@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
@@ -67,7 +68,7 @@ public class RobotContainer {
 
   private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
-  private final HopperFloorSubsystem transitionSubsystem = new HopperFloorSubsystem();
+  private final HopperFloorSubsystem hopperFloorSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final TurretSubsystem turretSubsystem = new TurretSubsystem();
@@ -172,7 +173,7 @@ public class RobotContainer {
             hoodSubsystem,
             shooterSubsystem,
             turretSubsystem,
-            transitionSubsystem,
+            hopperFloorSubsystem,
             robotPose,
             chassisSpeeds);
 
@@ -256,7 +257,7 @@ public class RobotContainer {
                                           shooterSubsystem,
                                           hoodSubsystem,
                                           turretSubsystem,
-                                          transitionSubsystem,
+                                          hopperFloorSubsystem,
                                           robotPose,
                                           chassisSpeeds))
                                   .withName("DriveOverBump"));
@@ -305,7 +306,7 @@ public class RobotContainer {
                                           shooterSubsystem,
                                           hoodSubsystem,
                                           turretSubsystem,
-                                          transitionSubsystem,
+                                          hopperFloorSubsystem,
                                           robotPose,
                                           chassisSpeeds))
                                   .withName("DriveUnderTrench"));
@@ -476,7 +477,7 @@ public class RobotContainer {
                     shooterSubsystem,
                     hoodSubsystem,
                     turretSubsystem,
-                    transitionSubsystem,
+                    hopperFloorSubsystem,
                     robotPose,
                     chassisSpeeds));
       } else {
@@ -498,7 +499,13 @@ public class RobotContainer {
         //               intakeSubsystem.setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
         //             }));
 
-        controller_two.x().onTrue(IntakeCommands.ToggleIntake(intakeSubsystem));
+        // controller_two
+        //     .x()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () ->
+        //                 CommandScheduler.getInstance()
+        //                     .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 
@@ -514,21 +521,21 @@ public class RobotContainer {
 
         // controller_two.y().onTrue(new TurretHomingCommand(turretSubsystem));
 
-        controller_two
-            .a()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-190)));
-                    }));
+        // controller_two
+        //     .a()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-190)));
+        //             }));
 
-        controller_two
-            .b()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(200)));
-                    }));
+        // controller_two
+        //     .b()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () -> {
+        //               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(200)));
+        //             }));
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
 
@@ -555,6 +562,43 @@ public class RobotContainer {
         // // differently)
         // controller_two.a().onTrue(RunMechWheels());
         // controller_two.b().onTrue(MechStop());
+
+        controller_two
+            .b()
+            .onTrue(
+                new ShootingCommand(
+                    shooterSubsystem,
+                    hoodSubsystem,
+                    turretSubsystem,
+                    hopperFloorSubsystem,
+                    robotPose,
+                    chassisSpeeds));
+
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        hopperFloorSubsystem.setDesiredHopperFloorVoltage(
+                            HopperFloorConstants.HOPPER_FLOOR_VOLTAGE)));
+
+        controller_two
+            .x()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(
+                                MechStop(
+                                    turretSubsystem,
+                                    shooterSubsystem,
+                                    hopperFloorSubsystem,
+                                    hoodSubsystem,
+                                    intakeSubsystem))));
+
+        controller_two
+            .rightBumper()
+            .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
       }
     }
   }
@@ -658,21 +702,27 @@ public class RobotContainer {
   // TODO: this command doesn't work -- need to fix (test this by commenting out
   // the way we do this
   // manually in Robot.java)
-  public Command MechStop() {
-    return /*
-            * IntakeCommands.StopIntake(intakeSubsystem)
-            * .andThen(IntakeCommands.RetractIntake(intakeSubsystem)))
-            * .alongWith(
-            */ new InstantCommand(
+  public Command MechStop(
+      TurretSubsystem turretSubsystem,
+      ShooterSubsystem shooterSubsystem,
+      HopperFloorSubsystem hopperFloorSubsystem,
+      HoodSubsystem hoodSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+    return new InstantCommand(
             () -> {
               turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
               shooterSubsystem.setDesiredFlywheelVelocity(0);
-              transitionSubsystem.setDesiredHopperFloorVelocity(0);
+              hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
               shooterSubsystem.setDesiredTransitionVoltage(0);
               hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
               hoodSubsystem.setHoodVoltage(0);
               // TODO add climber
-            }
+            },
+            turretSubsystem,
+            shooterSubsystem,
+            hopperFloorSubsystem,
+            hoodSubsystem,
+            intakeSubsystem
             // )
             )
         .alongWith(IntakeCommands.StopIntake(intakeSubsystem));
@@ -699,9 +749,12 @@ public class RobotContainer {
   }
 
   public Command HomeMechanisms() { // TODO: add any other homing commands with alongWith
-    return HoodCommands.HomeHood(hoodSubsystem)
-        .alongWith(new TurretHomingCommand(turretSubsystem))
-        .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
+    return HoodCommands.HomeHood(hoodSubsystem).alongWith(new TurretHomingCommand(turretSubsystem));
+    // .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
+  }
+
+  public TurretSubsystem getTurretSubsystem() {
+    return turretSubsystem;
   }
 
   public IntakeSubsystem getIntakeSubsystem() {
@@ -710,5 +763,13 @@ public class RobotContainer {
 
   public ShooterSubsystem getShooterSubsystem() {
     return shooterSubsystem;
+  }
+
+  public HoodSubsystem getHoodSubsystem() {
+    return hoodSubsystem;
+  }
+
+  public HopperFloorSubsystem getHopperFloorSubsystem() {
+    return hopperFloorSubsystem;
   }
 }

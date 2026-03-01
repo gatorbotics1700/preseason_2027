@@ -536,8 +536,8 @@ public final class Constants {
   }
 
   public static final class HopperFloorConstants {
-    public static final int HOPPER_MOTOR_CAN_ID = 16;
-
+    public static final int HOPPER_MOTOR_CAN_ID = 35;
+    public static final double HOPPER_FLOOR_VOLTAGE = -0.75;
     public static final double HOPPER_FLOOR_VELOCITY = 0.5; // TODO find a real number
   }
 
@@ -571,7 +571,7 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int LEFT_FLYWHEEL_MOTOR_CAN_ID = 29;
     public static final int RIGHT_FLYWHEEL_MOTOR_CAN_ID = 30;
-    public static final int TRANSITION_MOTOR_CAN_ID = 31;
+    public static final int TRANSITION_MOTOR_CAN_ID = 16;
 
     public static final double TRANSITION_VOLTAGE = 10;
     public static final double FLYWHEEL_SPEED_DEADBAND = 2;
