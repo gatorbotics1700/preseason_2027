@@ -162,8 +162,8 @@ public class ShotCalculator {
         Rotation2d turretAdjust = new Rotation2d(Math.atan2(-tangentialVelo, effectiveRadialVelo));
         Rotation2d compTurretToTargetAngle =
             uncompTurretToTargetAngle.plus(turretAdjust); // field relative
-        testTurretAngle =
-            compTurretToTargetAngle; // .minus(drivetrainPose.getRotation()); // robot relative
+        testTurretAngle = compTurretToTargetAngle;
+        // compTurretToTargetAngle.minus(drivetrainPose.getRotation()); // robot relative
 
         double error =
             getTrajectoryError(
@@ -201,9 +201,9 @@ public class ShotCalculator {
     }
 
     if (bestShotSpeed == 0) {
-      System.out.println("NO VALID SHOT");
+      // System.out.println("NO VALID SHOT");
     } else {
-      System.out.println("VALID SHOT CALCULATED");
+      // System.out.println("VALID SHOT CALCULATED");
     }
 
     return new ShotParameters(bestTurretAngle, bestHoodAngle, bestShotSpeed);
@@ -253,17 +253,52 @@ public class ShotCalculator {
     Translation3d initialVelocity = new Translation3d(vx, vy, vz);
 
     double t =
-        timeToTargetHeight(-0.5 * 9.8, initialVelocity.getZ(), fieldRelativeShooterToTarget.getZ());
+        timeToTargetHeight(
+            -0.5 * 9.8,
+            initialVelocity.getZ(),
+            -fieldRelativeShooterToTarget
+                .getZ()); // TODO figure out why this is negative? it works but I'm skeptical
 
-    Translation3d fieldRelativeShooterToBall =
+    Translation3d fieldRelativeShooterToBallLanding =
         new Translation3d(
             initialVelocity.getX() * t,
             initialVelocity.getY() * t,
             initialVelocity.getZ() * t - 0.5 * 9.8 * t * t);
 
-    double error = fieldRelativeShooterToBall.minus(fieldRelativeShooterToTarget).getNorm();
+    double error = fieldRelativeShooterToBallLanding.minus(fieldRelativeShooterToTarget).getNorm();
     return error;
   }
+
+  // public static double getTrajectoryError(
+  //     Rotation2d compTurretToTargetAngle,
+  //     Rotation2d hoodAngle,
+  //     Translation2d fieldRelativeShooterVelo,
+  //     Translation3d fieldToShooter,
+  //     double shotSpeed,
+  //     Translation3d target) {
+
+  //   double vx = shotSpeed * Math.cos(hoodAngle.getRadians()) * compTurretToTargetAngle.getCos();
+  //   double vy = shotSpeed * Math.cos(hoodAngle.getRadians()) * compTurretToTargetAngle.getSin();
+  //   double vz = shotSpeed * Math.sin(hoodAngle.getRadians());
+
+  //   vx += fieldRelativeShooterVelo.getX();
+  //   vy += fieldRelativeShooterVelo.getY();
+
+  //   Translation3d initialVelocity = new Translation3d(vx, vy, vz);
+
+  //   double t =
+  //       timeToTargetHeight(
+  //           -0.5 * 9.8, initialVelocity.getZ(), fieldToShooter.getZ() - target.getZ());
+
+  //   Translation3d fieldToBall =
+  //       new Translation3d(
+  //           fieldToShooter.getX() + initialVelocity.getX() * t,
+  //           fieldToShooter.getY() + initialVelocity.getY() * t,
+  //           fieldToShooter.getZ() + initialVelocity.getZ() * t - 0.5 * 9.8 * t * t);
+
+  //   double error = fieldToBall.minus(target).getNorm();
+  //   return error;
+  // }
 
   public static double apexTime(double vz) {
     return (-vz) / (2 * (-0.5 * 9.8));
