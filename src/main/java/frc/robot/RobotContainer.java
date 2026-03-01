@@ -410,7 +410,7 @@ public class RobotContainer {
                                 new Pose2d(
                                     1, FieldCoordinates.BLUE_HUB.getY() + 2, new Rotation2d()),
                                 new PathConstraints(
-                                    3, 12, Math.toRadians(700), Math.toRadians(1000))),
+                                    1.5, 12, Math.toRadians(700), Math.toRadians(1000))),
                             Commands.waitSeconds(0.2)
                                 .andThen(
                                     Commands.runOnce(

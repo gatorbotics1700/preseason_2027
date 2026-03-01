@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ShotCalculator;
 import java.util.Optional;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -43,6 +44,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private ShotCalculator
+      shotCalculator; // not actually used anywhere, but we need the constructor to run asap to
+
+  // generate the lookup table
 
   public Robot() {
     // Record metadata
@@ -109,6 +114,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    shotCalculator = new ShotCalculator();
     // SmartDashboard.putData(robotContainer.getDriveSubsystem());
     SmartDashboard.putData(CommandScheduler.getInstance());
   }
@@ -185,6 +191,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+
     CommandScheduler.getInstance().cancelAll();
     robotContainer.teleopInit();
     // robotContainer.getShooterSubsystem().setDesiredFlywheelVelocity(0);

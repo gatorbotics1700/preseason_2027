@@ -636,6 +636,13 @@ public final class Constants {
     public static final double MAX_SHOT_HEIGHT = 5; // 2 meters for MSLL
     public static final double MAX_SHOT_SPEED =
         30; // in mps, so calculate using flywheel rps * 2 * Math.PI * flywheel radius * flywheel
+
+    public static final double VELO_INCREMENT = 0.05; // mps
+    public static final double RANGE_INCREMENT = 0.05; // m
+    public static final double MAX_COMPONENT_VELO = 1.5; // mps
+    public static final double MAX_RANGE =
+        FieldCoordinates.BLUE_HUB.toTranslation2d().getNorm()
+            + 0.1; // m //TODO calculate furthest distance we would ever want to shoot from
     // slip
     // kraken x60 max velocity is ~100 rps
   }
