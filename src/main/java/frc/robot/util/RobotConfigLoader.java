@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 /** Simple config loader that reads properties files based on roboRIO serial number. */
@@ -53,8 +55,8 @@ public final class RobotConfigLoader {
     String configFile = resolveConfigFile(serial);
 
     config = new Properties();
-    try (FileInputStream stream =
-        new FileInputStream(Filesystem.getDeployDirectory().getPath() + "/" + configFile)) {
+    String deployBase = getDeployBasePath();
+    try (FileInputStream stream = new FileInputStream(deployBase + "/" + configFile)) {
       config.load(stream);
       System.out.println(
           "RobotConfigLoader: Loaded config '" + configFile + "' (Serial: " + serial + ")");
@@ -63,6 +65,29 @@ public final class RobotConfigLoader {
     }
 
     return config;
+  }
+
+  /**
+   * Returns a deploy directory path that works both on-robot and on desktop tools.
+   *
+   * <p>On desktop, WPILib's {@link Filesystem#getDeployDirectory()} can require native HAL
+   * libraries to be present, which isn't always true for simple command-line tools. In that case,
+   * fall back to the project deploy directory.
+   */
+  private static String getDeployBasePath() {
+    try {
+      return Filesystem.getDeployDirectory().getPath();
+    } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+      // Desktop tool without HAL loaded
+    } catch (Throwable t) {
+      // Be defensive: if anything goes wrong, fall back to project path.
+    }
+
+    Path projectDeploy = Path.of(System.getProperty("user.dir"), "src", "main", "deploy");
+    if (Files.isDirectory(projectDeploy)) {
+      return projectDeploy.toString();
+    }
+    return Path.of("src", "main", "deploy").toAbsolutePath().toString();
   }
 
   public static String getString(String key) {

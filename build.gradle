@@ -64,6 +64,14 @@ task(replayWatch, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+// Generate shot lookup table JSON into src/main/deploy (runs on your computer).
+task(generateShotTable, type: JavaExec) {
+    mainClass = "frc.robot.tools.ShotTableGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir(projectDir)
+    args "--name", "AlectoHub"
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
