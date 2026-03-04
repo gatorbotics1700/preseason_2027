@@ -22,11 +22,14 @@ public class ShotCalculator {
   // for testing only, used for logging where the calculator expects the ball to hit the target's
   // height ("land" on the target)
   public static Translation3d landingCoords = new Translation3d();
-  public static ShotParameters[][][] lookupTable;
+  public static ShotParameters[][][] hubLookupTable;
 
+  // to regen the lookup table (should only be necessary if you change constants like hood angles or
+  // max speeds), run ./gradlew generateShotTable in terminal!
   public ShotCalculator() {
-    double elevation = FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ();
-    lookupTable = loadLookupTableOrGenerate(elevation);
+    hubLookupTable =
+        loadLookupTableOrGenerate(
+            FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ());
   }
 
   private static String getShotTableName() {
@@ -128,10 +131,16 @@ public class ShotCalculator {
     // double shooterToHubHeight = target.getZ() - fieldToShooter.getZ();
     Translation3d fieldRelativeShooterToTarget = target.minus(fieldToShooter);
 
-    ShotParameters trajectoryRelativeParams =
-        lookupShot(lookupTable, tangentialVelo, radialVelo, uncompRange);
-    // sweepTrajectories(
-    // 0, 0, 6, FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ());
+    ShotParameters trajectoryRelativeParams;
+
+    if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
+      trajectoryRelativeParams =
+          lookupShot(hubLookupTable, tangentialVelo, radialVelo, uncompRange);
+    } else {
+      trajectoryRelativeParams =
+          sweepTrajectories(
+              tangentialVelo, radialVelo, uncompRange, fieldRelativeShooterToTarget.getZ());
+    }
 
     ShotParameters botRelativeParams =
         new ShotParameters(
@@ -423,14 +432,10 @@ public class ShotCalculator {
 
   public static ShotParameters lookupShot(
       ShotParameters[][][] lookupTable, double tangentialVelo, double radialVelo, double range) {
-    if (range > ShotCalculatorConditions.MAX_RANGE) {
-      System.out.println("OUT OF RANGE OUT OF RANGE");
-    }
-    if (Math.abs(radialVelo) > ShotCalculatorConditions.MAX_COMPONENT_VELO) {
-      System.out.println("TOO FAST R TOO FAST R");
-    }
-    if (Math.abs(tangentialVelo) > ShotCalculatorConditions.MAX_COMPONENT_VELO) {
-      System.out.println("TOO FAST T TOO FAST T");
+    if (range > ShotCalculatorConditions.MAX_RANGE
+        || Math.abs(radialVelo) > ShotCalculatorConditions.MAX_COMPONENT_VELO
+        || Math.abs(tangentialVelo) > ShotCalculatorConditions.MAX_COMPONENT_VELO) {
+      return new ShotParameters(new Rotation2d(), new Rotation2d(), 0);
     }
 
     int i =
