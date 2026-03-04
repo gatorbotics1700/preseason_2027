@@ -1,5 +1,7 @@
 package frc.robot.subsystems.mech;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -7,7 +9,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import java.util.function.BooleanSupplier;
@@ -184,5 +190,53 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Returns the desired angle, or null if no angle is set. */
   public BooleanSupplier getShouldShoot() {
     return shouldShoot;
+  }
+
+  private double getVelocityRadPerSec() {
+    double motorRPS = getFlywheelVelocity();
+    return motorRPS / ShooterConstants.FLYWHEEL_GEAR_RATIO * 2 * Math.PI;
+  }
+
+  private SysIdRoutine sysIdRoutine() {
+    // config for our test. Sets voltage ramps, limits, and a logging callback
+    SysIdRoutine.Config config =
+        new SysIdRoutine.Config(
+            // this is the ramp rate for voltage during a test
+            Volts.per(Second).of(2),
+            // this is the maximum voltage for the test
+            Volts.of(4),
+            // this is the duration of the test.
+            // Note we use `until` when we return the command to abort if we hit turret
+            // limits
+            Seconds.of(10),
+            (state) -> Logger.recordOutput("Mech/Right Shooter/SysIdState", state.toString()));
+
+    // mechanism for our test. Sets the voltage and logs the motor output
+    SysIdRoutine.Mechanism mechanism =
+        new SysIdRoutine.Mechanism(
+            (voltage) -> rightFlywheelMotor.setVoltage(voltage.in(Volts)),
+            (log) ->
+                log.motor("right shooter")
+                    .voltage(Volts.of(rightFlywheelMotor.getMotorVoltage().getValueAsDouble()))
+                    .angularVelocity(RadiansPerSecond.of(getVelocityRadPerSec())),
+            // the subsystem to test (which is us)
+            this,
+            // name for the task
+            "right shooter");
+    return new SysIdRoutine(config, mechanism);
+  }
+
+  // run under a series of "flat" voltages to measure velocity behavior
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine()
+        .quasistatic(direction)
+        .withName("Turret SysId Quasistatic " + direction);
+  }
+
+  // measure accelaration behavior
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine()
+        .dynamic(direction)
+        .withName("Turret SysId Dynamic " + direction);
   }
 }

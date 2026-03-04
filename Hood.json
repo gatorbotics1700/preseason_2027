@@ -1,0 +1,177 @@
+{
+  "hubs": [
+    {
+      "x": 68,
+      "y": 26,
+      "width": 1100,
+      "height": 660,
+      "state": {
+        "sidebar": {
+          "width": 264,
+          "expanded": [
+            "/photonvision/Arducam_OV9281_USB_Camera_Marks",
+            "/Shuffleboard/.metadata",
+            "/photonvision/Arducam_OV9281_USB_Camera/targetPose",
+            "/AdvantageKit/RealOutputs/Vision/Camera0",
+            "/AdvantageKit/DriverStation/Joystick4",
+            "/AdvantageKit/RealOutputs/Commands",
+            "/photonvision/monochrome_camera_0",
+            "/AdvantageKit/RealOutputs/LoggedRobot",
+            "/AdvantageKit/RealOutputs/DriveCommands",
+            "/AdvantageKit/RealOutputs/Buttons",
+            "/AdvantageKit/RealOutputs/Alerts",
+            "/SmartDashboard/Scheduler/Names",
+            "/SmartDashboard/Scheduler/Ids",
+            "/SmartDashboard/Scheduler/Cancel",
+            "/SmartDashboard",
+            "/photonvision/color_camera_2",
+            "/photonvision/color_camera_2/targetPose/translation",
+            "/AdvantageKit/RealOutputs",
+            "/AdvantageKit/DriverStation/Joystick3",
+            "/SmartDashboard/Drive",
+            "/AdvantageKit/RealOutputs/Odometry/Fuel",
+            "/photonvision/coprocessors/F0-74-E4-7F-58-7F",
+            "/photonvision/coprocessors/F0-74-E4-7F-58-7F/cameraNames",
+            "/photonvision/color_camera_2/rawBytes",
+            "/photonvision/color_camera_2/rawBytes/metadata",
+            "/photonvision/color_camera_2/rawBytes/targets",
+            "/photonvision/color_camera_2/rawBytes/targets/0",
+            "/photonvision/color_camera_2/rawBytes/targets/0/detectedCorners",
+            "/photonvision/color_camera_2/rawBytes/targets/0/minAreaRectCorners",
+            "/photonvision/color_camera_2/rawBytes/targets/0/minAreaRectCorners/0",
+            "/photonvision/color_camera_2/rawBytes/targets/0/minAreaRectCorners/1",
+            "/photonvision/color_camera_2/rawBytes/targets/0/minAreaRectCorners/2",
+            "/AdvantageKit/RealOutputs/encoderValue",
+            "/AdvantageKit",
+            "/AdvantageKit/RealOutputs/Odometry",
+            "/AdvantageKit/RealOutputs/Odometry/Robot",
+            "/photonvision/coprocessors",
+            "/photonvision/coprocessors/F0-74-E4-7F-52-E2",
+            "/photonvision/coprocessors/F0-74-E4-7F-58-F4",
+            "/photonvision/coprocessors/F0-74-E4-7F-58-F4/cameraNames",
+            "/photonvision/coprocessors/F0-74-E4-7F-52-E2/cameraNames",
+            "/photonvision/monochrome_camera_0/targetPose",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/TagPoses",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/RobotPosesRejected",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/RobotPosesAccepted",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/RobotPosesRejected/0",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/TagPoses/0",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/TagPoses/0/rotation",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/TagPoses/0/translation",
+            "/AdvantageKit/RealOutputs/Mech",
+            "/AdvantageKit/RealOutputs/Mech/Hood",
+            "/AdvantageKit/RealOutputs/DriveToFuel",
+            "/AdvantageKit/RealOutputs/DriveToFuel/towardFuelInRobotSpace",
+            "/AdvantageKit/RealOutputs/Mech/Climber",
+            "/AdvantageKit/RealOutputs/Mech/Turret"
+          ]
+        },
+        "tabs": {
+          "selected": 2,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "0moqglg579xbp7wqly0r7apnfn7kmo33",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Turret Angle",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Mech/Hood/Current Angle",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Mech/Hood/Desired Angle",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Mech/Hood/Limit switch",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "rightUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "hquovfqx9r00o30mkd8gqhyhaqgfs7k5",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Turret Motors",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Mech/Hood/Motor Output",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "rightUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "kowexqpv6x9stqilhz79dxg3sn5hrksp",
+              "renderer": null,
+              "controlsHeight": 200
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "26.0.0"
+}

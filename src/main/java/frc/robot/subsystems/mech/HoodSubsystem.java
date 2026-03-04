@@ -14,11 +14,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.TunerConstants;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
 
@@ -160,7 +158,11 @@ public class HoodSubsystem extends SubsystemBase {
 
   private double getVelocityRadPerSec() {
     double motorRPS = hoodMotor.getVelocity().getValueAsDouble();
-    return motorRPS / HoodConstants.HOOD_GEAR_RATIO / HoodConstants.HOOD_SHAFT_REVS_PER_MECH_REV * 2 * Math.PI;
+    return motorRPS
+        / HoodConstants.HOOD_GEAR_RATIO
+        / HoodConstants.HOOD_SHAFT_REVS_PER_MECH_REV
+        * 2
+        * Math.PI;
   }
 
   private SysIdRoutine sysIdRoutine() {
@@ -172,24 +174,23 @@ public class HoodSubsystem extends SubsystemBase {
             // this is the maximum voltage for the test
             Volts.of(4),
             // this is the duration of the test.
-            // Note we use `until` when we return the command to abort if we hit turret
-            // limits
+            // Note we use `until` when we return the command to abort if we hit hood min position
             Seconds.of(10),
-            (state) -> Logger.recordOutput("Mech/Turret/SysIdState", state.toString()));
+            (state) -> Logger.recordOutput("Mech/Hood/SysIdState", state.toString()));
 
     // mechanism for our test. Sets the voltage and logs the motor output
     SysIdRoutine.Mechanism mechanism =
         new SysIdRoutine.Mechanism(
             (voltage) -> hoodMotor.setVoltage(voltage.in(Volts)),
             (log) ->
-                log.motor("turret")
+                log.motor("hood")
                     .voltage(Volts.of(hoodMotor.getMotorVoltage().getValueAsDouble()))
                     .angularPosition(Radians.of(getCurrentAngle().getRadians()))
                     .angularVelocity(RadiansPerSecond.of(getVelocityRadPerSec())),
             // the subsystem to test (which is us)
             this,
             // name for the task
-            "turret");
+            "hood");
     return new SysIdRoutine(config, mechanism);
   }
 
@@ -203,7 +204,7 @@ public class HoodSubsystem extends SubsystemBase {
     return sysIdRoutine()
         .quasistatic(direction)
         .until(this::isSysIdOutOfBounds)
-        .withName("Turret SysId Quasistatic " + direction);
+        .withName("Hoo SysId Quasistatic " + direction);
   }
 
   // measure accelaration behavior
@@ -211,7 +212,6 @@ public class HoodSubsystem extends SubsystemBase {
     return sysIdRoutine()
         .dynamic(direction)
         .until(this::isSysIdOutOfBounds)
-        .withName("Turret SysId Dynamic " + direction);
+        .withName("Hood SysId Dynamic " + direction);
   }
-
 }

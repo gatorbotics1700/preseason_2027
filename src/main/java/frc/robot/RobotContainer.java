@@ -605,10 +605,18 @@ public class RobotContainer {
   }
 
   public void configureSysIdButtonBindings(CommandXboxController controller) {
-    controller.leftTrigger().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    controller.rightTrigger().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    controller.leftBumper().whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    controller.rightBumper().whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    controller
+        .leftTrigger()
+        .whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    controller
+        .rightTrigger()
+        .whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    controller
+        .leftBumper()
+        .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    controller
+        .rightBumper()
+        .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
   }
 
   public Command getAutonomousCommand() {

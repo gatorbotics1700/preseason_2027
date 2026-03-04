@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.TurretConstants;
@@ -29,7 +28,7 @@ public class TurretSubsystem extends SubsystemBase {
   private static MotionMagicExpoVoltage m_request;
 
   private static final double SYSID_LIMIT_MARGIN_DEGREES = 10.0;
-  
+
   private final int TURRET_GEARBOX_RATIO = 9;
   private final int GEAR_REVS_PER_TURRET_REV = 10;
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
@@ -198,5 +197,4 @@ public class TurretSubsystem extends SubsystemBase {
         .until(this::isSysIdOutOfBounds)
         .withName("Turret SysId Dynamic " + direction);
   }
-
 }
