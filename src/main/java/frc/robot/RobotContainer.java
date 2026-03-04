@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
@@ -565,6 +566,23 @@ public class RobotContainer {
     }
   }
 
+  public void configureSysIdButtons() {
+    if (DriverStation.isJoystickConnected(3)) {
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller_two = new CommandSimMacXboxController(3);
+        // putting this here because it should only run when we're in sim!
+
+      } else {
+        controller_two = new CommandXboxController(3);
+      }
+      controller_two.a().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      controller_two.b().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      controller_two.x().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      controller_two.y().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    }
+  }
+
   public Command getAutonomousCommand() {
     try {
       return multiStepAutoChooser.getAutonomousCommand();
@@ -622,7 +640,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
-      drive.enableTargetPointFacing();
+      // drive.enableTargetPointFacing();
     }
     configureButtonBindings();
   }

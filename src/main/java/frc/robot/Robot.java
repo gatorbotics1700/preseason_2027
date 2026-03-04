@@ -202,7 +202,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    robotContainer.periodic();
+    // robotContainer.periodic();
   }
 
   /** This function is called once when test mode is enabled. */
@@ -210,8 +210,9 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    robotContainer.configureDriverButtonBindings();
-    robotContainer.configureCodriverButtonBindings();
+    // robotContainer.configureDriverButtonBindings();
+    // robotContainer.configureCodriverButtonBindings();
+    robotContainer.configureSysIdButtons();
   }
 
   /** This function is called periodically during test mode. */

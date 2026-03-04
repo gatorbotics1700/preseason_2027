@@ -96,7 +96,8 @@ public final class Constants {
             .withKI(RobotConfigLoader.getDouble("tuner.drive_ki"))
             .withKD(RobotConfigLoader.getDouble("tuner.drive_kd"))
             .withKS(RobotConfigLoader.getDouble("tuner.drive_ks"))
-            .withKV(RobotConfigLoader.getDouble("tuner.drive_kv"));
+            .withKV(RobotConfigLoader.getDouble("tuner.drive_kv"))
+            .withKA(RobotConfigLoader.getDouble("tuner.drive_ka"));
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -146,7 +147,7 @@ public final class Constants {
             RobotConfigLoader.getString("tuner.drive_canbus_name").equals("null")
                 ? ""
                 : RobotConfigLoader.getString("tuner.drive_canbus_name"),
-            "");
+            "U/logs");
 
     // Mechanism CAN bus - reuses driveCANBus if they're the same physical bus
     public static final CANBus mechCANBus;
