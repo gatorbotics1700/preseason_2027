@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -603,6 +604,13 @@ public class RobotContainer {
     }
   }
 
+  public void configureSysIdButtonBindings(CommandXboxController controller) {
+    controller.leftTrigger().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    controller.rightTrigger().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    controller.leftBumper().whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    controller.rightBumper().whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+  }
+
   public Command getAutonomousCommand() {
     try {
       return multiStepAutoChooser.getAutonomousCommand();
@@ -656,6 +664,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverButtonBindings();
     configureCodriverButtonBindings();
+    configureSysIdButtonBindings(controller_two);
   }
 
   public void teleopInit() {
