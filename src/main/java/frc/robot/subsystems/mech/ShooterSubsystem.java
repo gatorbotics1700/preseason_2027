@@ -37,6 +37,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private BooleanSupplier shouldShoot;
   private boolean sysIdRunning = false;
+  private SysIdRoutine sysIdRoutine;
 
   public static LoggedNetworkNumber flyWheelSlip =
       new LoggedNetworkNumber("/Tuning/flywheelSlip", 0.27);
@@ -114,6 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
         };
   }
 
+  @Override
   public void periodic() {
     Logger.recordOutput("Mech/Shooter/Flywheel Velocity", getFlywheelVelocity());
     Logger.recordOutput("Mech/Shooter/Desired Flywheel Velocity", desiredFlywheelVelocity);
@@ -200,7 +202,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return motorRPS / ShooterConstants.FLYWHEEL_GEAR_RATIO * 2 * Math.PI;
   }
 
-  private SysIdRoutine sysIdRoutine() {
+  private void initSysIdRoutine() {
     // config for our test. Sets voltage ramps, limits, and a logging callback
     SysIdRoutine.Config config =
         new SysIdRoutine.Config(
@@ -209,15 +211,16 @@ public class ShooterSubsystem extends SubsystemBase {
             // this is the maximum voltage for the test
             Volts.of(18),
             // this is the duration of the test.
-            // Note we use `until` when we return the command to abort if we hit turret
-            // limits
             Seconds.of(15),
             (state) -> Logger.recordOutput("Mech/Right Shooter/SysIdState", state.toString()));
 
     // mechanism for our test. Sets the voltage and logs the motor output
     SysIdRoutine.Mechanism mechanism =
         new SysIdRoutine.Mechanism(
-            (voltage) -> rightFlywheelMotor.setVoltage(voltage.in(Volts)),
+            (voltage) -> {
+              sysIdRunning = true;
+              rightFlywheelMotor.setVoltage(voltage.in(Volts));
+            },
             (log) ->
                 log.motor("right shooter")
                     .voltage(Volts.of(rightFlywheelMotor.getMotorVoltage().getValueAsDouble()))
@@ -227,25 +230,29 @@ public class ShooterSubsystem extends SubsystemBase {
             // name for the task
             "right shooter");
     System.out.println("CREATING NEW SYSID ROUTINE");
-    return new SysIdRoutine(config, mechanism);
+    sysIdRoutine = new SysIdRoutine(config, mechanism);
   }
 
   // run under a series of "flat" voltages to measure velocity behavior
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     System.out.println("RUNNING SYSID QUASISTATIC");
-    return sysIdRoutine()
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
         .quasistatic(direction)
-        .beforeStarting(() -> sysIdRunning = true)
         .finallyDo(() -> sysIdRunning = false)
         .withName("Flywheel SysId Quasistatic " + direction);
   }
 
-  // measure accelaration behavior
+  // measure acceleration behavior
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     System.out.println("RUNNING SYSID DYNAMIC");
-    return sysIdRoutine()
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
         .dynamic(direction)
-        .beforeStarting(() -> sysIdRunning = true)
         .finallyDo(() -> sysIdRunning = false)
         .withName("Flywheel SysId Dynamic " + direction);
   }
