@@ -172,10 +172,10 @@ public class HoodSubsystem extends SubsystemBase {
             // this is the ramp rate for voltage during a test
             Volts.per(Second).of(2),
             // this is the maximum voltage for the test
-            Volts.of(4),
+            Volts.of(8),
             // this is the duration of the test.
             // Note we use `until` when we return the command to abort if we hit hood min position
-            Seconds.of(10),
+            Seconds.of(100),
             (state) -> Logger.recordOutput("Mech/Hood/SysIdState", state.toString()));
 
     // mechanism for our test. Sets the voltage and logs the motor output
@@ -191,24 +191,28 @@ public class HoodSubsystem extends SubsystemBase {
             this,
             // name for the task
             "hood");
+    System.out.println("CREATING NEW SYSID ROUTINE");
     return new SysIdRoutine(config, mechanism);
   }
 
   private boolean isSysIdOutOfBounds() {
     double angleDeg = getCurrentAngle().getDegrees();
-    return angleDeg <= HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
+    return angleDeg <= HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES
+        || angleDeg >= HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
   }
 
   // run under a series of "flat" voltages to measure velocity behavior
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID QUASISTATIC");
     return sysIdRoutine()
         .quasistatic(direction)
         .until(this::isSysIdOutOfBounds)
-        .withName("Hoo SysId Quasistatic " + direction);
+        .withName("Hood SysId Quasistatic " + direction);
   }
 
   // measure accelaration behavior
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID DYNAMIC");
     return sysIdRoutine()
         .dynamic(direction)
         .until(this::isSysIdOutOfBounds)

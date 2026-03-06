@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.TunerConstants;
-import frc.robot.Constants.TurretConstants;
-
 import org.littletonrobotics.junction.Logger;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -153,7 +151,12 @@ public class ClimberSubsystem extends SubsystemBase {
             (log) ->
                 log.motor("climber")
                     .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
-                    .linearPosition(Meters.of(getCurrentPositionInches())) //TODO the linear position and linear velocity return in units with metters, check if the Meters.of part does conversion
+                    .linearPosition(
+                        Meters.of(
+                            getCurrentPositionInches())) // TODO the linear position and linear
+                    // velocity return in units with metters,
+                    // check if the Meters.of part does
+                    // conversion
                     .linearVelocity(MetersPerSecond.of(getVelocityInchesPerSec())),
             // the subsystem to test (which is us)
             this,

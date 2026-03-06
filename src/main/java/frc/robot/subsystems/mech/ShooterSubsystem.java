@@ -9,11 +9,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import java.util.function.BooleanSupplier;
@@ -223,11 +221,13 @@ public class ShooterSubsystem extends SubsystemBase {
             this,
             // name for the task
             "right shooter");
+    System.out.println("CREATING NEW SYSID ROUTINE");
     return new SysIdRoutine(config, mechanism);
   }
 
   // run under a series of "flat" voltages to measure velocity behavior
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID QUASISTATIC");
     return sysIdRoutine()
         .quasistatic(direction)
         .withName("Flywheel SysId Quasistatic " + direction);
@@ -235,8 +235,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   // measure accelaration behavior
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return sysIdRoutine()
-        .dynamic(direction)
-        .withName("Flywheel SysId Dynamic " + direction);
+    System.out.println("RUNNING SYSID DYNAMIC");
+    return sysIdRoutine().dynamic(direction).withName("Flywheel SysId Dynamic " + direction);
   }
 }

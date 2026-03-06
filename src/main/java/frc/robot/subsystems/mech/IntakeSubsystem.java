@@ -205,7 +205,8 @@ public class IntakeSubsystem extends SubsystemBase {
             // this is the maximum voltage for the test
             Volts.of(4),
             // this is the duration of the test.
-            // Note we use `until` when we return the command to abort if we hit intake deployed or retracted positions
+            // Note we use `until` when we return the command to abort if we hit intake deployed or
+            // retracted positions
             Seconds.of(10),
             (state) -> Logger.recordOutput("Mech/Intake/SysIdState", state.toString()));
 

@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
@@ -564,59 +563,55 @@ public class RobotContainer {
         // controller_two.a().onTrue(RunMechWheels());
         // controller_two.b().onTrue(MechStop());
 
-        controller_two
-            .b()
-            .onTrue(
-                new ShootingCommand(
-                    shooterSubsystem,
-                    hoodSubsystem,
-                    turretSubsystem,
-                    hopperFloorSubsystem,
-                    robotPose,
-                    chassisSpeeds));
+        // controller_two
+        //     .b()
+        //     .onTrue(
+        //         new ShootingCommand(
+        //             shooterSubsystem,
+        //             hoodSubsystem,
+        //             turretSubsystem,
+        //             hopperFloorSubsystem,
+        //             robotPose,
+        //             chassisSpeeds));
 
-        controller_two
-            .a()
-            .onTrue(
-                new InstantCommand(
-                    () ->
-                        hopperFloorSubsystem.setDesiredHopperFloorVoltage(
-                            HopperFloorConstants.HOPPER_FLOOR_VOLTAGE)));
+        // controller_two
+        //     .a()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () ->
+        //                 hopperFloorSubsystem.setDesiredHopperFloorVoltage(
+        //                     HopperFloorConstants.HOPPER_FLOOR_VOLTAGE)));
+
+        // controller_two
+        //     .x()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () ->
+        //                 CommandScheduler.getInstance()
+        //                     .schedule(
+        //                         MechStop(
+        //                             turretSubsystem,
+        //                             shooterSubsystem,
+        //                             hopperFloorSubsystem,
+        //                             hoodSubsystem,
+        //                             intakeSubsystem))));
 
         controller_two
             .x()
-            .onTrue(
-                new InstantCommand(
-                    () ->
-                        CommandScheduler.getInstance()
-                            .schedule(
-                                MechStop(
-                                    turretSubsystem,
-                                    shooterSubsystem,
-                                    hopperFloorSubsystem,
-                                    hoodSubsystem,
-                                    intakeSubsystem))));
+            .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredFlywheelVelocity(90)));
 
-        controller_two
-            .rightBumper()
-            .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
+        // controller_two
+        //     .rightBumper()
+        //     .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
       }
     }
   }
 
   public void configureSysIdButtonBindings(CommandXboxController controller) {
-    controller
-        .leftTrigger()
-        .whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    controller
-        .rightTrigger()
-        .whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    controller
-        .leftBumper()
-        .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    controller
-        .rightBumper()
-        .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // controller.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    controller.y().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    controller.a().whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    controller.b().whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
   }
 
   public Command getAutonomousCommand() {
