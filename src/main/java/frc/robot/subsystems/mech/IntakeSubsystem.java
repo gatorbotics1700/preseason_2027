@@ -128,8 +128,9 @@ public class IntakeSubsystem extends SubsystemBase {
     } else if (angle.getDegrees() > IntakeConstants.EXTENDED_POSITION.getDegrees()) {
       desiredAngle = IntakeConstants.EXTENDED_POSITION;
     } else {
-      if(Math.abs(angle.getDegrees()-getCurrentAngle().getDegrees()) > IntakeConstants.POSITION_DEADBAND){
-      desiredAngle = angle;
+      if (Math.abs(angle.getDegrees() - getCurrentAngle().getDegrees())
+          > IntakeConstants.POSITION_DEADBAND) {
+        desiredAngle = angle;
       }
       desiredAngle = getCurrentAngle();
     }

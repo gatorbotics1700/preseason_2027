@@ -114,6 +114,7 @@ public class ShooterSubsystem extends SubsystemBase {
         };
   }
 
+  @Override
   public void periodic() {
     Logger.recordOutput("Mech/Shooter/Flywheel Velocity", getFlywheelVelocity());
     Logger.recordOutput("Mech/Shooter/Desired Flywheel Velocity", desiredFlywheelVelocity);
