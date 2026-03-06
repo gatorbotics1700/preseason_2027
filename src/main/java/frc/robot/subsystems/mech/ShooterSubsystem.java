@@ -36,6 +36,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Slot0Configs rightFlywheelSlot0Configs;
 
   private BooleanSupplier shouldShoot;
+  private boolean sysIdRunning = false;
 
   public static LoggedNetworkNumber flyWheelSlip =
       new LoggedNetworkNumber("/Tuning/flywheelSlip", 0.27);
@@ -124,9 +125,13 @@ public class ShooterSubsystem extends SubsystemBase {
         "Mech/Shooter/Kicker", (transitionMotor.getMotorVoltage().getValueAsDouble() != 0));
 
     Logger.recordOutput("Mech/Shooter/Should Be Shooting", shouldShoot);
+    Logger.recordOutput("Mech/Shooter/SysId Running", sysIdRunning);
 
-    leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
-    rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+    // Only control motors if SysID is not running
+    if (!sysIdRunning) {
+      leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+      rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+    }
 
     transitionMotor.setVoltage(desiredTransitionVoltage);
   }
@@ -230,12 +235,18 @@ public class ShooterSubsystem extends SubsystemBase {
     System.out.println("RUNNING SYSID QUASISTATIC");
     return sysIdRoutine()
         .quasistatic(direction)
+        .beforeStarting(() -> sysIdRunning = true)
+        .finallyDo(() -> sysIdRunning = false)
         .withName("Flywheel SysId Quasistatic " + direction);
   }
 
   // measure accelaration behavior
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     System.out.println("RUNNING SYSID DYNAMIC");
-    return sysIdRoutine().dynamic(direction).withName("Flywheel SysId Dynamic " + direction);
+    return sysIdRoutine()
+        .dynamic(direction)
+        .beforeStarting(() -> sysIdRunning = true)
+        .finallyDo(() -> sysIdRunning = false)
+        .withName("Flywheel SysId Dynamic " + direction);
   }
 }
