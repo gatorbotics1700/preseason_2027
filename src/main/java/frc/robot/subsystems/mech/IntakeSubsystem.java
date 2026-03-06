@@ -96,6 +96,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // setDesiredAngle(desiredAngle);
+
     Logger.recordOutput("Mech/Intake/Current Deploy Angle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Intake/Desired Deploy Angle", desiredAngle.getDegrees());
     Logger.recordOutput(
@@ -125,7 +128,10 @@ public class IntakeSubsystem extends SubsystemBase {
     } else if (angle.getDegrees() > IntakeConstants.EXTENDED_POSITION.getDegrees()) {
       desiredAngle = IntakeConstants.EXTENDED_POSITION;
     } else {
+      if(Math.abs(angle.getDegrees()-getCurrentAngle().getDegrees()) > IntakeConstants.POSITION_DEADBAND){
       desiredAngle = angle;
+      }
+      desiredAngle = getCurrentAngle();
     }
     deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
   }
@@ -170,11 +176,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void toggleIntake() {
     if (isDeployed.getAsBoolean()) {
+      desiredAngle = IntakeConstants.RETRACTED_POSITION;
       isDeployed =
           () -> {
             return false;
           };
     } else {
+      desiredAngle = IntakeConstants.EXTENDED_POSITION;
       isDeployed =
           () -> {
             return true;
@@ -203,7 +211,7 @@ public class IntakeSubsystem extends SubsystemBase {
             // this is the ramp rate for voltage during a test
             Volts.per(Second).of(2),
             // this is the maximum voltage for the test
-            Volts.of(4),
+            Volts.of(18),
             // this is the duration of the test.
             // Note we use `until` when we return the command to abort if we hit intake deployed or
             // retracted positions

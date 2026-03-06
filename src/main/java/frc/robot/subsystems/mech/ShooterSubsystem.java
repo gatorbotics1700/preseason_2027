@@ -202,11 +202,11 @@ public class ShooterSubsystem extends SubsystemBase {
             // this is the ramp rate for voltage during a test
             Volts.per(Second).of(2),
             // this is the maximum voltage for the test
-            Volts.of(4),
+            Volts.of(18),
             // this is the duration of the test.
             // Note we use `until` when we return the command to abort if we hit turret
             // limits
-            Seconds.of(10),
+            Seconds.of(15),
             (state) -> Logger.recordOutput("Mech/Right Shooter/SysIdState", state.toString()));
 
     // mechanism for our test. Sets the voltage and logs the motor output

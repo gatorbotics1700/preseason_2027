@@ -504,8 +504,7 @@ public class RobotContainer {
         //     .onTrue(
         //         new InstantCommand(
         //             () ->
-        //                 CommandScheduler.getInstance()
-        //                     .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
+        //               intakeSubsystem.toggleIntake()));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 
@@ -596,9 +595,9 @@ public class RobotContainer {
         //                             hoodSubsystem,
         //                             intakeSubsystem))));
 
-        controller_two
-            .x()
-            .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredFlywheelVelocity(90)));
+        // controller_two
+        //     .x()
+        //     .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredFlywheelVelocity(90)));
 
         // controller_two
         //     .rightBumper()
@@ -608,7 +607,7 @@ public class RobotContainer {
   }
 
   public void configureSysIdButtonBindings(CommandXboxController controller) {
-    // controller.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    controller.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     controller.y().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
     controller.a().whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     controller.b().whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));

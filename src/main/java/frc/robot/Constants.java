@@ -563,7 +563,7 @@ public final class Constants {
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
     public static final double INTAKING_VOLTAGE = 10;
 
-    public static final double POSITION_DEADBAND = 2;
+    public static final double POSITION_DEADBAND = 3;
 
     public static final double ROBOT_TO_INTAKE_YAW_DEGREES = 180;
   }
