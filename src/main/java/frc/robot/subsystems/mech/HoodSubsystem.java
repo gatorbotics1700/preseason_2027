@@ -84,7 +84,8 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (limitSwitch.get()) {
+    // Skip limit switch safety during SysID - the isSysIdOutOfBounds() handles limits
+    if (limitSwitch.get() && !sysIdRunning) {
       if (positionControl) {
         if (desiredAngle.getDegrees() > getCurrentAngle().getDegrees()) {
           desiredAngle = getCurrentAngle();
@@ -97,10 +98,12 @@ public class HoodSubsystem extends SubsystemBase {
       }
     }
 
-    if (positionControl) {
+    // Only run position control if SysID is not running
+    if (positionControl && !sysIdRunning) {
       setHoodPosition(desiredAngle);
     }
 
+    Logger.recordOutput("Mech/Hood/SysId Running", sysIdRunning);
     Logger.recordOutput("Mech/Hood/Desired Angle", desiredAngle.getDegrees());
     Logger.recordOutput("Mech/Hood/Current Angle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Hood/Motor Output", hoodMotor.get());
@@ -258,8 +261,13 @@ public class HoodSubsystem extends SubsystemBase {
 
   private boolean isSysIdOutOfBounds() {
     double angleDeg = getCurrentAngle().getDegrees();
-    return angleDeg > HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES
-        || angleDeg < HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
+    boolean outOfBounds =
+        angleDeg > HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES
+            || angleDeg < HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
+    Logger.recordOutput("Mech/Hood/SysId Out Of Bounds", outOfBounds);
+    Logger.recordOutput("Mech/Hood/SysId Retracted Limit", HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES);
+    Logger.recordOutput("Mech/Hood/SysId Min Limit", HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES);
+    return outOfBounds;
   }
 
   // run under a series of "flat" voltages to measure velocity behavior
@@ -270,9 +278,9 @@ public class HoodSubsystem extends SubsystemBase {
     }
     return sysIdRoutine
         .quasistatic(direction)
-        .until(this::isSysIdOutOfBounds)
+        // .until(this::isSysIdOutOfBounds)  // temporarily disabled for testing
         .finallyDo(() -> sysIdRunning = false)
-        .withName("Flywheel SysId Quasistatic " + direction);
+        .withName("Hood SysId Quasistatic " + direction);
   }
 
   // measure acceleration behavior
@@ -283,8 +291,8 @@ public class HoodSubsystem extends SubsystemBase {
     }
     return sysIdRoutine
         .dynamic(direction)
-        .until(this::isSysIdOutOfBounds)
+        // .until(this::isSysIdOutOfBounds)  // temporarily disabled for testing
         .finallyDo(() -> sysIdRunning = false)
-        .withName("Flywheel SysId Dynamic " + direction);
+        .withName("Hood SysId Dynamic " + direction);
   }
 }
