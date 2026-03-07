@@ -461,25 +461,25 @@ public class RobotContainer {
         // params.hoodAngle);
         // })));
 
-        // controller_two
-        //     .a()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> {
-        //               shooterSubsystem.toggleShouldShoot();
-        //               System.out.println("BUTTON AAAAAAAAA");
-        //             }));
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      shooterSubsystem.toggleShouldShoot();
+                      System.out.println("BUTTON AAAAAAAAA");
+                    }));
 
-        // controller_two
-        //     .x()
-        //     .onTrue(
-        //         new ShootingCommand(
-        //             shooterSubsystem,
-        //             hoodSubsystem,
-        //             turretSubsystem,
-        //             transitionSubsystem,
-        //             robotPose,
-        //             chassisSpeeds));
+        controller_two
+            .x()
+            .onTrue(
+                new ShootingCommand(
+                    shooterSubsystem,
+                    hoodSubsystem,
+                    turretSubsystem,
+                    transitionSubsystem,
+                    robotPose,
+                    chassisSpeeds));
       } else {
         // TODO INTAKE TESTING BUTTONS - uncomment for use
 
@@ -511,11 +511,23 @@ public class RobotContainer {
 
         // TODO TURRET TESTING BUTTONS - uncomment for use
 
-        controller_two.x().onTrue(new ClimbCommands.HomeClimber(climberSubsystem));
+        controller_two
+            .x()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(125)));
+                    }));
 
-        controller_two.y().onTrue(ClimbCommands.RetractClimber(climberSubsystem));
+        controller_two.y().onTrue(new TurretHomingCommand(turretSubsystem));
 
-        controller_two.a().onTrue(ClimbCommands.ExtendClimber(climberSubsystem));
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-200)));
+                    }));
 
         controller_two
             .b()
@@ -524,6 +536,13 @@ public class RobotContainer {
                     () -> {
                       turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)));
                     }));
+
+        // TODO CLIMBER TESTING BUTTONS - uncomment for use
+        // controller_two.x().onTrue(new ClimbCommands.HomeClimber(climberSubsystem));
+
+        // controller_two.y().onTrue(ClimbCommands.RetractClimber(climberSubsystem));
+
+        // controller_two.a().onTrue(ClimbCommands.ExtendClimber(climberSubsystem));
 
         // TODO HOOD TESTING BUTTONS - uncomment for use
 
