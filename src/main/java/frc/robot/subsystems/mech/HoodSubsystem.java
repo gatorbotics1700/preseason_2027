@@ -262,8 +262,8 @@ public class HoodSubsystem extends SubsystemBase {
   private boolean isSysIdOutOfBounds() {
     double angleDeg = getCurrentAngle().getDegrees();
     boolean outOfBounds =
-        angleDeg > HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES
-            || angleDeg < HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
+        angleDeg < HoodConstants.RETRACTED_POSITION.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES
+            || angleDeg > HoodConstants.MIN_ANGLE.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES;
     Logger.recordOutput("Mech/Hood/SysId Out Of Bounds", outOfBounds);
     Logger.recordOutput(
         "Mech/Hood/SysId Retracted Limit",
