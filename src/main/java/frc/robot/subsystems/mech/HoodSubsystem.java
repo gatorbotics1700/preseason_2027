@@ -1,15 +1,21 @@
 package frc.robot.subsystems.mech;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.util.RobotConfigLoader;
@@ -22,14 +28,21 @@ public class HoodSubsystem extends SubsystemBase {
   // when false, run voltage control
   private boolean positionControl = true;
 
-  private Rotation2d desiredAngle = HoodConstants.RETRACTED_POSITION;
+  private static final double SYSID_LIMIT_MARGIN_DEGREES = 2;
 
   private final TalonFX hoodMotor =
       new TalonFX(HoodConstants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
 
+  private boolean sysIdRunning = false;
+  private SysIdRoutine sysIdRoutine;
+  private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
+
+  private Rotation2d desiredAngle = getCurrentAngle(); // HoodConstants.RETRACTED_POSITION;
+
   public HoodSubsystem() {
+    hoodMotor.setNeutralMode(NeutralModeValue.Brake);
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
 
@@ -38,7 +51,7 @@ public class HoodSubsystem extends SubsystemBase {
           new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
     } else {
       talonFXConfigs.withMotorOutput(
-          new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+          new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
     }
 
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
@@ -71,7 +84,8 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (limitSwitch.get()) {
+    // Skip limit switch safety during SysID - the isSysIdOutOfBounds() handles limits
+    if (limitSwitch.get() && !sysIdRunning) {
       if (positionControl) {
         if (desiredAngle.getDegrees() > getCurrentAngle().getDegrees()) {
           desiredAngle = getCurrentAngle();
@@ -84,10 +98,12 @@ public class HoodSubsystem extends SubsystemBase {
       }
     }
 
-    if (positionControl) {
+    // Only run position control if SysID is not running
+    if (positionControl && !sysIdRunning) {
       setHoodPosition(desiredAngle);
     }
 
+    Logger.recordOutput("Mech/Hood/SysId Running", sysIdRunning);
     Logger.recordOutput("Mech/Hood/Desired Angle", desiredAngle.getDegrees());
     Logger.recordOutput("Mech/Hood/Current Angle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Hood/Motor Output", hoodMotor.get());
@@ -146,5 +162,150 @@ public class HoodSubsystem extends SubsystemBase {
 
   public void zeroHood() {
     hoodMotor.setPosition(degreesToRevs(HoodConstants.RETRACTED_POSITION.getDegrees()));
+  }
+
+  private double getVelocityRadPerSec() {
+    double motorRPS = hoodMotor.getVelocity().getValueAsDouble();
+    return motorRPS
+        / HoodConstants.HOOD_GEAR_RATIO
+        / HoodConstants.HOOD_SHAFT_REVS_PER_MECH_REV
+        * 2
+        * Math.PI;
+  }
+
+  // private SysIdRoutine sysIdRoutine() {
+  //   // config for our test. Sets voltage ramps, limits, and a logging callback
+  //   SysIdRoutine.Config config =
+  //       new SysIdRoutine.Config(
+  //           // this is the ramp rate for voltage during a test
+  //           Volts.per(Second).of(2),
+  //           // this is the maximum voltage for the test
+  //           Volts.of(8),
+  //           // this is the duration of the test.
+  //           // Note we use `until` when we return the command to abort if we hit hood min
+  // position
+  //           Seconds.of(100),
+  //           (state) -> Logger.recordOutput("Mech/Hood/SysIdState", state.toString()));
+
+  //   // mechanism for our test. Sets the voltage and logs the motor output
+  //   SysIdRoutine.Mechanism mechanism =
+  //       new SysIdRoutine.Mechanism(
+  //           (voltage) -> hoodMotor.setVoltage(voltage.in(Volts)),
+  //           (log) ->
+  //               log.motor("hood")
+  //                   .voltage(Volts.of(hoodMotor.getMotorVoltage().getValueAsDouble()))
+  //                   .angularPosition(Radians.of(getCurrentAngle().getRadians()))
+  //                   .angularVelocity(RadiansPerSecond.of(getVelocityRadPerSec())),
+  //           // the subsystem to test (which is us)
+  //           this,
+  //           // name for the task
+  //           "hood");
+  //   System.out.println("CREATING NEW SYSID ROUTINE");
+  //   return new SysIdRoutine(config, mechanism);
+  // }
+
+  // private boolean isSysIdOutOfBounds() {
+  //   double angleDeg = getCurrentAngle().getDegrees();
+  //   return angleDeg <= HoodConstants.RETRACTED_POSITION.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES
+  //       || angleDeg >= HoodConstants.MIN_ANGLE.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES;
+  // }
+
+  // // run under a series of "flat" voltages to measure velocity behavior
+  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+  //   System.out.println("RUNNING SYSID QUASISTATIC");
+  //   return sysIdRoutine()
+  //       .quasistatic(direction)
+  //       .until(this::isSysIdOutOfBounds)
+  //       .withName("Hood SysId Quasistatic " + direction);
+  // }
+
+  // // measure accelaration behavior
+  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+  //   System.out.println("RUNNING SYSID DYNAMIC");
+  //   return sysIdRoutine()
+  //       .dynamic(direction)
+  //       .until(this::isSysIdOutOfBounds)
+  //       .withName("Hood SysId Dynamic " + direction);
+  // }
+
+  private void initSysIdRoutine() {
+    // config for our test. Sets voltage ramps, limits, and a logging callback
+    SysIdRoutine.Config config =
+        new SysIdRoutine.Config(
+            // this is the ramp rate for voltage during a test
+            Volts.per(Second).of(1),
+            // this is the maximum voltage for the test
+            Volts.of(4),
+            // this is the duration of the test.
+            Seconds.of(1.5),
+            (state) -> Logger.recordOutput("Mech/Hood/SysIdState", state.toString()));
+
+    // mechanism for our test. Sets the voltage and logs the motor output
+    SysIdRoutine.Mechanism mechanism =
+        new SysIdRoutine.Mechanism(
+            (voltage) -> {
+              sysIdRunning = true;
+              hoodMotor.setControl(sysIdVoltageRequest.withOutput(voltage.in(Volts)));
+            },
+            (log) ->
+                log.motor("hood")
+                    .voltage(Volts.of(hoodMotor.getMotorVoltage().getValueAsDouble()))
+                    .angularVelocity(RadiansPerSecond.of(getVelocityRadPerSec())),
+            // the subsystem to test (which is us)
+            this,
+            // name for the task
+            "hood");
+    System.out.println("CREATING NEW SYSID ROUTINE");
+    sysIdRoutine = new SysIdRoutine(config, mechanism);
+  }
+
+  private boolean isSysIdOutOfBounds() {
+    double angleDeg = getCurrentAngle().getDegrees();
+    Logger.recordOutput("Mech/Hood/SysID Current Angle", angleDeg);
+    boolean outOfBounds =
+        angleDeg > HoodConstants.RETRACTED_POSITION.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES
+            || angleDeg < HoodConstants.MIN_ANGLE.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES;
+    Logger.recordOutput("Mech/Hood/SysId Out Of Bounds", outOfBounds);
+    Logger.recordOutput(
+        "Mech/Hood/SysId Retracted Limit",
+        HoodConstants.RETRACTED_POSITION.getDegrees() + SYSID_LIMIT_MARGIN_DEGREES);
+    Logger.recordOutput(
+        "Mech/Hood/SysId Min Limit",
+        HoodConstants.MIN_ANGLE.getDegrees() - SYSID_LIMIT_MARGIN_DEGREES);
+    return outOfBounds;
+  }
+
+  // run under a series of "flat" voltages to measure velocity behavior
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID QUASISTATIC");
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
+        .quasistatic(direction)
+        .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
+        .finallyDo(
+            () -> {
+              setHoodVoltage(0);
+              sysIdRunning = false;
+            })
+        .withName("Hood SysId Quasistatic " + direction);
+  }
+
+  // measure acceleration behavior
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID DYNAMIC");
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
+        .dynamic(direction)
+        .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
+        .finallyDo(
+            () -> {
+              setHoodVoltage(0);
+              sysIdRunning = false;
+            })
+        .withName("Hood SysId Dynamic " + direction);
   }
 }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.mech;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -9,7 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
@@ -24,6 +28,8 @@ public class ClimberSubsystem extends SubsystemBase {
   private static MotionMagicExpoVoltage m_request;
 
   private double desiredPositionInches;
+
+  private static final double SYSID_LIMIT_MARGIN_INCHES = 1;
 
   public ClimberSubsystem() {
     hallEffect = new DigitalInput(ClimberConstants.CLIMBER_HALL_EFFECT_PORT);
@@ -120,5 +126,66 @@ public class ClimberSubsystem extends SubsystemBase {
   public void setClimberVoltage(double voltage) {
     positionControl = false;
     motor.setVoltage(voltage); // TODO figure out if this actually works?
+  }
+
+  private double getVelocityInchesPerSec() {
+    double motorRPS = motor.getVelocity().getValueAsDouble();
+    return motorRPS / ClimberConstants.CLIMBER_GEAR_RATIO * ClimberConstants.WINCH_INCHES_PER_REV;
+  }
+
+  private SysIdRoutine sysIdRoutine() {
+    // config for our test. Sets voltage ramps, limits, and a logging callback
+    SysIdRoutine.Config config =
+        new SysIdRoutine.Config(
+            // this is the ramp rate for voltage during a test
+            Volts.per(Second).of(2),
+            // this is the maximum voltage for the test
+            Volts.of(4),
+            // this is the duration of the test.
+            // Note we use `until` when we return the command to abort if we hit turret
+            // limits
+            Seconds.of(10),
+            (state) -> Logger.recordOutput("Mech/Climber/SysIdState", state.toString()));
+
+    // mechanism for our test. Sets the voltage and logs the motor output
+    SysIdRoutine.Mechanism mechanism =
+        new SysIdRoutine.Mechanism(
+            (voltage) -> motor.setVoltage(voltage.in(Volts)),
+            (log) ->
+                log.motor("climber")
+                    .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
+                    .linearPosition(
+                        Meters.of(
+                            getCurrentPositionInches())) // TODO the linear position and linear
+                    // velocity return in units with metters,
+                    // check if the Meters.of part does
+                    // conversion
+                    .linearVelocity(MetersPerSecond.of(getVelocityInchesPerSec())),
+            // the subsystem to test (which is us)
+            this,
+            // name for the task
+            "climber");
+    return new SysIdRoutine(config, mechanism);
+  }
+
+  private boolean isSysIdOutOfBounds() {
+    double angleDeg = getCurrentPositionInches();
+    return angleDeg >= ClimberConstants.MAX_EXTENSION_INCHES - SYSID_LIMIT_MARGIN_INCHES;
+  }
+
+  // run under a series of "flat" voltages to measure velocity behavior
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine()
+        .quasistatic(direction)
+        .until(this::isSysIdOutOfBounds)
+        .withName("Climber SysId Quasistatic " + direction);
+  }
+
+  // measure accelaration behavior
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine()
+        .dynamic(direction)
+        .until(this::isSysIdOutOfBounds)
+        .withName("Climber SysId Dynamic " + direction);
   }
 }

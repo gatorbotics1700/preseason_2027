@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.FieldCoordinates;
-import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
@@ -104,8 +103,8 @@ public class ShootingCommand extends Command {
         System.out.println("VALID SHOT VALID SHOT");
         shooterSubsystem.setDesiredFlywheelVelocity(
             desiredFlywheelSpeed); // set velocity to our desired velocity
-        hopperFloorSubsystem.setDesiredHopperFloorVelocity(
-            HopperFloorConstants.HOPPER_FLOOR_VELOCITY);
+        // hopperFloorSubsystem.setDesiredHopperFloorVoltage(
+        // HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
         if (Math.abs(shooterSubsystem.getFlywheelVelocity() - desiredFlywheelSpeed)
             < ShooterConstants
                 .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
@@ -115,7 +114,7 @@ public class ShootingCommand extends Command {
         }
       } else { // if we dont have a valid shot
         // System.out.println("INVALID SHOT INVALID SHOT");
-        hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
+        hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
         shooterSubsystem.setDesiredTransitionVoltage(0);
       }
       hoodSubsystem.setDesiredAngle(params.hoodAngle);
@@ -124,7 +123,7 @@ public class ShootingCommand extends Command {
       System.out.println("WE DONT WANT TO SHOOT");
       shooterSubsystem.setDesiredFlywheelVelocity(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
-      hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
+      hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
     }
 
     // TODO add drivetrain angle things here instead of the turret angle for testing on sting
@@ -139,7 +138,7 @@ public class ShootingCommand extends Command {
   // these things in end instead of isFinished
   @Override
   public void end(boolean interrupted) {
-    hopperFloorSubsystem.setDesiredHopperFloorVelocity(0);
+    hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
     shooterSubsystem.setDesiredTransitionVoltage(0);
   }
 }

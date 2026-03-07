@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class HopperFloorSubsystem extends SubsystemBase {
   private final TalonFX hopperMotor;
-  private double desiredHopperVelocity;
+  private double desiredHopperVoltage;
   private static TalonFXConfiguration talonFXConfigs;
   private static Slot0Configs slot0Configs;
   private static MotionMagicVelocityVoltage m_velocity;
@@ -24,7 +24,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
 
     // TALONFX CONFIGS & MOTION MAGIC VELOCITY VOLTAGE CONTROL // TODO check if this works with
     // motionMagicVelocityVoltage - may want to delete some values
-    desiredHopperVelocity = 0.0;
+    desiredHopperVoltage = 0.0;
     m_velocity = new MotionMagicVelocityVoltage(0);
     talonFXConfigs = new TalonFXConfiguration();
 
@@ -55,12 +55,12 @@ public class HopperFloorSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    Logger.recordOutput("Mech/Hopper Floor/Desired Velocity", desiredHopperVelocity);
+    Logger.recordOutput("Mech/Hopper Floor/Desired Velocity", desiredHopperVoltage);
     Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
-    hopperMotor.setControl(m_velocity.withVelocity(desiredHopperVelocity));
+    hopperMotor.setVoltage(desiredHopperVoltage);
   }
 
-  public void setDesiredHopperFloorVelocity(double hopperVelocity) {
-    this.desiredHopperVelocity = hopperVelocity;
+  public void setDesiredHopperFloorVoltage(double hopperVoltage) {
+    this.desiredHopperVoltage = hopperVoltage;
   }
 }

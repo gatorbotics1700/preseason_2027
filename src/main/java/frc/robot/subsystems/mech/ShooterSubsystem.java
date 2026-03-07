@@ -1,13 +1,18 @@
 package frc.robot.subsystems.mech;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import java.util.function.BooleanSupplier;
@@ -26,14 +31,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private static TalonFXConfiguration leftFlywheelTalonFXConfigs;
   private static TalonFXConfiguration rightFlywheelTalonFXConfigs;
+  private static TalonFXConfiguration transitionMotorConfigs;
 
   private static Slot0Configs leftFlywheelSlot0Configs;
   private static Slot0Configs rightFlywheelSlot0Configs;
 
   private BooleanSupplier shouldShoot;
+  private boolean sysIdRunning = false;
+  private SysIdRoutine sysIdRoutine;
+  private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
 
   public static LoggedNetworkNumber flyWheelSlip =
-      new LoggedNetworkNumber("/Tuning/flywheelSlip", 1);
+      new LoggedNetworkNumber("/Tuning/flywheelSlip", 0.27);
 
   public ShooterSubsystem() {
     leftFlywheelMotor =
@@ -91,8 +100,14 @@ public class ShooterSubsystem extends SubsystemBase {
         400; // Target acceleration of 400 rps/s (0.25 seconds to max)
     rightMotionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0/1 seconds)
 
+    transitionMotorConfigs = new TalonFXConfiguration();
+
+    transitionMotorConfigs.withMotorOutput(
+        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+
     leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
     rightFlywheelMotor.getConfigurator().apply(rightFlywheelTalonFXConfigs);
+    transitionMotor.getConfigurator().apply(transitionMotorConfigs);
 
     m_request = new MotionMagicVelocityVoltage(0);
 
@@ -102,6 +117,7 @@ public class ShooterSubsystem extends SubsystemBase {
         };
   }
 
+  @Override
   public void periodic() {
     Logger.recordOutput("Mech/Shooter/Flywheel Velocity", getFlywheelVelocity());
     Logger.recordOutput("Mech/Shooter/Desired Flywheel Velocity", desiredFlywheelVelocity);
@@ -113,9 +129,13 @@ public class ShooterSubsystem extends SubsystemBase {
         "Mech/Shooter/Kicker", (transitionMotor.getMotorVoltage().getValueAsDouble() != 0));
 
     Logger.recordOutput("Mech/Shooter/Should Be Shooting", shouldShoot);
+    Logger.recordOutput("Mech/Shooter/SysId Running", sysIdRunning);
 
-    leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
-    rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+    // Only control motors if SysID is not running
+    if (!sysIdRunning) {
+      leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+      rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+    }
 
     transitionMotor.setVoltage(desiredTransitionVoltage);
   }
@@ -177,5 +197,65 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Returns the desired angle, or null if no angle is set. */
   public BooleanSupplier getShouldShoot() {
     return shouldShoot;
+  }
+
+  private double getVelocityRadPerSec() {
+    double motorRPS = getFlywheelVelocity();
+    return motorRPS / ShooterConstants.FLYWHEEL_GEAR_RATIO * 2 * Math.PI;
+  }
+
+  private void initSysIdRoutine() {
+    // config for our test. Sets voltage ramps, limits, and a logging callback
+    SysIdRoutine.Config config =
+        new SysIdRoutine.Config(
+            // this is the ramp rate for voltage during a test
+            Volts.per(Second).of(1),
+            // this is the maximum voltage for the test
+            Volts.of(10),
+            // this is the duration of the test.
+            Seconds.of(10),
+            (state) -> Logger.recordOutput("Mech/Right Shooter/SysIdState", state.toString()));
+
+    // mechanism for our test. Sets the voltage and logs the motor output
+    SysIdRoutine.Mechanism mechanism =
+        new SysIdRoutine.Mechanism(
+            (voltage) -> {
+              sysIdRunning = true;
+              rightFlywheelMotor.setControl(sysIdVoltageRequest.withOutput(voltage.in(Volts)));
+            },
+            (log) ->
+                log.motor("right shooter")
+                    .voltage(Volts.of(rightFlywheelMotor.getMotorVoltage().getValueAsDouble()))
+                    .angularVelocity(RadiansPerSecond.of(getVelocityRadPerSec())),
+            // the subsystem to test (which is us)
+            this,
+            // name for the task
+            "right shooter");
+    System.out.println("CREATING NEW SYSID ROUTINE");
+    sysIdRoutine = new SysIdRoutine(config, mechanism);
+  }
+
+  // run under a series of "flat" voltages to measure velocity behavior
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID QUASISTATIC");
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
+        .quasistatic(direction)
+        .finallyDo(() -> sysIdRunning = false)
+        .withName("Flywheel SysId Quasistatic " + direction);
+  }
+
+  // measure acceleration behavior
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    System.out.println("RUNNING SYSID DYNAMIC");
+    if (sysIdRoutine == null) {
+      initSysIdRoutine();
+    }
+    return sysIdRoutine
+        .dynamic(direction)
+        .finallyDo(() -> sysIdRunning = false)
+        .withName("Flywheel SysId Dynamic " + direction);
   }
 }

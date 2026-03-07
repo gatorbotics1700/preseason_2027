@@ -197,7 +197,17 @@ public class Robot extends LoggedRobot {
     // robotContainer.getShooterSubsystem().setDesiredFlywheelVelocity(0);
     // robotContainer.getShooterSubsystem().setDesiredTransitionVoltage(0);
     // robotContainer.getIntakeSubsystem().setIntakeVoltage(0);
-    robotContainer.MechStop();
+    CommandScheduler.getInstance()
+        .schedule(
+            robotContainer.MechStop(
+                robotContainer.getTurretSubsystem(),
+                robotContainer.getShooterSubsystem(),
+                robotContainer.getHopperFloorSubsystem(),
+                robotContainer.getHoodSubsystem(),
+                robotContainer.getIntakeSubsystem()));
+    // CommandScheduler.getInstance()
+    //     .schedule(
+    //         robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps
     Elastic.selectTab("Teleoperated");
 
     // This makes sure that the autonomous stops running when teleop starts
@@ -220,6 +230,8 @@ public class Robot extends LoggedRobot {
     // robotContainer.configureDriverButtonBindings();
     // robotContainer.configureCodriverButtonBindings();
     robotContainer.configureSysIdButtons();
+    // robotContainer.getHoodSubsystem().zeroHood();
+
   }
 
   /** This function is called periodically during test mode. */
