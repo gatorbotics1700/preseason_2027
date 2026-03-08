@@ -12,7 +12,6 @@ import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommand;
-import frc.robot.commands.mech.TurretHomingCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
@@ -95,19 +94,6 @@ public class DynamicAutoBuilder {
                 chassisSpeeds));
   }
 
-  /**
-   * Creates homing command for turret and hood at auto start. Skips in sim since sensors don't
-   * work.
-   */
-
-  // just call HomeMechanisms
-  private Command createHomingCommand() {
-    if (RobotBase.isSimulation()) {
-      System.out.println("  Skipping homing commands in simulation");
-      return Commands.none();
-    }
-    return new TurretHomingCommand(turretSubsystem).alongWith(HoodCommands.HomeHood(hoodSubsystem));
-  }
 
   private Command getActionForDestination(String destination) {
     if (destination == null || destination.equals("None")) {
@@ -224,23 +210,19 @@ public class DynamicAutoBuilder {
       }
     }
 
-    // Start with homing command (turret and hood) - skipped in sim
-    commandSequence.add(createHomingCommand());
-
-    // Deploy intake once at start (skip mech in sim)
-    if (RobotBase.isReal()) {
-      commandSequence.add(IntakeCommands.DeployIntake(intakeSubsystem));
-    }
-
+    // Note: Homing is handled by Robot.java calling HomeMechanisms() before auto starts
     // Run all paths with intake and shooting running continuously
-    // Intake runs all the time, shooting only fires when in alliance zone
     if (!pathSequence.isEmpty()) {
       Command allPaths = Commands.sequence(pathSequence.toArray(new Command[0]));
       if (RobotBase.isReal()) {
-        Command intakeAndShooting =
-            IntakeCommands.RunIntake(intakeSubsystem).alongWith(createShootingWithZoneCheck());
+        // Deploy intake once at start, then run intake and shooting in parallel with paths
+        // Deploy runs alongside paths (doesn't block), intake/shooting run throughout
+        Command deployAndIntake =
+            IntakeCommands.DeployIntake(intakeSubsystem)
+                .alongWith(IntakeCommands.RunIntake(intakeSubsystem))
+                .alongWith(createShootingWithZoneCheck());
         // Paths are the deadline - when paths finish, intake/shooting stop (until climb or end)
-        commandSequence.add(allPaths.deadlineFor(intakeAndShooting));
+        commandSequence.add(allPaths.deadlineFor(deployAndIntake));
       } else {
         // In sim, just run the paths without mech
         commandSequence.add(allPaths);
