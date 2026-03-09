@@ -18,6 +18,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.TunerConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -40,6 +41,14 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   private static MotionMagicExpoVoltage m_request;
+
+  // Tunable PID gains for intake deploy
+  public static final LoggedNetworkNumber intakeKp =
+      new LoggedNetworkNumber("/Tuning/Intake/kP", 1.0);
+  public static final LoggedNetworkNumber intakeKi =
+      new LoggedNetworkNumber("/Tuning/Intake/kI", 0.0);
+  public static final LoggedNetworkNumber intakeKd =
+      new LoggedNetworkNumber("/Tuning/Intake/kD", 0.1);
 
   private Rotation2d desiredAngle = new Rotation2d();
   private boolean useDeployPositionControl = false;
@@ -81,9 +90,10 @@ public class IntakeSubsystem extends SubsystemBase {
     // and 0.2)
     slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 1; // A position error of 2.5 rotations results in 12V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    slot0Configs.kP = intakeKp.get(); // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kI = intakeKi.get(); // no output for integrated error
+    slot0Configs.kD = intakeKd.get(); // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = deployTalonFXConfigs.MotionMagic;
@@ -107,6 +117,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Update PID gains from NetworkTables if they've changed, and reapply configs
+    Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
+    double newKp = intakeKp.get();
+    double newKi = intakeKi.get();
+    double newKd = intakeKd.get();
+    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+      slot0Configs.kP = newKp;
+      slot0Configs.kI = newKi;
+      slot0Configs.kD = newKd;
+      deployMotor.getConfigurator().apply(deployTalonFXConfigs);
+    }
 
     if (!sysIdRunning && useDeployPositionControl) {
       double errorDeg = Math.abs(getCurrentAngle().getDegrees() - desiredAngle.getDegrees());

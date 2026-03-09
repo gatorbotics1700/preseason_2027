@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ClimberSubsystem extends SubsystemBase {
   private boolean positionControl = true; // if false use voltage control
@@ -31,6 +32,14 @@ public class ClimberSubsystem extends SubsystemBase {
   private double desiredPositionInches;
   private static boolean settingPosition;
   private boolean sysIdRunning = false;
+
+  // Tunable PID gains for climber
+  public static final LoggedNetworkNumber climberKp =
+      new LoggedNetworkNumber("/Tuning/Climber/kP", 4.8);
+  public static final LoggedNetworkNumber climberKi =
+      new LoggedNetworkNumber("/Tuning/Climber/kI", 0.0);
+  public static final LoggedNetworkNumber climberKd =
+      new LoggedNetworkNumber("/Tuning/Climber/kD", 0.1);
 
   private static final double SYSID_LIMIT_MARGIN_INCHES = 1;
 
@@ -55,16 +64,17 @@ public class ClimberSubsystem extends SubsystemBase {
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
     slot0Configs.kG =
-        0.2128; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
+        0.0; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
     slot0Configs.kS =
-        0.25; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
+        0.0; // Add 0.01 V output to overcome static friction (just a guesstimate, but this might
     // just be 0
-    slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0Configs.kV = 0.0; // A velocity target of 1 rps results in 0.12 V output
+    slot0Configs.kA = 0.0; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    slot0Configs.kP = climberKp.get(); // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kI = climberKi.get(); // no output for integrated error
+    slot0Configs.kD = climberKd.get(); // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
@@ -79,6 +89,18 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
+    // Update PID gains from NetworkTables if they've changed, and reapply configs
+    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
+    double newKp = climberKp.get();
+    double newKi = climberKi.get();
+    double newKd = climberKd.get();
+    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+      slot0Configs.kP = newKp;
+      slot0Configs.kI = newKi;
+      slot0Configs.kD = newKd;
+      motor.getConfigurator().apply(talonFXConfigs);
+    }
+
     Logger.recordOutput("Mech/Climber/desiredPositionInches", desiredPositionInches);
     Logger.recordOutput("Mech/Climber/currentPositionInches", getCurrentPositionInches());
     Logger.recordOutput("Mech/Climber/Motor Output", motor.get());

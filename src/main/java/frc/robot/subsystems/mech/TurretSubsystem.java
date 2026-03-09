@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.TurretConstants;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class TurretSubsystem extends SubsystemBase {
   private final TalonFX turretMotor;
@@ -48,6 +49,14 @@ public class TurretSubsystem extends SubsystemBase {
 
   private Rotation2d desiredAngle;
 
+  // Tunable PID gains for turret
+  public static final LoggedNetworkNumber turretKp =
+      new LoggedNetworkNumber("/Tuning/Turret/kP", 2.0);
+  public static final LoggedNetworkNumber turretKi =
+      new LoggedNetworkNumber("/Tuning/Turret/kI", 0.0);
+  public static final LoggedNetworkNumber turretKd =
+      new LoggedNetworkNumber("/Tuning/Turret/kD", 0.1);
+
   public TurretSubsystem() {
     turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     turretMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -70,9 +79,10 @@ public class TurretSubsystem extends SubsystemBase {
     slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 2; // A position error of 2.5 rotations results in 12V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    slot0Configs.kP = turretKp.get(); // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kI = turretKi.get(); // no output for integrated error
+    slot0Configs.kD = turretKd.get(); // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
@@ -88,6 +98,18 @@ public class TurretSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Update PID gains from NetworkTables if they've changed, and reapply configs
+    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
+    double newKp = turretKp.get();
+    double newKi = turretKi.get();
+    double newKd = turretKd.get();
+    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+      slot0Configs.kP = newKp;
+      slot0Configs.kI = newKi;
+      slot0Configs.kD = newKd;
+      turretMotor.getConfigurator().apply(talonFXConfigs);
+    }
+
     if (!sysIdRunning) {
       turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     }

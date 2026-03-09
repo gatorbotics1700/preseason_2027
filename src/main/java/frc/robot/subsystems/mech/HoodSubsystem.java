@@ -20,6 +20,7 @@ import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class HoodSubsystem extends SubsystemBase {
 
@@ -40,6 +41,14 @@ public class HoodSubsystem extends SubsystemBase {
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
 
   private Rotation2d desiredAngle = getCurrentAngle(); // HoodConstants.RETRACTED_POSITION;
+
+  // Tunable PID gains for hood control
+  public static final LoggedNetworkNumber hoodKp =
+      new LoggedNetworkNumber("/Tuning/Hood/kP", 4.8);
+  public static final LoggedNetworkNumber hoodKi =
+      new LoggedNetworkNumber("/Tuning/Hood/kI", 0.0);
+  public static final LoggedNetworkNumber hoodKd =
+      new LoggedNetworkNumber("/Tuning/Hood/kD", 0.1);
 
   public HoodSubsystem() {
     hoodMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -64,9 +73,10 @@ public class HoodSubsystem extends SubsystemBase {
     slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
 
-    slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // a velocity error of 1 rps results in 0.1 V output
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    slot0Configs.kP = hoodKp.get(); // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kI = hoodKi.get(); // no output for integrated error
+    slot0Configs.kD = hoodKd.get(); // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
@@ -84,6 +94,18 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Update PID gains from NetworkTables if they've changed, and reapply configs
+    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
+    double newKp = hoodKp.get();
+    double newKi = hoodKi.get();
+    double newKd = hoodKd.get();
+    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+      slot0Configs.kP = newKp;
+      slot0Configs.kI = newKi;
+      slot0Configs.kD = newKd;
+      hoodMotor.getConfigurator().apply(talonFXConfigs);
+    }
+
     // Skip limit switch safety during SysID - the isSysIdOutOfBounds() handles limits
     if (limitSwitch.get() && !sysIdRunning) {
       if (positionControl) {

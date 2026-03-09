@@ -42,7 +42,16 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
 
   public static LoggedNetworkNumber flyWheelSlip =
-      new LoggedNetworkNumber("/Tuning/flywheelSlip", 0.27);
+      new LoggedNetworkNumber("/Tuning/Shooter/flywheelSlip", 0.27);
+
+  // Tunable PID gains for left and right flywheels (NetworkTables-backed)
+
+  public static final LoggedNetworkNumber flywheelKP =
+      new LoggedNetworkNumber("/Tuning/Shooter/Flywheel kP", 0.0);
+  public static final LoggedNetworkNumber flywheelKI =
+      new LoggedNetworkNumber("/Tuning/Shooter/Flywheel kI", 0.0);
+  public static final LoggedNetworkNumber flywheelKD =
+      new LoggedNetworkNumber("/Tuning/Shooter/Flywheel kD", 0.0);
 
   public ShooterSubsystem() {
     leftFlywheelMotor =
@@ -66,10 +75,10 @@ public class ShooterSubsystem extends SubsystemBase {
     leftFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
     leftFlywheelSlot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
     leftFlywheelSlot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-
-    leftFlywheelSlot0Configs.kP = 0.11; // A position error of 1 rps results in 0.11 V output
-    leftFlywheelSlot0Configs.kI = 0; // no output for integrated error
-    leftFlywheelSlot0Configs.kD = 0; // no output for error derivative
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    leftFlywheelSlot0Configs.kP = flywheelKP.get();
+    leftFlywheelSlot0Configs.kI = flywheelKI.get();
+    leftFlywheelSlot0Configs.kD = flywheelKD.get();
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs leftMotionMagicConfigs = leftFlywheelTalonFXConfigs.MotionMagic;
@@ -88,10 +97,10 @@ public class ShooterSubsystem extends SubsystemBase {
     rightFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
     rightFlywheelSlot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
     rightFlywheelSlot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-
-    rightFlywheelSlot0Configs.kP = 0.11; // A position error of 1 rps results in 0.11 V output
-    rightFlywheelSlot0Configs.kI = 0; // no output for integrated error
-    rightFlywheelSlot0Configs.kD = 0; // no output for error derivative
+    // Initial PID gains come from tunable LoggedNetworkNumbers
+    rightFlywheelSlot0Configs.kP = flywheelKP.get();
+    rightFlywheelSlot0Configs.kI = flywheelKI.get();
+    rightFlywheelSlot0Configs.kD = flywheelKD.get();
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs rightMotionMagicConfigs = rightFlywheelTalonFXConfigs.MotionMagic;
@@ -119,6 +128,24 @@ public class ShooterSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Update PID gains from NetworkTables if they've changed, and reapply configs
+    double newFlywheelKP = flywheelKP.get();
+    double newFlywheelKI = flywheelKI.get();
+    double newFlywheelKD = flywheelKD.get();
+    if (newFlywheelKP != leftFlywheelSlot0Configs.kP
+        || newFlywheelKI != leftFlywheelSlot0Configs.kI
+        || newFlywheelKD != leftFlywheelSlot0Configs.kD) {
+      leftFlywheelSlot0Configs.kP = newFlywheelKP;
+      leftFlywheelSlot0Configs.kI = newFlywheelKI;
+      leftFlywheelSlot0Configs.kD = newFlywheelKD;
+      leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
+
+      rightFlywheelSlot0Configs.kP = newFlywheelKP;
+      rightFlywheelSlot0Configs.kI = newFlywheelKI;
+      rightFlywheelSlot0Configs.kD = newFlywheelKD;
+      rightFlywheelMotor.getConfigurator().apply(rightFlywheelTalonFXConfigs);
+    }
+
     Logger.recordOutput("Mech/Shooter/Flywheel Velocity", getFlywheelVelocity());
     Logger.recordOutput("Mech/Shooter/Desired Flywheel Velocity", desiredFlywheelVelocity);
 

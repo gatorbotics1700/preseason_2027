@@ -20,7 +20,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
   private static Slot0Configs slot0Configs;
   private static MotionMagicVelocityVoltage m_velocity;
   public static LoggedNetworkNumber hopperVoltage =
-      new LoggedNetworkNumber("/Tuning/hopperVoltage", 2);
+      new LoggedNetworkNumber("/Tuning/hopperVoltage", 8);
 
   public HopperFloorSubsystem() {
     hopperMotor = new TalonFX(HopperFloorConstants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
