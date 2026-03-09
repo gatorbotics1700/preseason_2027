@@ -33,7 +33,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
 
     talonFXConfigs.withMotorOutput(
         new MotorOutputConfigs()
-            .withInverted(InvertedValue.Clockwise_Positive)); // TODO check invert
+            .withInverted(InvertedValue.Clockwise_Positive));
 
     slot0Configs = talonFXConfigs.Slot0;
 

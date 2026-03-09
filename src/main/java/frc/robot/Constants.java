@@ -489,17 +489,14 @@ public final class Constants {
     public static final double BLIND_SPOT_DEADBAND = 0.5; // TODO change
     public static final double MAX_IDLE_MILLISECONDS =
         2000; // TODO change based off real world maybe?
-
     public static final double ROTATING_SPEED_RADIANS_PER_SECOND =
         2.5; // TODO change based off real life
   }
 
   public static final class ClimberConstants {
     public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_HALL_EFFECT_PORT =
-        7; // TODO is this a limit switch or hall effect
+    public static final int CLIMBER_HALL_EFFECT_PORT = 7;
     public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
-
     public static final int CLIMBER_GEAR_RATIO = 25; // TODO get a real number
     public static final double WINCH_INCHES_PER_REV = (0.75) * Math.PI; // diameter in inches * pi
     // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
@@ -547,18 +544,17 @@ public final class Constants {
     public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 10;
     public static final int INTAKE_HALL_EFFECT_PORT = 0;
 
-    public static final int DEPLOY_GEARBOX_RATIO = 5; // TODO find the real value
+    public static final int DEPLOY_GEARBOX_RATIO = 5;
     public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
     public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-    public static final double EXTENDED_ANGLE_DEGREES =
-        96; // 80; // TODO figure out if this is from vertical or from retracted position?
-    public static final double RETRACTED_ANGLE_DEGREES = 0; // TODO measure?
+    public static final double EXTENDED_ANGLE_DEGREES = 96;
+    public static final double RETRACTED_ANGLE_DEGREES = 0;
 
     public static final Rotation2d EXTENDED_POSITION =
-        new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES)); // TODO: change
+        new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES));
     public static final Rotation2d RETRACTED_POSITION =
-        new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES)); // TODO: change
+        new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES));
 
     public static final double HOMING_VOLTAGE = -1; // TODO tune
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
@@ -651,7 +647,6 @@ public final class Constants {
     public static final double MAX_RANGE =
         FieldCoordinates.BLUE_HUB.toTranslation2d().getNorm()
             + 0.1; // m //TODO calculate furthest distance we would ever want to shoot from
-    // slip
     // kraken x60 max velocity is ~100 rps
   }
 }

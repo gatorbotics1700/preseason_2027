@@ -64,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
     desiredIntakeVoltage = 0;
     hallEffect =
         new DigitalInput(
-            IntakeConstants.INTAKE_HALL_EFFECT_PORT); // TODO:change port during testing
+            IntakeConstants.INTAKE_HALL_EFFECT_PORT);
 
     intakeMotor
         .getConfigurator()
@@ -78,7 +78,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     deployTalonFXConfigs.withMotorOutput(
         new MotorOutputConfigs()
-            .withInverted(InvertedValue.Clockwise_Positive)); // TODO check if we want to invert
+            .withInverted(InvertedValue.Clockwise_Positive));
 
     // TODO: TUNE ALL OF THESE
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
@@ -207,7 +207,7 @@ public class IntakeSubsystem extends SubsystemBase {
             / IntakeConstants.DEPLOY_PULLEY_ONE_GEAR_RATIO
             / IntakeConstants.DEPLOY_PULLEY_TWO_GEAR_RATIO
             * 360.0
-            % 360; // TODO check if we multiply or divide by the gear ratio
+            % 360;
     return new Rotation2d(Math.toRadians(deployAngleDegrees));
   }
 

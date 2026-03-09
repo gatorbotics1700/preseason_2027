@@ -88,7 +88,6 @@ public class RobotContainer {
   private final MultiStepAutoChooser multiStepAutoChooser;
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> chassisSpeeds;
-  private BooleanSupplier shouldShoot;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -162,11 +161,6 @@ public class RobotContainer {
         () -> {
           return drive.getChassisSpeeds();
         };
-
-    shouldShoot =
-        // () -> {
-        shooterSubsystem.getShouldShoot();
-    // };
 
     // Set up auto routines with multi-step chooser
     multiStepAutoChooser =
