@@ -46,6 +46,7 @@ public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
   private ShotCalculator
       shotCalculator; // not actually used anywhere, but we need the constructor to run asap to
+
   // generate the lookup table
 
   public Robot() {

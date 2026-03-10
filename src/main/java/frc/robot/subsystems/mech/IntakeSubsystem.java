@@ -62,9 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
         new TalonFX(IntakeConstants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     desiredIntakeVoltage = 0;
-    hallEffect =
-        new DigitalInput(
-            IntakeConstants.INTAKE_HALL_EFFECT_PORT);
+    hallEffect = new DigitalInput(IntakeConstants.INTAKE_HALL_EFFECT_PORT);
 
     intakeMotor
         .getConfigurator()
@@ -77,8 +75,7 @@ public class IntakeSubsystem extends SubsystemBase {
     deployTalonFXConfigs = new TalonFXConfiguration();
 
     deployTalonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs()
-            .withInverted(InvertedValue.Clockwise_Positive));
+        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
     // TODO: TUNE ALL OF THESE
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;

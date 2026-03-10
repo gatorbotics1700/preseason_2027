@@ -72,9 +72,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     leftFlywheelSlot0Configs = leftFlywheelTalonFXConfigs.Slot0;
 
-    leftFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
-    leftFlywheelSlot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
-    leftFlywheelSlot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
+    leftFlywheelSlot0Configs.kS = 0.072416; // Add _ V output to overcome static friction
+    leftFlywheelSlot0Configs.kV = 0.2553; // A velocity target of 1 rps results in 0.12-0.2 V output
+    leftFlywheelSlot0Configs.kA = 0.00; // An acceleration of 1 rps/s requires 0.01 V output
     // Initial PID gains come from tunable LoggedNetworkNumbers
     leftFlywheelSlot0Configs.kP = flywheelKP.get();
     leftFlywheelSlot0Configs.kI = flywheelKI.get();
@@ -94,9 +94,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     rightFlywheelSlot0Configs = rightFlywheelTalonFXConfigs.Slot0;
 
-    rightFlywheelSlot0Configs.kS = 0.25; // Add _ V output to overcome static friction
-    rightFlywheelSlot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12-0.2 V output
-    rightFlywheelSlot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
+    rightFlywheelSlot0Configs.kS = 0.072416; // Add _ V output to overcome static friction
+    rightFlywheelSlot0Configs.kV =
+        0.2553; // A velocity target of 1 rps results in 0.12-0.2 V output
+    rightFlywheelSlot0Configs.kA = 0.00; // An acceleration of 1 rps/s requires 0.01 V output
     // Initial PID gains come from tunable LoggedNetworkNumbers
     rightFlywheelSlot0Configs.kP = flywheelKP.get();
     rightFlywheelSlot0Configs.kI = flywheelKI.get();
@@ -213,8 +214,9 @@ public class ShooterSubsystem extends SubsystemBase {
         * getFlywheelVelocity()
         * 2
         * Math.PI
+        * ShooterConstants.FLYWHEEL_RADIUS_METERS
         * ShooterConstants
-            .FLYWHEEL_RADIUS_METERS; // 0.7 for the slip is a tentative estimate to account for loss
+            .FLYWHEEL_GEAR_RATIO; // 0.7 for the slip is a tentative estimate to account for loss
     // of energy
     // due to
     // energy dissipation/slip. this model assumes that the ball's exit speed matches the wheel's
@@ -222,7 +224,12 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
-    return shotSpeed / flyWheelSlip.get() / 2 / Math.PI / ShooterConstants.FLYWHEEL_RADIUS_METERS;
+    return shotSpeed
+        / flyWheelSlip.get()
+        / 2
+        / Math.PI
+        / ShooterConstants.FLYWHEEL_RADIUS_METERS
+        / ShooterConstants.FLYWHEEL_GEAR_RATIO;
   }
 
   public void toggleShouldShoot() {
@@ -262,9 +269,9 @@ public class ShooterSubsystem extends SubsystemBase {
             // this is the ramp rate for voltage during a test
             Volts.per(Second).of(1),
             // this is the maximum voltage for the test
-            Volts.of(10),
+            Volts.of(14),
             // this is the duration of the test.
-            Seconds.of(10),
+            Seconds.of(15),
             (state) -> Logger.recordOutput("Mech/Shooter/SysID/SysIdState", state.toString()));
 
     // mechanism for our test. Drives both flywheels; we log voltage/position/velocity for each in

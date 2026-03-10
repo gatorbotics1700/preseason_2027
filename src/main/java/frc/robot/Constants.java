@@ -633,7 +633,7 @@ public final class Constants {
     public static final double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
     public static final double MAX_SHOT_HEIGHT = 3.35; // 2 meters for MSLL
     public static final double MAX_SHOT_SPEED =
-        100
+        80
             * ShooterConstants.FLYWHEEL_GEAR_RATIO
             * 2
             * Math.PI
