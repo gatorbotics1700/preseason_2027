@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShotCalculatorConditions;
 import frc.robot.Constants.TunerConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -40,6 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
+  private static double desiredRotorVelocity = 0;
 
   public static LoggedNetworkNumber flyWheelSlip =
       new LoggedNetworkNumber("/Tuning/Shooter/flywheelSlip", 0.27);
@@ -147,7 +149,8 @@ public class ShooterSubsystem extends SubsystemBase {
       rightFlywheelMotor.getConfigurator().apply(rightFlywheelTalonFXConfigs);
     }
 
-    Logger.recordOutput("Mech/Shooter/Flywheel Velocity", getFlywheelVelocity());
+    Logger.recordOutput("Mech/Shooter/Flywheel Rotor Velocity", getFlywheelRotorVelocity());
+    Logger.recordOutput("Mech/Shooter/Desired Rotor Velocity", desiredRotorVelocity);
     Logger.recordOutput("Mech/Shooter/Desired Flywheel Velocity", desiredFlywheelVelocity);
 
     Logger.recordOutput(
@@ -188,10 +191,20 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Mech/Shooter/Flywheel Voltage", leftFlywheelMotor.getMotorVoltage().getValueAsDouble());
 
+    Logger.recordOutput("Mech/Shooter/MAX SPEED", ShotCalculatorConditions.MAX_SHOT_SPEED);
+    Logger.recordOutput(
+        "Mech/Shooter/MAX FLYWHEEL SPEED",
+        calculateFlywheelSpeed(ShotCalculatorConditions.MAX_SHOT_SPEED));
+    Logger.recordOutput(
+        "Mech/Shooter/MAX ROTOR SPEED",
+        calculateFlywheelSpeed(ShotCalculatorConditions.MAX_SHOT_SPEED)
+            / ShooterConstants.FLYWHEEL_GEAR_RATIO);
     // Only control motors if SysID is not running
     if (!sysIdRunning) {
-      leftFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
-      rightFlywheelMotor.setControl(m_request.withVelocity(desiredFlywheelVelocity));
+      desiredRotorVelocity = desiredFlywheelVelocity / ShooterConstants.FLYWHEEL_GEAR_RATIO;
+      leftFlywheelMotor.setControl(m_request.withVelocity(desiredRotorVelocity));
+      rightFlywheelMotor.setControl(m_request.withVelocity(desiredRotorVelocity));
+      System.out.println("SETTING ROTOR VELO TO " + desiredRotorVelocity);
     }
 
     transitionMotor.setVoltage(desiredTransitionVoltage);
@@ -201,7 +214,7 @@ public class ShooterSubsystem extends SubsystemBase {
     this.desiredFlywheelVelocity = desiredFlywheelVelocity;
   }
 
-  public double getFlywheelVelocity() {
+  public double getFlywheelRotorVelocity() {
     return rightFlywheelMotor.getRotorVelocity().getValueAsDouble();
   }
 
@@ -211,7 +224,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public double getExitVelocity() {
     return flyWheelSlip.get()
-        * getFlywheelVelocity()
+        * getFlywheelRotorVelocity()
         * 2
         * Math.PI
         * ShooterConstants.FLYWHEEL_RADIUS_METERS
@@ -225,11 +238,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public static double calculateFlywheelSpeed(double shotSpeed) { // shotSpeed in meters/second
     return shotSpeed
-        / flyWheelSlip.get()
-        / 2
+        / 2.0
         / Math.PI
         / ShooterConstants.FLYWHEEL_RADIUS_METERS
-        / ShooterConstants.FLYWHEEL_GEAR_RATIO;
+        / ShooterConstants.FLYWHEEL_SLIP;
   }
 
   public void toggleShouldShoot() {
