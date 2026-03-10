@@ -592,7 +592,7 @@ public class RobotContainer {
                                     intakeSubsystem))));
         controller_two
             .y()
-            .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredFlywheelVelocity(60)));
+            .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredRotorVelocity(60)));
 
         // controller_two
         //     .y()
@@ -779,7 +779,7 @@ public class RobotContainer {
     return new InstantCommand(
             () -> {
               turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
-              shooterSubsystem.setDesiredFlywheelVelocity(0);
+              shooterSubsystem.setDesiredRotorVelocity(0);
               hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
               shooterSubsystem.setDesiredTransitionVoltage(0);
               hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
@@ -803,7 +803,7 @@ public class RobotContainer {
         .andThen(
             new InstantCommand(
                 () -> {
-                  shooterSubsystem.setDesiredFlywheelVelocity(3);
+                  shooterSubsystem.setDesiredRotorVelocity(3);
                   hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(57)));
                   shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
                 }));
@@ -812,7 +812,7 @@ public class RobotContainer {
   public Command RunShooterWheels() {
     return new InstantCommand(
         () -> {
-          shooterSubsystem.setDesiredFlywheelVelocity(ShooterSubsystem.calculateFlywheelSpeed(22));
+          shooterSubsystem.setDesiredRotorVelocity(70);
           shooterSubsystem.setDesiredTransitionVoltage(12);
         });
   }
@@ -820,8 +820,7 @@ public class RobotContainer {
   public Command RunMechWheels() {
     return new InstantCommand(
             () -> {
-              shooterSubsystem.setDesiredFlywheelVelocity(
-                  ShooterSubsystem.calculateFlywheelSpeed(22));
+              shooterSubsystem.setDesiredRotorVelocity(70);
               shooterSubsystem.setDesiredTransitionVoltage(12);
               // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
               // TODO uncomment???

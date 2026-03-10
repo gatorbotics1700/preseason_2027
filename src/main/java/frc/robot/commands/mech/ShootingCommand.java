@@ -78,19 +78,19 @@ public class ShootingCommand extends Command {
     }
     ShotParameters params =
         ShotCalculator.calculateShot(drivetrainPose.get(), drivetrainVelocity.get(), target);
-    double desiredFlywheelSpeed = ShooterSubsystem.calculateFlywheelSpeed(params.shotSpeed);
+    double desiredRotorVelocity = ShooterSubsystem.launchSpeedToRotorSpeed(params.shotSpeed);
 
     Logger.recordOutput(
         "Mech/ShotCalculator/shouldShoot", shooterSubsystem.getShouldShoot().getAsBoolean());
-    Logger.recordOutput("Mech/ShotCalculator/validShot", params.shotSpeed != 0);
-    Logger.recordOutput("Mech/ShotCalculator/shotSpeed", params.shotSpeed);
-    Logger.recordOutput("Mech/ShotCalculator/flyWheelSpeed", desiredFlywheelSpeed);
+    Logger.recordOutput("Mech/ShootingCommand/validShot", params.shotSpeed != 0);
+    Logger.recordOutput("Mech/ShootingCommand/shotSpeed", params.shotSpeed);
+    Logger.recordOutput("Mech/ShootingCommand/rotorSpeed", desiredRotorVelocity);
 
-    Logger.recordOutput("Mech/ShotCalculator/hoodAngle", params.hoodAngle.getDegrees());
-    Logger.recordOutput("Mech/ShotCalculator/turretAngle", params.turretAngle.getDegrees());
-    Logger.recordOutput("Mech/ShotCalculator/currentPose", drivetrainPose.get());
-    Logger.recordOutput("Mech/ShotCalculator/chassisSpeeds", drivetrainVelocity.get());
-    Logger.recordOutput("Mech/ShotCalculator/target", target);
+    Logger.recordOutput("Mech/ShootingCommand/hoodAngle", params.hoodAngle.getDegrees());
+    Logger.recordOutput("Mech/ShootingCommand/turretAngle", params.turretAngle.getDegrees());
+    Logger.recordOutput("Mech/ShootingCommand/currentPose", drivetrainPose.get());
+    Logger.recordOutput("Mech/ShootingCommand/chassisSpeeds", drivetrainVelocity.get());
+    Logger.recordOutput("Mech/ShootingCommand/target", target);
 
     // if should be shooting
     // set flywheel speed to the last non-zero flywheel speed
@@ -102,13 +102,11 @@ public class ShootingCommand extends Command {
       if (params.shotSpeed != 0) { // and if we have a valid shot
 
         System.out.println("VALID SHOT VALID SHOT");
-        shooterSubsystem.setDesiredFlywheelVelocity(
-            desiredFlywheelSpeed); // set velocity to our desired velocity
+        shooterSubsystem.setDesiredRotorVelocity(
+            desiredRotorVelocity); // set velocity to our desired velocity
         hopperFloorSubsystem.setDesiredHopperFloorVoltage(
             HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
-        if (Math.abs(
-                shooterSubsystem.getFlywheelRotorVelocity()
-                    - ShooterSubsystem.flywheelSpeedToRotorSpeed(desiredFlywheelSpeed))
+        if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - desiredRotorVelocity)
             < ShooterConstants
                 .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
           // velocity
@@ -124,7 +122,7 @@ public class ShootingCommand extends Command {
       turretSubsystem.setDesiredAngle(params.turretAngle);
     } else {
       System.out.println("WE DONT WANT TO SHOOT");
-      shooterSubsystem.setDesiredFlywheelVelocity(0);
+      shooterSubsystem.setDesiredRotorVelocity(0);
       shooterSubsystem.setDesiredTransitionVoltage(0);
       hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
     }
