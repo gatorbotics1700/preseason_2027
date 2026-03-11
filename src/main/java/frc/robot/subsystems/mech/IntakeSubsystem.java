@@ -44,11 +44,18 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // Tunable PID gains for intake deploy
   public static final LoggedNetworkNumber intakeKp =
-      new LoggedNetworkNumber("/Tuning/Intake/kP", 1.0);
+      new LoggedNetworkNumber("/Tuning/Intake/kP", 0.0);
   public static final LoggedNetworkNumber intakeKi =
       new LoggedNetworkNumber("/Tuning/Intake/kI", 0.0);
   public static final LoggedNetworkNumber intakeKd =
-      new LoggedNetworkNumber("/Tuning/Intake/kD", 0.1);
+      new LoggedNetworkNumber("/Tuning/Intake/kD", 0.0);
+  
+  // Tunable Feedfoward gains for intake deploy
+  public static final LoggedNetworkNumber intakeKg = new LoggedNetworkNumber("/Tuning/Intake/kG", 0.0);
+  public static final LoggedNetworkNumber intakeKs = new LoggedNetworkNumber("/Tuning/Intake/kS", 0.0);
+  public static final LoggedNetworkNumber intakeKv = new LoggedNetworkNumber("/Tuning/Intake/kV", 0.0);
+  public static final LoggedNetworkNumber intakeKa = new LoggedNetworkNumber("/Tuning/Intake/kA", 0.0);
+
 
   private Rotation2d desiredAngle = new Rotation2d();
   private boolean useDeployPositionControl = false;
@@ -80,17 +87,15 @@ public class IntakeSubsystem extends SubsystemBase {
     // TODO: TUNE ALL OF THESE
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
 
-    slot0Configs.kG = 0.2128; // Add _ V output to overcome gravity
-    slot0Configs.kS = 0.25; // Add _ V output to overcome static friction
-    slot0Configs.kV =
-        0.16; // A velocity target of 1 rps results in _ V output (should be somewhere between 0.12
-    // and 0.2)
-    slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0Configs.kG = 0.2128; // 0.2128 vaguely works
+    slot0Configs.kS = 0.25; // 0.25 vaguely works
+    slot0Configs.kV = 0.16; // 0.16 vaguely works
+    slot0Configs.kA = 0.01; // 0.01 vaguely works
 
     // Initial PID gains come from tunable LoggedNetworkNumbers
-    slot0Configs.kP = intakeKp.get(); // A position error of 2.5 rotations results in 12V output
+    slot0Configs.kP = intakeKp.get(); // 1 vaguely works
     slot0Configs.kI = intakeKi.get(); // no output for integrated error
-    slot0Configs.kD = intakeKd.get(); // a velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = intakeKd.get(); // 0.1 vaguely works
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = deployTalonFXConfigs.MotionMagic;
