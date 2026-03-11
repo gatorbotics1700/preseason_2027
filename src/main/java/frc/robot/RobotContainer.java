@@ -483,7 +483,8 @@ public class RobotContainer {
                     () ->
                         CommandScheduler.getInstance()
                             .schedule(IntakeCommands.RunIntake(intakeSubsystem))));
-        // controller_two.x().onTrue(new InstantCommand(() -> intakeSubsystem.toggleIntake()));
+
+        controller_two.y().onTrue(new InstantCommand(() -> intakeSubsystem.toggleIntake()));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 
@@ -580,9 +581,9 @@ public class RobotContainer {
                                     hopperFloorSubsystem,
                                     hoodSubsystem,
                                     intakeSubsystem))));
-        controller_two
-            .y()
-            .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredRotorVelocity(60)));
+        // controller_two
+        //     .y()
+        //     .onTrue(new InstantCommand(() -> shooterSubsystem.setDesiredRotorVelocity(60)));
 
         // controller_two
         //     .y()
@@ -634,30 +635,30 @@ public class RobotContainer {
       // controller.y().whileTrue(hoodSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       // controller.a().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
       // controller.b().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      // climber
-      // controller_two.x().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      // controller_two.y().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      // controller_two
-      //     .a()
-      //     .whileTrue(intakeSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      // controller_two
-      //     .b()
-      //     .whileTrue(intakeSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-
-      // controller_two
-      //     .rightBumper()
-      //     .onTrue(
-      //         new InstantCommand(() ->
-      // intakeSubsystem.zeroIntakeDeploy()).ignoringDisable(true));
-
-      controller_two.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      controller_two.y().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // TODO: intake
+      controller_two.x().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      controller_two.y().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       controller_two
           .a()
-          .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+          .whileTrue(intakeSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
       controller_two
           .b()
-          .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+          .whileTrue(intakeSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+
+      controller_two
+          .rightBumper()
+          .onTrue(
+              new InstantCommand(() -> intakeSubsystem.zeroIntakeDeploy()).ignoringDisable(true));
+
+      // TODO: shooter
+      // controller_two.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // controller_two.y().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // controller_two
+      //     .a()
+      //     .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // controller_two
+      //     .b()
+      //     .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     }
   }
 
@@ -822,8 +823,8 @@ public class RobotContainer {
     return HoodCommands.HomeHood(hoodSubsystem)
         .alongWith(
             new ClimbCommands.HomeClimber(
-                climberSubsystem)); // .alongWith(new TurretHomingCommand(turretSubsystem));
-    // .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
+                climberSubsystem)) // .alongWith(new TurretHomingCommand(turretSubsystem));
+        .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
   }
 
   public TurretSubsystem getTurretSubsystem() {

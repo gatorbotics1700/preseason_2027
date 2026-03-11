@@ -148,7 +148,7 @@ public class ShotCalculator {
                 .turretAngle
                 .plus(uncompTurretToTargetAngle)
                 .minus(drivetrainPose.getRotation()),
-            trajectoryRelativeParams.hoodAngle,
+            trajectoryRelativeParams.hoodAngle.minus(new Rotation2d(Math.toRadians(1))),
             trajectoryRelativeParams.shotSpeed);
     Logger.recordOutput("shotCalculator/turretAngle", botRelativeParams.turretAngle);
     Logger.recordOutput("shotCalculator/landingCoords", landingCoords);

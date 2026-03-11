@@ -234,11 +234,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public static double launchSpeedToRotorSpeed(double shotSpeed) { // shotSpeed in meters/second
     return shotSpeed
-        / 2.0
+        / ShooterConstants.FLYWHEEL_GEAR_RATIO
+        / 2
         / Math.PI
         / ShooterConstants.FLYWHEEL_RADIUS_METERS
-        / flyWheelSlip.get()
-        / ShooterConstants.FLYWHEEL_GEAR_RATIO;
+        / flyWheelSlip.get();
   }
 
   public void toggleShouldShoot() {
