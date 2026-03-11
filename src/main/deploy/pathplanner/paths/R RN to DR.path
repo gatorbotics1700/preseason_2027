@@ -48,7 +48,7 @@
   "folder": "Red Right Starters",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.9622008142818
+    "rotation": 89.89938608771564
   },
   "useDefaultConstraints": true
 }

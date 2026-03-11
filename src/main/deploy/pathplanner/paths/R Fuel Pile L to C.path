@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.922598090277777,
-        "y": 0.7374802517361116
+        "x": 9.693227358853251,
+        "y": 0.46581701724516744
       },
       "isLocked": false,
       "linkedName": null
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 179.99585837836466
   },
   "reversed": false,
   "folder": "Red Fuel Pile Starts",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -92.79819212246763
   },
   "useDefaultConstraints": true
 }

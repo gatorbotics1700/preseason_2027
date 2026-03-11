@@ -48,7 +48,7 @@
   "folder": "Red Outpost & DC",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -91.7274659431947
+    "rotation": 90.69987479104485
   },
   "useDefaultConstraints": true
 }

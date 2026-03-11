@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.601774305555555,
-        "y": 3.1561469184027784
+        "x": 13.2718125961116,
+        "y": 2.2909129228910374
       },
       "isLocked": false,
       "linkedName": null
@@ -48,7 +48,7 @@
   "folder": "Red Outpost & DC",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.2649501760083
+    "rotation": 89.93352857227146
   },
   "useDefaultConstraints": true
 }

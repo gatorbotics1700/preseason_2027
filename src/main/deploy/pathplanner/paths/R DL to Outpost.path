@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 16.121888,
+        "x": 16.122,
         "y": 1.151
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.72210402199074,
+        "x": 13.722216021990741,
         "y": 1.2056770109953705
       },
       "isLocked": false,
@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 16.122,
+        "x": 15.872,
         "y": 7.403
       },
       "prevControl": {
-        "x": 14.212608362274022,
+        "x": 13.962608362274022,
         "y": 4.96214243344238
       },
       "nextControl": null,
@@ -48,7 +48,7 @@
   "folder": "Red Outpost & DC",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -92.73145300617578
+    "rotation": -90.50273285790897
   },
   "useDefaultConstraints": true
 }

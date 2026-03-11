@@ -48,7 +48,7 @@
   "folder": "Red Fuel Pile Starts",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -87.90359580869993
   },
   "useDefaultConstraints": true
 }
