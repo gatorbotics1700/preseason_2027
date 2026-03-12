@@ -664,5 +664,6 @@ public final class Constants {
         FieldCoordinates.BLUE_HUB.toTranslation2d().getNorm()
             + 0.1; // m //TODO calculate furthest distance we would ever want to shoot from
     // kraken x60 max velocity is ~100 rps
+    public static final double RANGE_FUDGE = 1.0;
   }
 }
