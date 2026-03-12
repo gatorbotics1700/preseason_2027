@@ -36,6 +36,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
+import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommands;
@@ -674,6 +675,148 @@ public class RobotContainer {
       }
     }
   }
+
+    public void configureCompDriverButtonBindings() {
+    if (DriverStation.isJoystickConnected(0)) {
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller = new CommandSimMacXboxController(0);
+      } else {
+        controller = new CommandXboxController(0);
+      }
+
+      // Default command, normal field-relative drive
+      Trigger driverControl =
+          new Trigger(
+              () ->
+                  Math.abs(controller.getLeftY()) > 0.1
+                      || Math.abs(controller.getLeftX()) > 0.1
+                      || Math.abs(controller.getRightX()) > 0.1);
+
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      } else {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      }
+
+      controller
+          .y()
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    drive.setSlowDrive();
+                  },
+                  drive));
+      controller
+          .b()
+          .onTrue(
+              Commands.runOnce(
+                      () -> {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(180))));
+                        } else {
+                          drive.setPose(
+                              new Pose2d(
+                                  drive.getPose().getTranslation(),
+                                  new Rotation2d(Math.toRadians(0))));
+                        }
+                      },
+                      drive)
+                  .ignoringDisable(true));
+      controller
+          .rightBumper()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem)
+                                  .withName("DriveOverBump"));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+      controller
+          .leftBumper()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              DriveUnderTrenchCommand.driveUnderTrench(drive, shooterSubsystem)
+                                  .withName("DriveUnderTrench"));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
+    }
+
+
+  }
+  
+  public void configureCompCodriverButtonBindings() {
+    //TODO actually call this method
+    if (DriverStation.isJoystickConnected(1)) {
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller_two = new CommandSimMacXboxController(1);
+        // putting this here because it should only run when we're in sim!
+
+      } else {
+        controller_two = new CommandXboxController(1);
+      }
+    controller_two
+            .x()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(
+                                MechStop(
+                                    turretSubsystem,
+                                    shooterSubsystem,
+                                    hopperFloorSubsystem,
+                                    hoodSubsystem,
+                                    intakeSubsystem))));
+     controller_two
+            .y()
+            .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
+    controller_two
+            .b()
+            .onTrue(
+                ShootingCommands.StationaryShootingCommand(
+                    shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
+      controller_two
+            .leftBumper()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
+      //I am making the assumption that we are not using pathfinding to climb
+      controller_two.rightBumper().onTrue(ClimbCommands.ClimbWithoutDrive(climberSubsystem));
+    }
+    }
 
   public void configureSysIdButtons() {
     if (DriverStation.isJoystickConnected(3)) {
