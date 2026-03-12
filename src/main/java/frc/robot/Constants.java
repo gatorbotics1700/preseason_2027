@@ -550,7 +550,7 @@ public final class Constants {
     public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
     public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-    public static final double EXTENDED_ANGLE_DEGREES = 110;
+    public static final double EXTENDED_ANGLE_DEGREES = 95;
     public static final double RETRACTED_ANGLE_DEGREES = 0;
 
     public static final Rotation2d EXTENDED_POSITION =
@@ -560,11 +560,12 @@ public final class Constants {
 
     public static final double HOMING_VOLTAGE = -1; // TODO tune
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
-    public static final double INTAKING_VOLTAGE = 10;
+    public static final double INTAKING_VOLTAGE = 13;
 
     public static final double POSITION_DEADBAND = 3;
 
     public static final double ROBOT_TO_INTAKE_YAW_DEGREES = 180;
+    public static final double DEPLOYED_CURRENT_LIMIT = 10.0; // amps
   }
 
   public static final class ShooterConstants {

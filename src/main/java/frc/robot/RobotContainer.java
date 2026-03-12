@@ -525,7 +525,13 @@ public class RobotContainer {
                         CommandScheduler.getInstance()
                             .schedule(IntakeCommands.RunIntake(intakeSubsystem))));
 
-        controller_two.y().onTrue(new InstantCommand(() -> intakeSubsystem.toggleIntake()));
+        controller_two
+            .y()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
 
         // controller_two.y().onTrue(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
 

@@ -2,8 +2,8 @@ package frc.robot.commands.mech;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.mech.IntakeSubsystem;
 
@@ -12,11 +12,16 @@ public class IntakeCommands {
   public IntakeCommands() {}
 
   public static Command ToggleIntake(IntakeSubsystem intakeSubsystem) {
-    intakeSubsystem.toggleIntake();
-    if (intakeSubsystem.getIsDeployed().getAsBoolean()) {
-      return new DeployIntakeCommand(intakeSubsystem).withName("Deploy Intake");
+    if (!intakeSubsystem.getIsDeployed().getAsBoolean()) {
+      return new DeployIntakeCommand(intakeSubsystem)
+          .withName("Deploy Intake")
+          .andThen(new WaitCommand(0.75))
+          .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToTrue()));
     } else {
-      return new RetractIntakeCommand(intakeSubsystem).withName("Retract Intake");
+      return new RetractIntakeCommand(intakeSubsystem)
+          .withName("Retract Intake")
+          .andThen(new WaitCommand(0.75))
+          .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToFalse()));
     }
   }
 
@@ -52,6 +57,7 @@ public class IntakeCommands {
       intakeSubsystem.zeroIntakeDeploy();
       intakeSubsystem.setDesiredAngle(
           IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
+      intakeSubsystem.setIsDeployedToFalse();
     }
   }
 
@@ -82,9 +88,8 @@ public class IntakeCommands {
     }
 
     @Override
-    public void execute() {
-      System.out.println("EXTENDING");
-      intakeSubsystem.extendDeployMotor();
+    public void initialize() {
+      intakeSubsystem.setDesiredAngle(IntakeConstants.EXTENDED_POSITION);
     }
 
     @Override
@@ -110,17 +115,16 @@ public class IntakeCommands {
 
     @Override
     public void initialize() {
-      intakeSubsystem.setDeployVoltage(IntakeConstants.RETRACTING_VOLTAGE);
+      intakeSubsystem.setDesiredAngle(IntakeConstants.RETRACTED_POSITION);
     }
 
     @Override
     public boolean isFinished() {
-      return intakeSubsystem.isHallEffectTriggered();
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-      CommandScheduler.getInstance().schedule(new HomeIntakeDeploy(intakeSubsystem));
+      return intakeSubsystem.isHallEffectTriggered()
+          || (Math.abs(
+                  IntakeConstants.RETRACTED_ANGLE_DEGREES
+                      - intakeSubsystem.getCurrentAngle().getDegrees())
+              <= IntakeConstants.POSITION_DEADBAND);
     }
   }
 }
