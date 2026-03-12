@@ -110,7 +110,11 @@ public class RobotContainer {
                 new VisionIOPhotonVision(
                     VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
                 new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
+                    VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1),
+                new VisionIOPhotonVision(
+                    VisionConstants.CAMERA_2_NAME, VisionConstants.ROBOT_TO_CAMERA_2),
+                new VisionIOPhotonVision(
+                    VisionConstants.CAMERA_3_NAME, VisionConstants.ROBOT_TO_CAMERA_3));
         break;
 
       case SIM:
@@ -133,6 +137,14 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     VisionConstants.CAMERA_1_NAME,
                     VisionConstants.ROBOT_TO_CAMERA_1,
+                    drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CAMERA_2_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_2,
+                    drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CAMERA_3_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_3,
                     drive::getPose));
         DriverStation.silenceJoystickConnectionWarning(true);
         break;
@@ -842,7 +854,8 @@ public class RobotContainer {
             //     new ClimbCommands.HomeClimber(
             //         climberSubsystem))
             // .alongWith(new TurretHomingCommand(turretSubsystem))
-            // TODO: this line would make it so the turret doesn't run the homing command since no limit switch and we assume it's in the right sector on init
+            // TODO: this line would make it so the turret doesn't run the homing command since no
+            // limit switch and we assume it's in the right sector on init
             // .alongWith(new InstantCommand(()-> turretSubsystem.homeTurret()))
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
         .withName("Home Mechansims");
