@@ -39,7 +39,8 @@ import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
-import frc.robot.commands.mech.ShootingCommand;
+import frc.robot.commands.mech.ShootingCommands;
+import frc.robot.commands.mech.ShootingCommands.ShootOnTheMoveCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -207,14 +208,25 @@ public class RobotContainer {
                       || Math.abs(controller.getLeftX()) > 0.1
                       || Math.abs(controller.getRightX()) > 0.1);
 
-      driverControl
-          .whileTrue(
-              DriveCommands.joystickDrive(
-                  drive,
-                  () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
-                  () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
-                  () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
-          .onFalse(DriveCommands.stopDriveCommand(drive));
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      } else {
+        driverControl
+            .whileTrue(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> modifyJoystickAxis(-controller.getLeftY()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getLeftX()), // Changed to raw values
+                    () -> modifyJoystickAxis(-controller.getRightX()))) // Changed to raw values
+            .onFalse(DriveCommands.stopDriveCommand(drive));
+      }
 
       // drive over bump
 
@@ -314,6 +326,17 @@ public class RobotContainer {
                     drive.setSlowDrive();
                   },
                   drive));
+
+      controller
+          .rightTrigger()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    CommandScheduler.getInstance()
+                        .schedule(
+                            ShootingCommands.StationaryShootingCommand(
+                                shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
+                  }));
     }
   }
 
@@ -574,7 +597,7 @@ public class RobotContainer {
         controller_two
             .b()
             .onTrue(
-                new ShootingCommand(
+                new ShootOnTheMoveCommand(
                     shooterSubsystem,
                     hoodSubsystem,
                     turretSubsystem,
@@ -813,13 +836,7 @@ public class RobotContainer {
   public Command LineupCommand() {
     return AutoBuilder.pathfindToPose(
             // new Pose2d(3.037, 3.6, new Rotation2d()),
-            DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                ? new Pose2d(13.3, 7.2, new Rotation2d(-116))
-                : new Pose2d(
-                    FieldCoordinates.FIELD_CENTER.getX()
-                        - Math.abs(FieldCoordinates.FIELD_CENTER.getX() - 13.3),
-                    7.2,
-                    new Rotation2d(-116 - 90)),
+            new Pose2d(13.3, 7.2, new Rotation2d(Math.toRadians(-116))),
             new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
         .andThen(
             new InstantCommand(

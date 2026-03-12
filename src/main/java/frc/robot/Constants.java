@@ -41,7 +41,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.util.Calculations;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ValidStationaryShot;
 
 /**
  * This class defines the runtime mode used by AdvantageKit and loads robot-specific configuration
@@ -582,6 +584,19 @@ public final class Constants {
             0.152, 0,
             0.495); // TODO figure out what part of the shooter to measure from (this is the center
     // of the turret plate)
+    public static final ValidStationaryShot RED_RIGHT =
+        new ValidStationaryShot(
+            new Pose2d(
+                13.3,
+                7.2,
+                Calculations.angleToPoint(
+                    FieldCoordinates.RED_HUB.getX() - 13.3, FieldCoordinates.RED_HUB.getY() - 7.2)),
+            new Rotation2d(Math.toRadians(64)),
+            62.2);
+    public static final ValidStationaryShot BLUE_LEFT =
+        new ValidStationaryShot(
+            Calculations.mirrorPose(RED_RIGHT.pose), new Rotation2d(Math.toRadians(64)), 62.2);
+    public static final ValidStationaryShot[] STATIONARY_SHOT_ARRAY = {RED_RIGHT, BLUE_LEFT};
   }
 
   public static final class TurretConstants {
