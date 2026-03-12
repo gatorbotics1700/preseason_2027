@@ -16,12 +16,20 @@ public class Calculations {
             + Math.pow(firstPose.getY() - secondPose.getY(), 2));
   }
 
-  public static Pose2d mirrorPose(Pose2d pose) {
+  public static Pose2d mirrorPoseAcrossAlliance(Pose2d pose) {
     double deltaX = pose.getX() - FieldCoordinates.FIELD_CENTER.getX();
     double deltaRotation = pose.getRotation().getDegrees() - 90;
     return new Pose2d(
         FieldCoordinates.FIELD_CENTER.getX() - deltaX,
         pose.getY(),
         new Rotation2d(Math.toRadians(90 - deltaRotation)));
+  }
+
+  public static Pose2d mirrorPoseAcrossXAxis(Pose2d pose) {
+    double deltaY = pose.getY() - FieldCoordinates.FIELD_CENTER.getY();
+    return new Pose2d(
+        pose.getX(),
+        FieldCoordinates.FIELD_CENTER.getY() - deltaY,
+        pose.getRotation().unaryMinus());
   }
 }
