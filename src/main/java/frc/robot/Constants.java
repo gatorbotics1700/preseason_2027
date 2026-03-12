@@ -560,7 +560,7 @@ public final class Constants {
 
     public static final double HOMING_VOLTAGE = -1; // TODO tune
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
-    public static final double INTAKING_VOLTAGE = 10;
+    public static final double INTAKING_VOLTAGE = 13;
 
     public static final double POSITION_DEADBAND = 3;
 
