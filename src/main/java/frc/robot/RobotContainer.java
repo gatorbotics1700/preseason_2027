@@ -840,8 +840,10 @@ public class RobotContainer {
     return (HoodCommands.HomeHood(hoodSubsystem)
             // .alongWith(
             //     new ClimbCommands.HomeClimber(
-            //         climberSubsystem));
-            // .alongWith(new TurretHomingCommand(turretSubsystem));
+            //         climberSubsystem))
+            // .alongWith(new TurretHomingCommand(turretSubsystem))
+            // TODO: this line would make it so the turret doesn't run the homing command since no limit switch and we assume it's in the right sector on init
+            // .alongWith(new InstantCommand(()-> turretSubsystem.homeTurret()))
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
         .withName("Home Mechansims");
   }
