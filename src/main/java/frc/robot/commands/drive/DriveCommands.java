@@ -330,7 +330,6 @@ public class DriveCommands {
               Logger.recordOutput(
                   "DriveCommands/DesiredAngleDegrees",
                   desiredAngle != null ? Math.toDegrees(desiredAngle.getRadians()) : Double.NaN);
-              // System.out.println("got desired angle: " + drive.getDesiredAngle());
               double omega;
 
               if (desiredAngle != null) {
@@ -340,7 +339,6 @@ public class DriveCommands {
 
                 if (previousAngle == null) {
                   // First time setting an angle - reset the controller
-                  System.out.println("previous angle being set");
                   goalChanged = true;
                 } else {
                   // Check if the goal has changed

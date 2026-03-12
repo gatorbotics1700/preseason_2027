@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldCoordinates;
-import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -354,7 +353,6 @@ public class RobotContainer {
         controller_two
             .rightBumper()
             .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
-        controller_two.y().onTrue(LineupCommand());
         controller_two
             .a()
             .onTrue(
@@ -647,7 +645,11 @@ public class RobotContainer {
             .rightBumper()
             .onTrue(new InstantCommand(() -> shooterSubsystem.toggleShouldShoot()));
 
-        controller_two.leftBumper().onTrue(LineupCommand());
+        controller_two
+            .leftBumper()
+            .onTrue(
+                ShootingCommands.StationaryShootingCommand(
+                    shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
         // controller_two
         //     .leftBumper()
         //     .onTrue(
@@ -766,9 +768,6 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
-      drive.enableTargetPointFacing();
-    }
     configureButtonBindings();
   }
 
@@ -777,12 +776,20 @@ public class RobotContainer {
       gamePieceSimulation.updateBalls();
     }
 
+    robotContainerLogs();
+
     multiStepAutoChooser.updateChooserOptions();
 
     // Print path name to console me thinks
     // String selectedPathName = multiStepAutoChooser.getSelectedPathName();
-    System.out.flush(); // Ensure output appears immediately
+    // System.out.flush(); // Ensure output appears immediately
 
+    // shotParameters =
+    // ShotCalculator.calculateShot(
+    // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);\
+  }
+
+  public void robotContainerLogs() {
     // Log command scheduler status
     Logger.recordOutput("Commands/SchedulerActive", true);
     Logger.recordOutput("Commands/LogTime", System.currentTimeMillis());
@@ -800,82 +807,43 @@ public class RobotContainer {
 
     Logger.recordOutput("DriveToFuel/Fuel", vision.getFuelPose(drive.getPose()));
     Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
-
-    // shotParameters =
-    // ShotCalculator.calculateShot(
-    // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);\
   }
 
-  // TODO: this command doesn't work -- need to fix (test this by commenting out
-  // the way we do this
-  // manually in Robot.java)
   public Command MechStop(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       HopperFloorSubsystem hopperFloorSubsystem,
       HoodSubsystem hoodSubsystem,
       IntakeSubsystem intakeSubsystem) {
-    return new InstantCommand(
-            () -> {
-              turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
-              shooterSubsystem.setDesiredRotorVelocity(0);
-              hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
-              shooterSubsystem.setDesiredTransitionVoltage(0);
-              hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
-              hoodSubsystem.setHoodVoltage(0);
-              // TODO add climber
-            },
-            turretSubsystem,
-            shooterSubsystem,
-            hopperFloorSubsystem,
-            hoodSubsystem,
-            intakeSubsystem
-            // )
-            )
-        .alongWith(IntakeCommands.StopIntake(intakeSubsystem));
-  }
-
-  public Command LineupCommand() {
-    return AutoBuilder.pathfindToPose(
-            // new Pose2d(3.037, 3.6, new Rotation2d()),
-            new Pose2d(13.3, 7.2, new Rotation2d(Math.toRadians(-116))),
-            new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
-        .andThen(
-            new InstantCommand(
+    return (new InstantCommand(
                 () -> {
-                  shooterSubsystem.setDesiredRotorVelocity(62.2);
-                  hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(64)));
-                  shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
-                  hopperFloorSubsystem.setDesiredHopperFloorVoltage(
-                      HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
-                }));
+                  turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
+                  shooterSubsystem.setDesiredRotorVelocity(0);
+                  hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
+                  shooterSubsystem.setDesiredTransitionVoltage(0);
+                  hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
+                  hoodSubsystem.setHoodVoltage(0);
+                  climberSubsystem.setDesiredPositionInches(
+                      climberSubsystem.getCurrentPositionInches());
+                  climberSubsystem.setClimberVoltage(0);
+                },
+                turretSubsystem,
+                shooterSubsystem,
+                hopperFloorSubsystem,
+                hoodSubsystem,
+                intakeSubsystem)
+            .alongWith(IntakeCommands.StopIntake(intakeSubsystem)))
+        .withName("Mech Stop");
   }
 
-  public Command RunShooterWheels() {
-    return new InstantCommand(
-        () -> {
-          shooterSubsystem.setDesiredRotorVelocity(70);
-          shooterSubsystem.setDesiredTransitionVoltage(12);
-        });
-  }
-
-  public Command RunMechWheels() {
-    return new InstantCommand(
-            () -> {
-              shooterSubsystem.setDesiredRotorVelocity(70);
-              shooterSubsystem.setDesiredTransitionVoltage(12);
-              // transitionSubsystem.setHopperFloorVelocity(transitionSubsystem.HOPPER_FLOOR_SPEED);
-              // TODO uncomment???
-            })
-        .alongWith(IntakeCommands.RunIntake(intakeSubsystem));
-  }
-
-  public Command HomeMechanisms() { // TODO: add any other homing commands with alongWith
-    return HoodCommands.HomeHood(hoodSubsystem)
-        // .alongWith(
-        //     new ClimbCommands.HomeClimber(
-        //         climberSubsystem)); // .alongWith(new TurretHomingCommand(turretSubsystem));
-        .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
+  public Command HomeMechanisms() { // TODO: uncomment these other homing commands
+    return (HoodCommands.HomeHood(hoodSubsystem)
+            // .alongWith(
+            //     new ClimbCommands.HomeClimber(
+            //         climberSubsystem));
+            // .alongWith(new TurretHomingCommand(turretSubsystem));
+            .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
+        .withName("Home Mechansims");
   }
 
   public TurretSubsystem getTurretSubsystem() {

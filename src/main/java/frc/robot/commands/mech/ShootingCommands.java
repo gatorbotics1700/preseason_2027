@@ -54,7 +54,7 @@ public class ShootingCommands {
       this.hoodSubsystem = hoodSubsystem;
       this.turretSubsystem = turretSubsystem;
       addRequirements(shooterSubsystem, hoodSubsystem, turretSubsystem, hopperFloorSubsystem);
-      setName("ShootingCommand");
+      setName("ShootOnTheMoveCommand");
     }
 
     @Override
@@ -107,10 +107,7 @@ public class ShootingCommands {
       // transition
 
       if (shooterSubsystem.getShouldShoot().getAsBoolean()) {
-        System.out.println("WE WANT TO SHOOT");
         if (params.shotSpeed != 0) { // and if we have a valid shot
-
-          System.out.println("VALID SHOT VALID SHOT");
           shooterSubsystem.setDesiredRotorVelocity(
               desiredRotorVelocity); // set velocity to our desired velocity
           hopperFloorSubsystem.setDesiredHopperFloorVoltage(
@@ -119,11 +116,9 @@ public class ShootingCommands {
               < ShooterConstants
                   .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
             // velocity
-            // System.out.println("SHOOTING SHOOTING SHOOTING");
             shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
           }
         } else { // if we dont have a valid shot
-          // System.out.println("INVALID SHOT INVALID SHOT");
           hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
           shooterSubsystem.setDesiredTransitionVoltage(0);
         }
@@ -131,13 +126,10 @@ public class ShootingCommands {
             hoodSubsystem.convertLaunchAngleToHoodAngle(params.hoodAngle));
         turretSubsystem.setDesiredAngle(params.turretAngle);
       } else {
-        System.out.println("WE DONT WANT TO SHOOT");
         shooterSubsystem.setDesiredRotorVelocity(0);
         shooterSubsystem.setDesiredTransitionVoltage(0);
         hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
       }
-
-      // TODO add drivetrain angle things here instead of the turret angle for testing on sting
     }
 
     @Override
@@ -190,7 +182,6 @@ public class ShootingCommands {
           < ShooterConstants
               .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
         // velocity
-        // System.out.println("SHOOTING SHOOTING SHOOTING");
         shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
         hoodSubsystem.setDesiredAngle(
             hoodSubsystem.convertLaunchAngleToHoodAngle(validStationaryShot.hoodAngle));
@@ -215,13 +206,13 @@ public class ShootingCommands {
       HopperFloorSubsystem hopperFloorSubsystem,
       Supplier<Pose2d> drivetrainPose) {
     ValidStationaryShot closestShot = null;
-    Logger.recordOutput("Stationary/RED_RIGHT", ShooterConstants.RED_RIGHT.pose);
-    Logger.recordOutput("Stationary/BLUE_LEFT", ShooterConstants.BLUE_LEFT.pose);
+    Logger.recordOutput("Mech/Shooter/Stationary/RED_RIGHT", ShooterConstants.RED_RIGHT.pose);
+    Logger.recordOutput("Mech/Shooter/Stationary/BLUE_LEFT", ShooterConstants.BLUE_LEFT.pose);
     Logger.recordOutput(
-        "Stationary/RED_RIGHT distance",
+        "Mech/Shooter/Stationary/RED_RIGHT distance",
         Calculations.distanceToPoseInMeters(drivetrainPose.get(), ShooterConstants.RED_RIGHT.pose));
     Logger.recordOutput(
-        "Stationary/BLUE_LEFT distance",
+        "Mech/Shooter/Stationary/BLUE_LEFT distance",
         Calculations.distanceToPoseInMeters(drivetrainPose.get(), ShooterConstants.BLUE_LEFT.pose));
     for (ValidStationaryShot shot : ShooterConstants.STATIONARY_SHOT_ARRAY) {
       if (closestShot == null

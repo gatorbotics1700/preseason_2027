@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class HopperFloorSubsystem extends SubsystemBase {
   private final TalonFX hopperMotor;
@@ -19,8 +18,6 @@ public class HopperFloorSubsystem extends SubsystemBase {
   private static TalonFXConfiguration talonFXConfigs;
   private static Slot0Configs slot0Configs;
   private static MotionMagicVelocityVoltage m_velocity;
-  public static LoggedNetworkNumber hopperVoltage =
-      new LoggedNetworkNumber("/Tuning/hopperVoltage", 8);
 
   public HopperFloorSubsystem() {
     hopperMotor = new TalonFX(HopperFloorConstants.HOPPER_MOTOR_CAN_ID, TunerConstants.mechCANBus);
@@ -57,17 +54,17 @@ public class HopperFloorSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    Logger.recordOutput("Mech/Hopper Floor/Desired Velocity", desiredHopperVoltage);
-    Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
     hopperMotor.setVoltage(desiredHopperVoltage);
+
+    hopperFloorLogs();
   }
 
   public void setDesiredHopperFloorVoltage(double voltage) {
-    // if (voltage == 0.0) {
-    //   this.desiredHopperVoltage = 0.0;
-    // } else {
-    //   this.desiredHopperVoltage = hopperVoltage.get();
-    // }
     this.desiredHopperVoltage = voltage;
+  }
+
+  public void hopperFloorLogs() {
+    Logger.recordOutput("Mech/Hopper Floor/Desired Voltage", desiredHopperVoltage);
+    Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
   }
 }

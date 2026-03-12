@@ -28,6 +28,9 @@ public class TurretSubsystem extends SubsystemBase {
   private static TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
 
+  private static Slot0Configs slot0Configs;
+  private static MotionMagicConfigs motionMagicConfigs;
+
   private static final double SYSID_LIMIT_MARGIN_DEGREES = 10.0;
   private boolean sysIdRunning = false;
 
@@ -69,7 +72,7 @@ public class TurretSubsystem extends SubsystemBase {
     talonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
+    slot0Configs = talonFXConfigs.Slot0;
 
     slot0Configs.kG =
         0; // Add 0.2128 V output to overcome gravity (tuned in early feedforward testing)
@@ -85,7 +88,7 @@ public class TurretSubsystem extends SubsystemBase {
     slot0Configs.kD = turretKd.get(); // a velocity error of 1 rps results in 0.1 V output
 
     // MOTION MAGIC EXPO
-    MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
+    motionMagicConfigs = talonFXConfigs.MotionMagic;
 
     motionMagicConfigs.MotionMagicCruiseVelocity = 0; // unlimited cruise velocity
     motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps
@@ -99,39 +102,13 @@ public class TurretSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID gains from NetworkTables if they've changed, and reapply configs
-    Slot0Configs slot0Configs = talonFXConfigs.Slot0;
-    double newKp = turretKp.get();
-    double newKi = turretKi.get();
-    double newKd = turretKd.get();
-    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
-      slot0Configs.kP = newKp;
-      slot0Configs.kI = newKi;
-      slot0Configs.kD = newKd;
-      turretMotor.getConfigurator().apply(talonFXConfigs);
-    }
+    updateSlot0Configs();
 
     if (!sysIdRunning) {
       turretMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
     }
 
-    Logger.recordOutput("Mech/Turret/SysID/turretSysIDRunning", sysIdRunning);
-    // SysId tool expects these keys; log when SysId command is running
-    if (sysIdRunning) {
-      Logger.recordOutput(
-          "Mech/Turret/SysID/turretVoltage", turretMotor.getMotorVoltage().getValueAsDouble());
-      Logger.recordOutput(
-          "Mech/Turret/SysID/turretPosition",
-          getCurrentAngle().getRadians() / (2.0 * Math.PI)); // rotations
-      Logger.recordOutput(
-          "Mech/Turret/SysID/turretVelocity", getVelocityRadPerSec() / (2.0 * Math.PI)); // rot/s
-    }
-    Logger.recordOutput("Mech/Turret/boreEncoder", boreEncoder.get());
-    Logger.recordOutput("Mech/Turret/boreEncoder isConnected", boreEncoder.isConnected());
-    Logger.recordOutput("Mech/Turret/currentAngle", getCurrentAngle().getDegrees());
-    Logger.recordOutput("Mech/Turret/desiredAngle", desiredAngle.getDegrees());
-
-    // System.out.println(desiredAngle.getDegrees());
-    Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
+    turretLogs();
   }
 
   public void setDesiredAngle(
@@ -246,5 +223,38 @@ public class TurretSubsystem extends SubsystemBase {
                 .until(this::isSysIdOutOfBounds)
                 .finallyDo(() -> setSysIdRunning(false)))
         .withName("Turret SysId Dynamic " + direction);
+  }
+
+  public void updateSlot0Configs() {
+    double newKp = turretKp.get();
+    double newKi = turretKi.get();
+    double newKd = turretKd.get();
+    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+      slot0Configs.kP = newKp;
+      slot0Configs.kI = newKi;
+      slot0Configs.kD = newKd;
+      turretMotor.getConfigurator().apply(talonFXConfigs);
+    }
+  }
+
+  public void turretLogs() {
+    Logger.recordOutput("Mech/Turret/boreEncoder", boreEncoder.get());
+    Logger.recordOutput("Mech/Turret/boreEncoder isConnected", boreEncoder.isConnected());
+    Logger.recordOutput("Mech/Turret/currentAngle", getCurrentAngle().getDegrees());
+    Logger.recordOutput("Mech/Turret/desiredAngle", desiredAngle.getDegrees());
+
+    Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
+
+    // SysID
+    Logger.recordOutput("Mech/Turret/SysID/turretSysIDRunning", sysIdRunning);
+    if (sysIdRunning) {
+      Logger.recordOutput(
+          "Mech/Turret/SysID/turretVoltage", turretMotor.getMotorVoltage().getValueAsDouble());
+      Logger.recordOutput(
+          "Mech/Turret/SysID/turretPosition",
+          getCurrentAngle().getRadians() / (2.0 * Math.PI)); // rotations
+      Logger.recordOutput(
+          "Mech/Turret/SysID/turretVelocity", getVelocityRadPerSec() / (2.0 * Math.PI)); // rot/s
+    }
   }
 }

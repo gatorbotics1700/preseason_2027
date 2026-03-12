@@ -12,25 +12,25 @@ public class IntakeCommands {
   public IntakeCommands() {}
 
   public static Command ToggleIntake(IntakeSubsystem intakeSubsystem) {
-    if (!intakeSubsystem.getIsDeployed().getAsBoolean()) {
-      return new DeployIntakeCommand(intakeSubsystem)
-          .withName("Deploy Intake")
-          .andThen(new WaitCommand(0.75))
-          .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToTrue()));
+    if (intakeSubsystem.getIsDeployed().getAsBoolean()) {
+      return RetractIntake(intakeSubsystem);
     } else {
-      return new RetractIntakeCommand(intakeSubsystem)
-          .withName("Retract Intake")
-          .andThen(new WaitCommand(0.75))
-          .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToFalse()));
+      return DeployIntake(intakeSubsystem);
     }
   }
 
   public static Command RetractIntake(IntakeSubsystem intakeSubsystem) {
-    return new RetractIntakeCommand(intakeSubsystem).withName("Retract Intake");
+    return new RetractIntakeCommand(intakeSubsystem)
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToFalse()))
+        .withName("Retract Intake");
   }
 
   public static Command DeployIntake(IntakeSubsystem intakeSubsystem) {
-    return new DeployIntakeCommand(intakeSubsystem).withName("Deploy Intake");
+    return new DeployIntakeCommand(intakeSubsystem)
+        .andThen(new WaitCommand(0.75))
+        .andThen(new InstantCommand(() -> intakeSubsystem.setIsDeployedToTrue()))
+        .withName("Deploy Intake");
   }
 
   public static class HomeIntakeDeploy extends Command {
@@ -125,6 +125,15 @@ public class IntakeCommands {
                   IntakeConstants.RETRACTED_ANGLE_DEGREES
                       - intakeSubsystem.getCurrentAngle().getDegrees())
               <= IntakeConstants.POSITION_DEADBAND);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      if (!intakeSubsystem.isHallEffectTriggered()) {
+        new IntakeCommands.HomeIntakeDeploy(intakeSubsystem);
+      } else {
+        intakeSubsystem.zeroIntakeDeploy();
+      }
     }
   }
 }
