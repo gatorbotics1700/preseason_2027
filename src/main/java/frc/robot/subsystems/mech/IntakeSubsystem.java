@@ -2,6 +2,7 @@ package frc.robot.subsystems.mech;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -44,18 +45,26 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // Tunable PID gains for intake deploy
   public static final LoggedNetworkNumber intakeKp =
-      new LoggedNetworkNumber("/Tuning/Intake/kP", 0.0);
+      new LoggedNetworkNumber("/Tuning/Intake/kP", 1.0);
   public static final LoggedNetworkNumber intakeKi =
       new LoggedNetworkNumber("/Tuning/Intake/kI", 0.0);
   public static final LoggedNetworkNumber intakeKd =
-      new LoggedNetworkNumber("/Tuning/Intake/kD", 0.0);
-  
-  // Tunable Feedfoward gains for intake deploy
-  public static final LoggedNetworkNumber intakeKg = new LoggedNetworkNumber("/Tuning/Intake/kG", 0.0);
-  public static final LoggedNetworkNumber intakeKs = new LoggedNetworkNumber("/Tuning/Intake/kS", 0.0);
-  public static final LoggedNetworkNumber intakeKv = new LoggedNetworkNumber("/Tuning/Intake/kV", 0.0);
-  public static final LoggedNetworkNumber intakeKa = new LoggedNetworkNumber("/Tuning/Intake/kA", 0.0);
+      new LoggedNetworkNumber("/Tuning/Intake/kD", 0.1);
 
+  // Tunable Feedfoward gains for intake deploy
+  public static final LoggedNetworkNumber intakeKg =
+      new LoggedNetworkNumber("/Tuning/Intake/kG", 0.0);
+  public static final LoggedNetworkNumber intakeKs =
+      new LoggedNetworkNumber("/Tuning/Intake/kS", 0.0);
+  public static final LoggedNetworkNumber intakeKv =
+      new LoggedNetworkNumber("/Tuning/Intake/kV", 0.16);
+  public static final LoggedNetworkNumber intakeKa =
+      new LoggedNetworkNumber("/Tuning/Intake/kA", 0.01);
+
+  public static final LoggedNetworkNumber intakeExpoKa =
+      new LoggedNetworkNumber("/Tuning/Intake/Expo kA", 0.16);
+  public static final LoggedNetworkNumber intakeExpoKv =
+      new LoggedNetworkNumber("/Tuning/Intake/Expo kV", 0.1);
 
   private Rotation2d desiredAngle = new Rotation2d();
   private boolean useDeployPositionControl = false;
@@ -87,10 +96,10 @@ public class IntakeSubsystem extends SubsystemBase {
     // TODO: TUNE ALL OF THESE
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
 
-    slot0Configs.kG = 0.2128; // 0.2128 vaguely works
-    slot0Configs.kS = 0.25; // 0.25 vaguely works
-    slot0Configs.kV = 0.16; // 0.16 vaguely works
-    slot0Configs.kA = 0.01; // 0.01 vaguely works
+    slot0Configs.kG = intakeKg.get(); // 0.2128 vaguely works
+    slot0Configs.kS = intakeKs.get(); // 0.25 vaguely works
+    slot0Configs.kV = intakeKv.get(); // 0.16 vaguely works
+    slot0Configs.kA = intakeKa.get(); // 0.01 vaguely works
 
     // Initial PID gains come from tunable LoggedNetworkNumbers
     slot0Configs.kP = intakeKp.get(); // 1 vaguely works
@@ -100,10 +109,15 @@ public class IntakeSubsystem extends SubsystemBase {
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = deployTalonFXConfigs.MotionMagic;
 
+    CurrentLimitsConfigs currentLimitConfigs = deployTalonFXConfigs.CurrentLimits;
+
     motionMagicConfigs.MotionMagicCruiseVelocity = 0; // 0 gives us unlimited cruise velocity
-    motionMagicConfigs.MotionMagicExpo_kV = 0.16; // kV is around 0.12 V/rps, might be 0.12-0.2
+    motionMagicConfigs.MotionMagicExpo_kV =
+        intakeExpoKv.get(); // was 0.16 kV is around 0.12 V/rps, might be 0.12-0.2
     motionMagicConfigs.MotionMagicExpo_kA =
-        0.1; // Use a slower kA of 0.1 V/(rps/s) - the larger the kA, the smoother and slower
+        intakeExpoKa
+            .get(); // was 0.1 Use a slower kA of 0.1 V/(rps/s) - the larger the kA, the smoother
+    // and slower
 
     deployMotor.getConfigurator().apply(deployTalonFXConfigs);
 
@@ -121,24 +135,55 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // Update PID gains from NetworkTables if they've changed, and reapply configs
     Slot0Configs slot0Configs = deployTalonFXConfigs.Slot0;
+    MotionMagicConfigs motionMagicConfigs = deployTalonFXConfigs.MotionMagic;
+    CurrentLimitsConfigs currentLimitConfigs = deployTalonFXConfigs.CurrentLimits;
+
     double newKp = intakeKp.get();
     double newKi = intakeKi.get();
     double newKd = intakeKd.get();
-    if (newKp != slot0Configs.kP || newKi != slot0Configs.kI || newKd != slot0Configs.kD) {
+    double newKg = intakeKg.get();
+    double newKs = intakeKs.get();
+    double newKa = intakeKa.get();
+    double newKv = intakeKv.get();
+    double newExpoKa = intakeExpoKa.get();
+    double newExpoKv = intakeExpoKv.get();
+
+    if (newKp != slot0Configs.kP
+        || newKi != slot0Configs.kI
+        || newKd != slot0Configs.kD
+        || newKa != slot0Configs.kA
+        || newKv != slot0Configs.kV
+        || newKg != slot0Configs.kG
+        || newKs != slot0Configs.kS
+        || newExpoKa != motionMagicConfigs.MotionMagicExpo_kA
+        || newExpoKv != motionMagicConfigs.MotionMagicExpo_kV) {
       slot0Configs.kP = newKp;
       slot0Configs.kI = newKi;
       slot0Configs.kD = newKd;
+      slot0Configs.kG = newKg;
+      slot0Configs.kS = newKs;
+      slot0Configs.kA = newKa;
+      slot0Configs.kV = newKv;
+      motionMagicConfigs.MotionMagicExpo_kA = newExpoKa;
+      motionMagicConfigs.MotionMagicExpo_kV = newExpoKv;
       deployMotor.getConfigurator().apply(deployTalonFXConfigs);
     }
 
     if (!sysIdRunning && useDeployPositionControl) {
-      double errorDeg = Math.abs(getCurrentAngle().getDegrees() - desiredAngle.getDegrees());
-      if (errorDeg > IntakeConstants.POSITION_DEADBAND) {
-        deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
-      } else {
-        deployMotor.setControl(
-            m_request.withPosition(degreesToRevs(getCurrentAngle().getDegrees())));
+      // double errorDeg = Math.abs(getCurrentAngle().getDegrees() - desiredAngle.getDegrees());
+      // if (errorDeg > IntakeConstants.POSITION_DEADBAND) {
+      deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
+      if (isDeployed.getAsBoolean() && currentLimitConfigs.StatorCurrentLimit != 10) {
+        currentLimitConfigs.StatorCurrentLimit = 10;
+        deployMotor.getConfigurator().apply(deployTalonFXConfigs);
+      } else if (!isDeployed.getAsBoolean() && currentLimitConfigs.StatorCurrentLimit != 60) {
+        currentLimitConfigs.StatorCurrentLimit = 60;
+        deployMotor.getConfigurator().apply(deployTalonFXConfigs);
       }
+      // } else {
+      //   deployMotor.setControl(
+      //       m_request.withPosition(degreesToRevs(getCurrentAngle().getDegrees())));
+      // }
     }
 
     Logger.recordOutput("Mech/Intake/SysID/intakeSysIDRunning", sysIdRunning);
@@ -163,6 +208,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Mech/Intake/Current Intake Motor Output", intakeMotor.get());
     Logger.recordOutput("Mech/Intake/Desired Intake Voltage", desiredIntakeVoltage);
+
+    Logger.recordOutput(
+        "Mech/Intake/ClosedLoopReference", deployMotor.getClosedLoopReference().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Intake/ClosedLoopError", deployMotor.getClosedLoopError().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Intake/Stator Current", deployMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Intake/Supply Current", deployMotor.getSupplyCurrent().getValueAsDouble());
     // TODO have position and voltage setting in periodic once deploy homing is set up?
   }
 
@@ -231,13 +285,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void toggleIntake() {
     if (isDeployed.getAsBoolean()) {
-      desiredAngle = IntakeConstants.RETRACTED_POSITION;
+      // desiredAngle = IntakeConstants.RETRACTED_POSITION;
       isDeployed =
           () -> {
             return false;
           };
     } else {
-      desiredAngle = IntakeConstants.EXTENDED_POSITION;
+      // desiredAngle = IntakeConstants.EXTENDED_POSITION;
       isDeployed =
           () -> {
             return true;
@@ -247,6 +301,20 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public BooleanSupplier getIsDeployed() {
     return isDeployed;
+  }
+
+  public void setIsDeployedToTrue() {
+    isDeployed =
+        () -> {
+          return true;
+        };
+  }
+
+  public void setIsDeployedToFalse() {
+    isDeployed =
+        () -> {
+          return false;
+        };
   }
 
   private double getVelocityRadPerSec() {
