@@ -353,14 +353,14 @@ public class RobotContainer {
   }
 
   public void configureCodriverButtonBindings() {
-    if (DriverStation.isJoystickConnected(3)) {
+    if (DriverStation.isJoystickConnected(1)) {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
-        controller_two = new CommandSimMacXboxController(3);
+        controller_two = new CommandSimMacXboxController(1);
         // putting this here because it should only run when we're in sim!
 
       } else {
-        controller_two = new CommandXboxController(3);
+        controller_two = new CommandXboxController(1);
       }
 
       if (Constants.currentMode == Constants.Mode.SIM) {
@@ -832,14 +832,14 @@ public class RobotContainer {
     }
 
   public void configureSysIdButtons() {
-    if (DriverStation.isJoystickConnected(3)) {
+    if (DriverStation.isJoystickConnected(1)) {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
-        controller_two = new CommandSimMacXboxController(3);
+        controller_two = new CommandSimMacXboxController(1);
         // putting this here because it should only run when we're in sim!
 
       } else {
-        controller_two = new CommandXboxController(3);
+        controller_two = new CommandXboxController(1);
       }
 
       // TODO: drivetrain sysid buttons -- uncomment for use
