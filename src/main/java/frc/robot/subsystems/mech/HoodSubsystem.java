@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.TunerConstants;
-import frc.robot.util.RobotConfigLoader;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -52,13 +51,13 @@ public class HoodSubsystem extends SubsystemBase {
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
 
-    if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
-      talonFXConfigs.withMotorOutput(
-          new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    } else {
-      talonFXConfigs.withMotorOutput(
-          new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-    }
+    // if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
+    //   talonFXConfigs.withMotorOutput(
+    //       new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+    // } else {
+    talonFXConfigs.withMotorOutput(
+        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+    // }
 
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
