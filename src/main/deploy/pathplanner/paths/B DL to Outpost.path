@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.523431250000001,
+        "x": 4.52343125,
         "y": 7.070864945023149
       },
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 1.890243986004233
   },
   "reversed": false,
-  "folder": "Blue Outpost & DC",
+  "folder": "Blue Non-starters",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -1,0 +1,143 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R LN to Fuel Pile L"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R Fuel Pile L to ML"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intaking Command"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R Fuel Pile ML to L RP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RP L to Shoot M"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shooter Command"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shooter Command"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R Shoot M to LN"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R LN to Fuel Pile L"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R Fuel Pile ML to L RP"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intaking Command"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R Fuel Pile ML to L RP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RP L to Shoot M"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shooter Command"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Command"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Round About Autos",
+  "choreoAuto": false
+}

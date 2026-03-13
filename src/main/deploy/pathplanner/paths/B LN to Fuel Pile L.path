@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.964678457754631,
-        "y": 7.394652922453704
+        "x": 6.659195818865741,
+        "y": 7.554611400462964
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.766767216435186,
-        "y": 5.927273365162036
+        "x": 7.802065682870371,
+        "y": 6.9940350115740735
       },
       "prevControl": {
-        "x": 7.728909939236111,
-        "y": 7.334094401041666
+        "x": 6.225182146990741,
+        "y": 7.672447916666666
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.89700604349025
+    "rotation": 107.24361698510789
   },
   "reversed": false,
-  "folder": "Blue Left Starters",
+  "folder": "BLUE 1P RB",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.6946323292452
+    "rotation": 89.4116587883934
   },
   "useDefaultConstraints": true
 }

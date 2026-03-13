@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 7.349024956597223,
-        "y": 3.7097029803240735
+        "y": 3.709702980324073
       },
       "isLocked": false,
       "linkedName": null
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Blue Fuel Pile Starts",
+  "folder": "Blue Non-starters",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

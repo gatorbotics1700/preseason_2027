@@ -45,10 +45,10 @@
     "rotation": -0.19713041717638446
   },
   "reversed": false,
-  "folder": "Red Outpost & DC",
+  "folder": "Red Non-starters",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.69987479104485
+    "rotation": 90.69987479104486
   },
   "useDefaultConstraints": true
 }

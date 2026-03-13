@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 7.7205775033068775,
-        "y": 1.0695913938492088
+        "y": 1.0695913938492092
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 179.83847359821323
   },
   "reversed": false,
-  "folder": "Blue Right Starters",
+  "folder": "Blue Starters",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -179.51744205196806

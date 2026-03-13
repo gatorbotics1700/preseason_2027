@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.509854528356482,
-        "y": 1.9685306712962944
+        "x": 2.5098545283564824,
+        "y": 1.968530671296294
       },
       "isLocked": false,
       "linkedName": null
@@ -20,7 +20,7 @@
         "y": 0.666
       },
       "prevControl": {
-        "x": 2.160467925347223,
+        "x": 2.1604679253472225,
         "y": 1.877200810185185
       },
       "nextControl": null,
@@ -45,7 +45,7 @@
     "rotation": -0.23450845931651254
   },
   "reversed": false,
-  "folder": "Blue Outpost & DC",
+  "folder": "Blue Non-starters",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

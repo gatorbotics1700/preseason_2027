@@ -1,0 +1,143 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B RN To Fuel Pile R"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "B Fuel Pile R to MR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intaking Command"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B Fuel Pile MR to BP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BP R to Shoot M"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shooter Command"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shooter Command"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B Shoot M to RN"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B RN To Fuel Pile R"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "B Fuel Pile R to MR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intaking Command"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B Fuel Pile MR to BP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BP R to Shoot M"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shooter Command"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shooter Command"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Round About Autos",
+  "choreoAuto": false
+}
