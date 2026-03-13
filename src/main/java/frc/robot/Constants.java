@@ -41,7 +41,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.util.Calculations;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ValidStationaryShot;
 
 /**
  * This class defines the runtime mode used by AdvantageKit and loads robot-specific configuration
@@ -398,6 +400,39 @@ public final class Constants {
 
     public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera1Transform();
 
+    public static final String CAMERA_2_NAME = RobotConfigLoader.getString("camera.2.name");
+
+    public static final double ROBOT_TO_CAMERA_2_X_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.x_meters");
+    public static final double ROBOT_TO_CAMERA_2_Y_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.y_meters");
+    public static final double ROBOT_TO_CAMERA_2_Z_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.z_meters");
+    public static final double ROBOT_TO_CAMERA_2_ROLL_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.roll_degrees");
+    public static final double ROBOT_TO_CAMERA_2_PITCH_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.pitch_degrees");
+    public static final double ROBOT_TO_CAMERA_2_YAW_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_2.yaw_degrees");
+
+    public static Transform3d ROBOT_TO_CAMERA_2 = createRobotToCamera2Transform();
+
+    public static final String CAMERA_3_NAME = RobotConfigLoader.getString("camera.3.name");
+    public static final double ROBOT_TO_CAMERA_3_X_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.x_meters");
+    public static final double ROBOT_TO_CAMERA_3_Y_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.y_meters");
+    public static final double ROBOT_TO_CAMERA_3_Z_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.z_meters");
+    public static final double ROBOT_TO_CAMERA_3_ROLL_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.roll_degrees");
+    public static final double ROBOT_TO_CAMERA_3_PITCH_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.pitch_degrees");
+    public static final double ROBOT_TO_CAMERA_3_YAW_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_3.yaw_degrees");
+
+    public static Transform3d ROBOT_TO_CAMERA_3 = createRobotToCamera3Transform();
+
     public static Transform3d[] ROBOT_TO_CAMERA_TRANSFORMS_ARRAY = createCameraTransformsArray();
 
     // Basic filtering thresholds
@@ -451,6 +486,26 @@ public final class Constants {
           ROBOT_TO_CAMERA_1_YAW_DEGREES);
     }
 
+    public static Transform3d createRobotToCamera2Transform() {
+      return createRobotToCameraTransform(
+          ROBOT_TO_CAMERA_2_X_METERS,
+          ROBOT_TO_CAMERA_2_Y_METERS,
+          ROBOT_TO_CAMERA_2_Z_METERS,
+          ROBOT_TO_CAMERA_2_ROLL_DEGREES,
+          ROBOT_TO_CAMERA_2_PITCH_DEGREES,
+          ROBOT_TO_CAMERA_2_YAW_DEGREES);
+    }
+
+    public static Transform3d createRobotToCamera3Transform() {
+      return createRobotToCameraTransform(
+          ROBOT_TO_CAMERA_3_X_METERS,
+          ROBOT_TO_CAMERA_3_Y_METERS,
+          ROBOT_TO_CAMERA_3_Z_METERS,
+          ROBOT_TO_CAMERA_3_ROLL_DEGREES,
+          ROBOT_TO_CAMERA_3_PITCH_DEGREES,
+          ROBOT_TO_CAMERA_3_YAW_DEGREES);
+    }
+
     public static Transform3d createRobotToCameraTransform(
         double xMeters,
         double yMeters,
@@ -469,7 +524,9 @@ public final class Constants {
     }
 
     public static Transform3d[] createCameraTransformsArray() {
-      Transform3d[] array = {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
+      Transform3d[] array = {
+        ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3
+      };
       return array;
     }
 
@@ -548,7 +605,7 @@ public final class Constants {
     public static final double DEPLOY_PULLEY_ONE_GEAR_RATIO = 42.0 / 18.0;
     public static final double DEPLOY_PULLEY_TWO_GEAR_RATIO = 36.0 / 18.0;
 
-    public static final double EXTENDED_ANGLE_DEGREES = 96;
+    public static final double EXTENDED_ANGLE_DEGREES = 95;
     public static final double RETRACTED_ANGLE_DEGREES = 0;
 
     public static final Rotation2d EXTENDED_POSITION =
@@ -558,11 +615,12 @@ public final class Constants {
 
     public static final double HOMING_VOLTAGE = -1; // TODO tune
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
-    public static final double INTAKING_VOLTAGE = 10;
+    public static final double INTAKING_VOLTAGE = 13;
 
     public static final double POSITION_DEADBAND = 3;
 
     public static final double ROBOT_TO_INTAKE_YAW_DEGREES = 180;
+    public static final double DEPLOYED_CURRENT_LIMIT = 10.0; // amps
   }
 
   public static final class ShooterConstants {
@@ -573,14 +631,41 @@ public final class Constants {
     public static final double TRANSITION_VOLTAGE = 10;
     public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-    public static final double FLYWHEEL_SLIP = 0.27; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_SLIP = 0.17; // 0.7; // TODO TUNE!!!
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER =
         new Translation3d(
-            0.146, 0,
-            0.368); // TODO figure out what part of the shooter to measure from (this is the center
+            0.152, 0,
+            0.495); // TODO figure out what part of the shooter to measure from (this is the center
     // of the turret plate)
+    public static final ValidStationaryShot RED_RIGHT =
+        new ValidStationaryShot(
+            new Pose2d(
+                13.3,
+                7.2,
+                Calculations.angleToPoint(
+                    FieldCoordinates.RED_HUB.getX() - 13.3, FieldCoordinates.RED_HUB.getY() - 7.2)),
+            new Rotation2d(Math.toRadians(64)),
+            62.2);
+    public static final ValidStationaryShot BLUE_LEFT =
+        new ValidStationaryShot(
+            Calculations.mirrorPoseAcrossAlliance(RED_RIGHT.pose),
+            new Rotation2d(Math.toRadians(64)),
+            62.2);
+    public static final ValidStationaryShot RED_LEFT =
+        new ValidStationaryShot(
+            Calculations.mirrorPoseAcrossXAxis(RED_RIGHT.pose),
+            new Rotation2d(Math.toRadians(64)),
+            62.2);
+    public static final ValidStationaryShot BLUE_RIGHT =
+        new ValidStationaryShot(
+            Calculations.mirrorPoseAcrossXAxis(BLUE_LEFT.pose),
+            new Rotation2d(Math.toRadians(64)),
+            62.2);
+    public static final ValidStationaryShot[] STATIONARY_SHOT_ARRAY = {
+      RED_LEFT, RED_RIGHT, BLUE_LEFT, BLUE_RIGHT
+    };
   }
 
   public static final class TurretConstants {
@@ -631,7 +716,7 @@ public final class Constants {
     // shot height measures the highest point of the arc in meters, max should be ceiling height
     // minus a bit, and min should be just over the target height
     public static final double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
-    public static final double MAX_SHOT_HEIGHT = 3.35; // 2 meters for MSLL
+    public static final double MAX_SHOT_HEIGHT = 2.85; // 3.35; // 2 meters for MSLL
     public static final double MAX_SHOT_SPEED =
         80
             * ShooterConstants.FLYWHEEL_GEAR_RATIO
@@ -648,5 +733,6 @@ public final class Constants {
         FieldCoordinates.BLUE_HUB.toTranslation2d().getNorm()
             + 0.1; // m //TODO calculate furthest distance we would ever want to shoot from
     // kraken x60 max velocity is ~100 rps
+    public static final double RANGE_FUDGE = 1.0;
   }
 }

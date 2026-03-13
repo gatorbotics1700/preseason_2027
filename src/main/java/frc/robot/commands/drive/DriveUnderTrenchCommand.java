@@ -30,13 +30,13 @@ public class DriveUnderTrenchCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B TR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B TL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
@@ -67,12 +67,12 @@ public class DriveUnderTrenchCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       }
     }
     return pathToFollow.withName("DriveUnderTrench");

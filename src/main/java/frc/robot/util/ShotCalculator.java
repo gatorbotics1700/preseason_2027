@@ -185,11 +185,18 @@ public class ShotCalculator {
     double radialVelo = trajectoryRelativeShooterVelo.getX();
 
     double uncompRange = get2dDistance(fieldToShooter, target);
+    uncompRange += ShotCalculatorConditions.RANGE_FUDGE;
 
     // double shooterToHubHeight = target.getZ() - fieldToShooter.getZ();
     Translation3d fieldRelativeShooterToTarget = target.minus(fieldToShooter);
 
     ShotParameters trajectoryRelativeParams;
+    Logger.recordOutput("Mech/Shot Calculator/drivetrainPose", drivetrainPose);
+    Logger.recordOutput("Mech/Shot Calculator/chassisSpeeds", chassisSpeeds);
+    Logger.recordOutput("Mech/Shot Calculator/tan velo", tangentialVelo);
+    Logger.recordOutput("Mech/Shot Calculator/rad velo", radialVelo);
+    Logger.recordOutput("Mech/Shot Calculator/target", target);
+    Logger.recordOutput("Mech/Shot Calculator/uncomprange", uncompRange);
 
     if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
       trajectoryRelativeParams =
@@ -206,7 +213,7 @@ public class ShotCalculator {
                 .turretAngle
                 .plus(uncompTurretToTargetAngle)
                 .minus(drivetrainPose.getRotation()),
-            trajectoryRelativeParams.hoodAngle,
+            trajectoryRelativeParams.hoodAngle, // .minus(new Rotation2d(Math.toRadians(3))),
             trajectoryRelativeParams.shotSpeed);
     Logger.recordOutput("shotCalculator/turretAngle", botRelativeParams.turretAngle);
     Logger.recordOutput("shotCalculator/landingCoords", landingCoords);

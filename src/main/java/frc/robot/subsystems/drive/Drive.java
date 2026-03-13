@@ -264,6 +264,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
+    Rotation2d hubAngle = getDesiredHubAngle();
+    Logger.recordOutput(
+        "Drivetrain/Desired Drivetrain Angle to Hub (Degrees)",
+        hubAngle != null ? hubAngle.getDegrees() : Double.NaN);
+
+    // Back-compat key for existing dashboards/logs (this is NOT the hub angle; it's the drive's
+    // active desired angle used by auto-rotation/pathing features).
     Rotation2d currentDesiredAngle = getDesiredAngle();
     Logger.recordOutput(
         "Robot/Desired Angle (Degrees)",
@@ -485,6 +492,21 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     }
   }
 
+  /** Returns the drivetrain angle that would point at the alliance hub (for logging/shot math). */
+  public Rotation2d getDesiredHubAngle() {
+    Translation2d hub = getAllianceTargetPoint();
+    if (hub == null) {
+      return null;
+    }
+
+    Pose2d currentPose = getPose();
+    double deltaX = hub.getX() - currentPose.getX();
+    double deltaY = hub.getY() - currentPose.getY();
+    Rotation2d angle = angleToPoint(deltaX, deltaY);
+
+    return angle;
+  }
+
   private Translation2d getAllianceTargetPoint() {
     if (DriverStation.getAlliance().isPresent()) {
       return DriverStation.getAlliance().get() == Alliance.Red
@@ -560,7 +582,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     double error = desiredValue - currentValue;
     if (Math.abs(error) < VisionConstants.DISTANCE_DEADBAND_METERS) { // Stop if within deadband
       error = 0.0;
-      // System.out.println("AT X DEADBAND");
     }
     return error;
   }
@@ -571,7 +592,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     if (Math.abs(error) < VisionConstants.ROTATION_DEADBAND_DEGREES) { // Stop if within deadband
       error = 0.0;
-      // System.out.println("AT X DEADBAND");
     }
     return error;
   }

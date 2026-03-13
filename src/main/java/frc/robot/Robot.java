@@ -205,6 +205,7 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHopperFloorSubsystem(),
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
+    System.out.println("IN TELEOP INIT");
     CommandScheduler.getInstance()
         .schedule(
             robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps

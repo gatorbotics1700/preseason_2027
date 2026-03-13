@@ -29,13 +29,13 @@ public class DriveOverBumpCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B BR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B BL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
@@ -66,12 +66,12 @@ public class DriveOverBumpCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R BR A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R BL A to N"), constraints);
-        shooterSubsystem.setShouldShoot(true);
+        shooterSubsystem.setShouldShoot(false);
       }
     }
     return pathToFollow.withName("DriveOverBump");

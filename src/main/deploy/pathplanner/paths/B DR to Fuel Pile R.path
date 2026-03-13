@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.4191,
+        "x": 0.669,
         "y": 5.01269
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1553965567162683,
-        "y": 6.189912326381257
+        "x": 3.17235529513889,
+        "y": 6.43358984375
       },
       "isLocked": false,
       "linkedName": null
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 91.12933369389964
+    "rotation": 1.7052443434923519
   },
   "reversed": false,
   "folder": "B Depot to Fuel Pile",

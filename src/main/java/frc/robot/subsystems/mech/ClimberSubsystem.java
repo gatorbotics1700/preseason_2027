@@ -101,27 +101,6 @@ public class ClimberSubsystem extends SubsystemBase {
       motor.getConfigurator().apply(talonFXConfigs);
     }
 
-    Logger.recordOutput("Mech/Climber/desiredPositionInches", desiredPositionInches);
-    Logger.recordOutput("Mech/Climber/currentPositionInches", getCurrentPositionInches());
-    Logger.recordOutput("Mech/Climber/Motor Output", motor.get());
-    Logger.recordOutput(
-        "Mech/Climber/Control Mode", positionControl ? "position control" : "voltage control");
-    Logger.recordOutput(
-        "Mech/Climber/Hall Effect Triggered (!halleffect.get)", hallEffectTriggered());
-    Logger.recordOutput("Mech/Climber/Setting Positions", settingPosition);
-
-    Logger.recordOutput("Mech/Climber/SysID/climberSysIDRunning", sysIdRunning);
-    if (sysIdRunning) {
-      Logger.recordOutput(
-          "Mech/Climber/SysID/climberVoltage", motor.getMotorVoltage().getValueAsDouble());
-      Logger.recordOutput(
-          "Mech/Climber/SysID/climberPosition",
-          Units.inchesToMeters(getCurrentPositionInches())); // meters
-      Logger.recordOutput(
-          "Mech/Climber/SysID/climberVelocity",
-          Units.inchesToMeters(1) * getVelocityInchesPerSec()); // m/s
-    }
-
     if (!sysIdRunning) {
       if (positionControl
           && (!hallEffectTriggered()
@@ -129,10 +108,12 @@ public class ClimberSubsystem extends SubsystemBase {
         motor.setControl(m_request.withPosition(inchesToRevs(desiredPositionInches)));
         settingPosition = true;
       } else if (hallEffectTriggered()) {
-        setClimberVoltage(0); // TODO figure out if this actually works?
+        setClimberVoltage(0);
         settingPosition = false;
       }
     }
+
+    climberLogs();
   }
 
   public void setDesiredPositionInches(double desiredPositionInches) {
@@ -233,5 +214,29 @@ public class ClimberSubsystem extends SubsystemBase {
                 .until(this::isSysIdOutOfBounds)
                 .finallyDo(() -> setSysIdRunning(false)))
         .withName("Climber SysId Dynamic " + direction);
+  }
+
+  public void climberLogs() {
+    Logger.recordOutput("Mech/Climber/desiredPositionInches", desiredPositionInches);
+    Logger.recordOutput("Mech/Climber/currentPositionInches", getCurrentPositionInches());
+    Logger.recordOutput("Mech/Climber/Motor Output", motor.get());
+    Logger.recordOutput(
+        "Mech/Climber/Control Mode", positionControl ? "position control" : "voltage control");
+    Logger.recordOutput(
+        "Mech/Climber/Hall Effect Triggered (!halleffect.get)", hallEffectTriggered());
+    Logger.recordOutput("Mech/Climber/Setting Positions", settingPosition);
+
+    // SysID
+    Logger.recordOutput("Mech/Climber/SysID/climberSysIDRunning", sysIdRunning);
+    if (sysIdRunning) {
+      Logger.recordOutput(
+          "Mech/Climber/SysID/climberVoltage", motor.getMotorVoltage().getValueAsDouble());
+      Logger.recordOutput(
+          "Mech/Climber/SysID/climberPosition",
+          Units.inchesToMeters(getCurrentPositionInches())); // meters
+      Logger.recordOutput(
+          "Mech/Climber/SysID/climberVelocity",
+          Units.inchesToMeters(1) * getVelocityInchesPerSec()); // m/s
+    }
   }
 }

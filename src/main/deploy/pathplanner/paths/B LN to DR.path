@@ -20,7 +20,7 @@
         "y": 5.01269
       },
       "prevControl": {
-        "x": 1.0578278356440087,
+        "x": 1.0578278356440085,
         "y": 5.028146629047303
       },
       "nextControl": null,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "Blue Left Starters",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.35079313696095
+    "rotation": -90.35079313696096
   },
   "useDefaultConstraints": true
 }

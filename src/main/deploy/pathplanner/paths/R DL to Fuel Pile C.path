@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.257742549189816,
-        "y": 0.6466752748842595
+        "x": 12.25774321489611,
+        "y": 0.6466701805329921
       },
       "isLocked": false,
       "linkedName": null
@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 8.684986617476852,
-        "y": -1.0032983940972233
+        "y": -1.0032983940972242
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "R Depot to Fuel Pile",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 88.66422775038194
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
