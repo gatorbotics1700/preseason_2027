@@ -173,12 +173,12 @@ public class ShootingCommands {
 
     @Override
     public void execute() {
-      double desiredRotorVelocity =
-          ShooterSubsystem.launchSpeedToRotorSpeed(validStationaryShot.shotSpeed);
+      // double desiredRotorVelocity =
+      //     ShooterSubsystem.launchSpeedToRotorSpeed(validStationaryShot.shotSpeed);
       shooterSubsystem.setDesiredRotorVelocity(
-          desiredRotorVelocity); // set velocity to our desired velocity
+          validStationaryShot.shotSpeed); // set velocity to our desired velocity
       hopperFloorSubsystem.setDesiredHopperFloorVoltage(HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
-      if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - desiredRotorVelocity)
+      if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - validStationaryShot.shotSpeed)
           < ShooterConstants
               .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired
         // velocity

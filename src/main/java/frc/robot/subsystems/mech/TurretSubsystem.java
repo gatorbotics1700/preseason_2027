@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,7 +47,8 @@ public class TurretSubsystem extends SubsystemBase {
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
   private DutyCycleEncoder boreEncoder =
       new DutyCycleEncoder(TurretConstants.TURRET_BORE_ENCODER_PORT);
-  private final DigitalInput hallEffect = new DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
+  // private final DigitalInput hallEffect = new
+  // DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
 
   private Rotation2d desiredAngle;
 
@@ -146,12 +146,12 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public double degreesToRevs(double turretAngleDegrees) {
-    return turretAngleDegrees / 360 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
+    return turretAngleDegrees / 360.0 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
   }
 
-  public boolean isHallEffectTriggered() {
-    return !hallEffect.get();
-  }
+  // public boolean isHallEffectTriggered() {
+  //   return !hallEffect.get();
+  // }
 
   public void setMotorVoltage(double voltage) {
     turretMotor.setVoltage(voltage);
@@ -168,7 +168,8 @@ public class TurretSubsystem extends SubsystemBase {
                 * TURRET_GEARBOX_RATIO
                 * GEAR_REVS_PER_TURRET_REV
             + degreesToRevs(TurretConstants.TURRET_HOMING_ANGLE));
-    setDesiredAngle(getCurrentAngle());
+    System.out.println("ANGLE AT END OF TURRET HOMING: " + getCurrentAngle());
+    setDesiredAngle((new Rotation2d(Math.toRadians(0))));
   }
 
   private double getVelocityRadPerSec() {
@@ -261,7 +262,17 @@ public class TurretSubsystem extends SubsystemBase {
     Logger.recordOutput("Mech/Turret/currentAngle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Turret/desiredAngle", desiredAngle.getDegrees());
 
-    Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
+    // Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
+    Logger.recordOutput(
+        "Mech/Turret/motor output", turretMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Turret/closed loop feed foward",
+        turretMotor.getClosedLoopFeedForward().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Turret/closed loop reference",
+        turretMotor.getClosedLoopReference().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Turret/closed loop error", turretMotor.getClosedLoopError().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Turret/SysID/turretSysIDRunning", sysIdRunning);

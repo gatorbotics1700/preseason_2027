@@ -27,10 +27,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldCoordinates;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.HopperFloorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -58,6 +62,7 @@ import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.Calculations;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
 // import frc.robot.util.MultiStepAutoChooser; // COMMENTED OUT - using PathPlanner pre-made autos
@@ -67,7 +72,6 @@ import frc.robot.util.ShotParameters;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   // Subsystems
@@ -91,7 +95,7 @@ public class RobotContainer {
   // Dashboard inputs
   // private final MultiStepAutoChooser multiStepAutoChooser; // COMMENTED OUT - using PathPlanner
   // pre-made autos
-  private final LoggedDashboardChooser<Command> autoChooser;
+  // private final LoggedDashboardChooser<Command> autoChooser;
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> chassisSpeeds;
 
@@ -195,8 +199,8 @@ public class RobotContainer {
             }));
 
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
-    autoChooser =
-        new LoggedDashboardChooser<>("Auto/PathPlanner Auto", AutoBuilder.buildAutoChooser());
+    // autoChooser =
+    //     new LoggedDashboardChooser<>("Auto/PathPlanner Auto", AutoBuilder.buildAutoChooser());
 
     // COMMENTED OUT - using PathPlanner pre-made autos instead of DynamicAutoBuilder
     // multiStepAutoChooser =
@@ -729,7 +733,7 @@ public class RobotContainer {
         //             () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
 
         // controller_two
-        //     .rightTrigger()
+        //     .povDown()
         //     .onTrue(
         //         new InstantCommand(
         //             () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-36)))));
@@ -831,6 +835,17 @@ public class RobotContainer {
                           .schedule(new DriveToFuelCommand(drive, vision, robotPose)),
                   drive,
                   vision));
+      controller
+          .x()
+          .onTrue(
+              AutoBuilder.pathfindToPose(
+                  new Pose2d(
+                      robotPose.get().getX(),
+                      robotPose.get().getY(),
+                      Calculations.angleToPoint(
+                          FieldCoordinates.OUR_ALLIANCE_HUB.getX() - robotPose.get().getX(),
+                          FieldCoordinates.OUR_ALLIANCE_HUB.getY() - robotPose.get().getY())),
+                  new PathConstraints(0, 0, 10, 10)));
 
       controller
           .rightTrigger()
@@ -907,6 +922,7 @@ public class RobotContainer {
   }
 
   public void configureSysIdButtons() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
     if (DriverStation.isJoystickConnected(1)) {
       if (Constants.currentMode == Constants.Mode.SIM
           && System.getProperty("os.name").contains("Mac")) {
@@ -968,15 +984,15 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // Using PathPlanner pre-made autos
-    Command selected = autoChooser.get();
-    return selected != null ? selected : Commands.none();
+    // Command selected = autoChooser.get();
+    // return selected != null ? selected : Commands.none();
 
     // COMMENTED OUT - using PathPlanner pre-made autos instead of DynamicAutoBuilder
     // try {
     //   return multiStepAutoChooser.getAutonomousCommand();
     // } catch (Exception ioe) {
     //   System.out.println("bad io error");
-    //   return Commands.none();
+    return Commands.none();
     // }
   }
 
@@ -1028,6 +1044,79 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverButtonBindings();
     configureCodriverButtonBindings();
+  }
+
+  public void configureSystemCheckButtons() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+    if (DriverStation.isJoystickConnected(1)) {
+      if (Constants.currentMode == Constants.Mode.SIM
+          && System.getProperty("os.name").contains("Mac")) {
+        controller_two = new CommandSimMacXboxController(1);
+        // putting this here because it should only run when we're in sim!
+
+      } else {
+        controller_two = new CommandXboxController(1);
+      }
+
+      controller_two
+          .a()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    drive.runVelocity(new ChassisSpeeds(0.2, 0.0, 0.0));
+                    shooterSubsystem.setDesiredRotorVelocity(80);
+                    shooterSubsystem.setDesiredTransitionVoltage(
+                        ShooterConstants.TRANSITION_VOLTAGE);
+                    hopperFloorSubsystem.setDesiredHopperFloorVoltage(
+                        HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
+                    intakeSubsystem.setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
+                  }));
+
+      controller_two
+          .b()
+          .onTrue(
+              HoodCommands.HomeHood(hoodSubsystem)
+                  .andThen(new WaitCommand(1))
+                  .andThen(
+                      new InstantCommand(
+                          () -> hoodSubsystem.setDesiredAngle(HoodConstants.MIN_ANGLE)))
+                  .andThen(new WaitCommand(1))
+                  .andThen(
+                      new InstantCommand(
+                          () -> hoodSubsystem.setDesiredAngle(HoodConstants.RETRACTED_POSITION))));
+
+      controller_two
+          .x()
+          .onTrue(
+              new ClimbCommands.HomeClimber(climberSubsystem)
+                  .andThen(new WaitCommand(1))
+                  .andThen(ClimbCommands.ExtendClimber(climberSubsystem))
+                  .andThen(new WaitCommand(1))
+                  .andThen(ClimbCommands.RetractClimber(climberSubsystem)));
+
+      controller_two
+          .y()
+          .onTrue(
+              new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)
+                  .andThen(new WaitCommand(1))
+                  .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
+                  .andThen(new WaitCommand(1))
+                  .andThen(IntakeCommands.RetractIntake(intakeSubsystem)));
+
+      controller_two
+          .rightBumper()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              MechStop(
+                                  turretSubsystem,
+                                  shooterSubsystem,
+                                  hopperFloorSubsystem,
+                                  hoodSubsystem,
+                                  intakeSubsystem))));
+    }
   }
 
   public void teleopInit() {
@@ -1101,19 +1190,18 @@ public class RobotContainer {
 
   public Command HomeMechanisms() { // TODO: uncomment these other homing commands
     return (HoodCommands.HomeHood(hoodSubsystem)
-            // .alongWith(
-            //     new ClimbCommands.HomeClimber(
-            //         climberSubsystem))
-            // .alongWith(new TurretHomingCommand(turretSubsystem))
-            // TODO: this line would make it so the turret doesn't run the homing command since no
-            // limit switch and we assume it's in the right sector on init
-            .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
+            .alongWith(new ClimbCommands.HomeClimber(climberSubsystem))
+            // .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
         .withName("Home Mechansims");
   }
 
   public TurretSubsystem getTurretSubsystem() {
     return turretSubsystem;
+  }
+
+  public ClimberSubsystem getClimberSubsystem() {
+    return climberSubsystem;
   }
 
   public IntakeSubsystem getIntakeSubsystem() {

@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
@@ -211,9 +211,12 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance()
         .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
     CommandScheduler.getInstance()
-        .schedule(new InstantCommand(() -> robotContainer.getTurretSubsystem().homeTurret()));
-    CommandScheduler.getInstance()
-        .schedule(new InstantCommand(() -> robotContainer.getIntakeSubsystem().zeroIntakeDeploy()));
+        .schedule(new ClimbCommands.HomeClimber(robotContainer.getClimberSubsystem()));
+    // CommandScheduler.getInstance()
+    //     .schedule(new InstantCommand(() -> robotContainer.getTurretSubsystem().homeTurret()));
+    // CommandScheduler.getInstance()
+    //     .schedule(new InstantCommand(() ->
+    // robotContainer.getIntakeSubsystem().zeroIntakeDeploy()));
     // CommandScheduler.getInstance()
     //     .schedule(
     //         robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps
@@ -238,7 +241,8 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().cancelAll();
     // robotContainer.configureDriverButtonBindings();
     // robotContainer.configureCodriverButtonBindings();
-    robotContainer.configureSysIdButtons();
+    // robotContainer.configureSysIdButtons();
+    robotContainer.configureSystemCheckButtons();
     // robotContainer.getHoodSubsystem().zeroHood();
 
   }

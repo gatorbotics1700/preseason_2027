@@ -40,6 +40,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.Calculations;
 import frc.robot.util.RobotConfigLoader;
@@ -552,14 +554,14 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_HALL_EFFECT_PORT = 7;
+    public static final int CLIMBER_HALL_EFFECT_PORT = 8;
     public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
     public static final int CLIMBER_GEAR_RATIO = 25; // TODO get a real number
     public static final double WINCH_INCHES_PER_REV = (0.75) * Math.PI; // diameter in inches * pi
     // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
     public static final double MAX_EXTENSION_INCHES = 5.58; // TODO get a real number
     public static final double RETRACTED_HEIGHT_INCHES = 0; // TODO get a real number
-    public static final double HOMING_VOLTAGE = -10; // TODO get a real number
+    public static final double HOMING_VOLTAGE = -4; // TODO get a real number
     public static final double POSITION_DEADBAND = 0.5; // TODO get a real number
   }
 
@@ -665,9 +667,9 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int TURRET_MOTOR_CAN_ID = 14;
+    public static final int TURRET_MOTOR_CAN_ID = 50;
     public static final int TURRET_BORE_ENCODER_PORT = 1;
-    public static final int TURRET_HALL_EFFECT_PORT = 8;
+    // public static final int TURRET_HALL_EFFECT_PORT = 8;
 
     public static final double TURRET_DEADBAND = 0.75;
 
@@ -684,6 +686,11 @@ public final class Constants {
     // trying to phase through walls)
     // hub
     public static final Translation3d RED_HUB = new Translation3d(11.915394, 4.034663, 1.80);
+    public static final Translation3d OUR_ALLIANCE_HUB =
+        DriverStation.getAlliance().get() != null
+                && DriverStation.getAlliance().get() == Alliance.Red
+            ? RED_HUB
+            : BLUE_HUB;
     public static final Translation3d BLUE_LEFT_FUNNELING = new Translation3d(2.482, 6.653, 0);
     public static final Translation3d BLUE_RIGHT_FUNNELING = new Translation3d(2.482, 1.511, 0);
     public static final Translation3d RED_LEFT_FUNNELING = new Translation3d(14.858, 6.653, 0);
