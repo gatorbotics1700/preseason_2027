@@ -89,7 +89,8 @@ public class RobotContainer {
   private CommandXboxController controller_two = null; // port 3
 
   // Dashboard inputs
-  // private final MultiStepAutoChooser multiStepAutoChooser; // COMMENTED OUT - using PathPlanner pre-made autos
+  // private final MultiStepAutoChooser multiStepAutoChooser; // COMMENTED OUT - using PathPlanner
+  // pre-made autos
   private final LoggedDashboardChooser<Command> autoChooser;
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> chassisSpeeds;
@@ -179,24 +180,23 @@ public class RobotContainer {
         };
 
     // Register named commands for PathPlanner autos
-    NamedCommands.registerCommand("Shooter Command",
-        new ShootingCommand(
-            shooterSubsystem,
-            hoodSubsystem,
-            turretSubsystem,
-            hopperFloorSubsystem,
-            robotPose,
-            chassisSpeeds));
+    NamedCommands.registerCommand(
+        "Shooter Command",
+        ShootingCommands.StationaryShootingCommand(
+            shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
     NamedCommands.registerCommand("Intaking Command", IntakeCommands.RunIntake(intakeSubsystem));
-    NamedCommands.registerCommand("Stop Shooter Command",
-        new InstantCommand(() -> {
-          shooterSubsystem.setDesiredRotorVelocity(0);
-          shooterSubsystem.setDesiredTransitionVoltage(0);
-          hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
-        }));
+    NamedCommands.registerCommand(
+        "Stop Shooter Command",
+        new InstantCommand(
+            () -> {
+              shooterSubsystem.setDesiredRotorVelocity(0);
+              shooterSubsystem.setDesiredTransitionVoltage(0);
+              hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
+            }));
 
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
-    autoChooser = new LoggedDashboardChooser<>("Auto/PathPlanner Auto", AutoBuilder.buildAutoChooser());
+    autoChooser =
+        new LoggedDashboardChooser<>("Auto/PathPlanner Auto", AutoBuilder.buildAutoChooser());
 
     // COMMENTED OUT - using PathPlanner pre-made autos instead of DynamicAutoBuilder
     // multiStepAutoChooser =
@@ -1041,7 +1041,7 @@ public class RobotContainer {
 
     robotContainerLogs();
 
-   // multiStepAutoChooser.updateChooserOptions();
+    // multiStepAutoChooser.updateChooserOptions();
 
     // Print path name to console me thinks
     // String selectedPathName = multiStepAutoChooser.getSelectedPathName();
