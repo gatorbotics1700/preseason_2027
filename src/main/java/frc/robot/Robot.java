@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.commands.mech.HoodCommands;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
 import frc.robot.util.ShotCalculator;
@@ -207,8 +209,12 @@ public class Robot extends LoggedRobot {
                 robotContainer.getIntakeSubsystem()));
     System.out.println("IN TELEOP INIT");
     CommandScheduler.getInstance()
-        .schedule(
-            robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps
+        .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
+    CommandScheduler.getInstance()
+        .schedule(new InstantCommand(() -> robotContainer.getTurretSubsystem().homeTurret()));
+    // CommandScheduler.getInstance()
+    //     .schedule(
+    //         robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps
     Elastic.selectTab("Teleoperated");
 
     // This makes sure that the autonomous stops running when teleop starts

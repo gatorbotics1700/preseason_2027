@@ -122,24 +122,7 @@ public class HoodSubsystem extends SubsystemBase {
       setHoodPosition(desiredAngle);
     }
 
-    Logger.recordOutput("Mech/Hood/SysID/hoodSysIDRunning", sysIdRunning);
-    // SysId tool expects these keys (voltage/position/velocity-{motor}-{name}); log when running
-    if (sysIdRunning) {
-      Logger.recordOutput(
-          "Mech/Hood/SysID/hoodVoltage", hoodMotor.getMotorVoltage().getValueAsDouble());
-      Logger.recordOutput(
-          "Mech/Hood/SysID/hoodPosition",
-          getCurrentAngle().getRadians() / (2.0 * Math.PI)); // rotations
-      Logger.recordOutput(
-          "Mech/Hood/SysID/hoodVelocity", getVelocityRadPerSec() / (2.0 * Math.PI)); // rot/s
-    }
-    Logger.recordOutput("Mech/Hood/Desired Angle", desiredAngle.getDegrees());
-    Logger.recordOutput("Mech/Hood/Current Angle", getCurrentAngle().getDegrees());
-    Logger.recordOutput("Mech/Hood/Motor Output", hoodMotor.get());
-    Logger.recordOutput("Mech/Hood/Current velocity", hoodMotor.getVelocity().getValueAsDouble());
-    Logger.recordOutput("Mech/Hood/Limit switch", isRetractedLimitSwitchPressed());
-    Logger.recordOutput(
-        "Mech/Hood/Control Mode", positionControl ? "position control" : "voltage control");
+    hoodLogs();
   }
 
   public void setDesiredAngle(Rotation2d desiredAngle) {
@@ -281,5 +264,27 @@ public class HoodSubsystem extends SubsystemBase {
               sysIdRunning = false;
             })
         .withName("Hood SysId Dynamic " + direction);
+  }
+
+  public void hoodLogs() {
+    Logger.recordOutput("Mech/Hood/Desired Angle", desiredAngle.getDegrees());
+    Logger.recordOutput("Mech/Hood/Current Angle", getCurrentAngle().getDegrees());
+    Logger.recordOutput("Mech/Hood/Motor Output", hoodMotor.get());
+    Logger.recordOutput("Mech/Hood/Current velocity", hoodMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Mech/Hood/Limit switch", isRetractedLimitSwitchPressed());
+    Logger.recordOutput(
+        "Mech/Hood/Control Mode", positionControl ? "position control" : "voltage control");
+
+    // SysID
+    Logger.recordOutput("Mech/Hood/SysID/hoodSysIDRunning", sysIdRunning);
+    if (sysIdRunning) {
+      Logger.recordOutput(
+          "Mech/Hood/SysID/hoodVoltage", hoodMotor.getMotorVoltage().getValueAsDouble());
+      Logger.recordOutput(
+          "Mech/Hood/SysID/hoodPosition",
+          getCurrentAngle().getRadians() / (2.0 * Math.PI)); // rotations
+      Logger.recordOutput(
+          "Mech/Hood/SysID/hoodVelocity", getVelocityRadPerSec() / (2.0 * Math.PI)); // rot/s
+    }
   }
 }
