@@ -42,6 +42,7 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveToFuelCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
+import frc.robot.commands.drive.PointAtHubCommand;
 import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
@@ -62,7 +63,6 @@ import frc.robot.subsystems.mech.TurretSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.Calculations;
 import frc.robot.util.CommandSimMacXboxController;
 import frc.robot.util.GamePieceSimulation;
 // import frc.robot.util.MultiStepAutoChooser; // COMMENTED OUT - using PathPlanner pre-made autos
@@ -829,45 +829,12 @@ public class RobotContainer {
                           .schedule(new DriveToFuelCommand(drive, vision, robotPose)),
                   drive,
                   vision));
-      if (DriverStation.getAlliance().isPresent()
-          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        controller
-            .x()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              AutoBuilder.pathfindToPose(
-                                  new Pose2d(
-                                      robotPose.get().getX(),
-                                      robotPose.get().getY(),
-                                      Calculations.angleToPoint(
-                                          FieldCoordinates.RED_HUB.getX() - robotPose.get().getX(),
-                                          FieldCoordinates.RED_HUB.getY()
-                                              - robotPose.get().getY())),
-                                  new PathConstraints(0, 0, 10, 10)));
-                    }));
-
-      } else {
-        controller
-            .x()
-            .onTrue(
-                new InstantCommand(
-                    () -> {
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              AutoBuilder.pathfindToPose(
-                                  new Pose2d(
-                                      robotPose.get().getX(),
-                                      robotPose.get().getY(),
-                                      Calculations.angleToPoint(
-                                          FieldCoordinates.BLUE_HUB.getX() - robotPose.get().getX(),
-                                          FieldCoordinates.BLUE_HUB.getY()
-                                              - robotPose.get().getY())),
-                                  new PathConstraints(0, 0, 10, 10)));
-                    }));
-      }
+      controller
+          .x()
+          .onTrue(
+              Commands.runOnce(
+                  () -> CommandScheduler.getInstance().schedule(new PointAtHubCommand(drive)),
+                  drive));
 
       controller
           .rightTrigger()
