@@ -720,23 +720,23 @@ public class RobotContainer {
                 ShootingCommands.StationaryShootingCommand(
                     shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
 
-        // controller_two
-        //     .leftTrigger()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(36)))));
+        controller_two
+            .leftTrigger()
+            .onTrue(
+                new InstantCommand(
+                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(36)))));
 
-        // controller_two
-        //     .rightTrigger()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
+        controller_two
+            .rightTrigger()
+            .onTrue(
+                new InstantCommand(
+                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
 
-        // controller_two
-        //     .povDown()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-36)))));
+        controller_two
+            .povDown()
+            .onTrue(
+                new InstantCommand(
+                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-36)))));
 
         // controller_two
         //     .povDown()

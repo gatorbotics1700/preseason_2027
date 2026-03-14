@@ -554,7 +554,7 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_HALL_EFFECT_PORT = 8;
+    public static final int CLIMBER_HALL_EFFECT_PORT = 7;
     public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
     public static final int CLIMBER_GEAR_RATIO = 25; // TODO get a real number
     public static final double WINCH_INCHES_PER_REV = (0.75) * Math.PI; // diameter in inches * pi
@@ -667,7 +667,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int TURRET_MOTOR_CAN_ID = 50;
+    public static final int TURRET_MOTOR_CAN_ID = 14;
     public static final int TURRET_BORE_ENCODER_PORT = 1;
     // public static final int TURRET_HALL_EFFECT_PORT = 8;
 
