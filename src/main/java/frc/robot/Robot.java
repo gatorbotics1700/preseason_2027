@@ -176,9 +176,11 @@ public class Robot extends LoggedRobot {
               robotContainer.getDriveSubsystem().setPose(startPose);
             });
 
-    robotContainer.HomeMechanisms();
     CommandScheduler.getInstance()
-        .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
+        .schedule(
+            robotContainer.HomeMechanisms());
+    // CommandScheduler.getInstance()
+    //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
