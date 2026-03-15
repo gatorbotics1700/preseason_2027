@@ -69,7 +69,6 @@ public class TurretSubsystem extends SubsystemBase {
 
   public TurretSubsystem() {
     turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-    turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
     desiredAngle = getCurrentAngle();
 
@@ -77,7 +76,8 @@ public class TurretSubsystem extends SubsystemBase {
     talonFXConfigs = new TalonFXConfiguration();
 
     talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+        .withNeutralMode(NeutralModeValue.Brake));
 
     slot0Configs = talonFXConfigs.Slot0;
 

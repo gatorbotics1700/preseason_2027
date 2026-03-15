@@ -6,6 +6,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.FieldCoordinates;
@@ -20,12 +21,12 @@ public class ClimbCommands {
   private ClimbCommands() {}
 
   public static Command ExtendClimber(ClimberSubsystem climberSubsystem) {
-    return new ClimberCommand(climberSubsystem, ClimberConstants.L1_EXTENSION_INCHES)
+    return new ClimberExtendCommand(climberSubsystem, ClimberConstants.L1_EXTENSION_INCHES)
         .withName("ExtendClimber");
   }
 
   public static Command RetractClimber(ClimberSubsystem climberSubsystem) {
-    return new ClimberCommand(climberSubsystem, ClimberConstants.RETRACTED_HEIGHT_INCHES)
+    return new ClimberRetractCommand(climberSubsystem, ClimberConstants.RETRACTED_HEIGHT_INCHES)
         .withName("RetractClimber");
   }
 
@@ -171,13 +172,13 @@ public class ClimbCommands {
     }
   }
 
-  private static class ClimberCommand extends Command {
+  private static class ClimberExtendCommand extends Command {
     private final ClimberSubsystem climberSubsystem;
     private final double height;
 
-    ClimberCommand(ClimberSubsystem climberSubsystem, double height) {
+    ClimberExtendCommand(ClimberSubsystem climberSubsystem, double height) {
       this.climberSubsystem = climberSubsystem;
-      this.height = height;
+      this.height = ClimberConstants.L1_EXTENSION_INCHES;
       addRequirements(climberSubsystem);
     }
 
@@ -195,6 +196,43 @@ public class ClimbCommands {
         return true;
       }
       return false;
+    }
+  }
+
+  private static class ClimberRetractCommand extends Command {
+    private final ClimberSubsystem climberSubsystem;
+    private final double height;
+
+    ClimberRetractCommand(ClimberSubsystem climberSubsystem, double height) {
+      this.climberSubsystem = climberSubsystem;
+      this.height = ClimberConstants.RETRACTED_HEIGHT_INCHES;
+      addRequirements(climberSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+      climberSubsystem.setDesiredPositionInches(height);
+    }
+
+    @Override
+    public boolean isFinished() {
+      if (climberSubsystem.hallEffectTriggered()
+          || Math.abs(
+                  climberSubsystem.getCurrentPositionInches()
+                      - climberSubsystem.getDesiredPositionInches())
+              <= ClimberConstants.POSITION_DEADBAND) {
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      if (!climberSubsystem.hallEffectTriggered()) {
+        CommandScheduler.getInstance().schedule(new ClimbCommands.HomeClimber(climberSubsystem));
+      } else {
+        climberSubsystem.zeroClimber();
+      }
     }
   }
 }

@@ -57,7 +57,9 @@ public class HoodSubsystem extends SubsystemBase {
     //       new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
     // } else {
     talonFXConfigs.withMotorOutput(
-        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive).withNeutralMode(NeutralModeValue.Brake));
+        new MotorOutputConfigs()
+            .withInverted(InvertedValue.CounterClockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Brake));
     // }
 
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
