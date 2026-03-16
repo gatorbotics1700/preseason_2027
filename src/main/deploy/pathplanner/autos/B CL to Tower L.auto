@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R LN to Tower Lineup"
+                  "pathName": "B C to Tower Line-Up"
                 }
               }
             ]
@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "R Tower Lineup to Tower L"
+            "pathName": "B Tower Lineup to Tower L"
           }
         },
         {

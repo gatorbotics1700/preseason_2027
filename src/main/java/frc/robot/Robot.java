@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.commands.mech.ClimbCommands;
-import frc.robot.commands.mech.HoodCommands;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
 import frc.robot.util.ShotCalculator;
@@ -176,9 +175,7 @@ public class Robot extends LoggedRobot {
               robotContainer.getDriveSubsystem().setPose(startPose);
             });
 
-    CommandScheduler.getInstance()
-        .schedule(
-            robotContainer.HomeMechanisms());
+    CommandScheduler.getInstance().schedule(robotContainer.HomeMechanisms());
     // CommandScheduler.getInstance()
     //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
 
