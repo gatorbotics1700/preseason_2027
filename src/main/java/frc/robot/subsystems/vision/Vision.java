@@ -73,7 +73,7 @@ public class Vision extends SubsystemBase {
     Pose3d robotPose3d = new Pose3d(robotPose);
     Pose2d fuelPose = null;
     double maxArea = 0;
-    for (int cameraIndex = 1; cameraIndex < 1; cameraIndex++) { // TODO: fix this for loop range
+    for (int cameraIndex = 0; cameraIndex < 0; cameraIndex++) { // TODO: fix this for loop range
       List<PhotonPipelineResult> allResults = io[cameraIndex].getCamera().getAllUnreadResults();
       for (PhotonPipelineResult result : allResults) {
         PhotonTrackedTarget target = result.getBestTarget();

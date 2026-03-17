@@ -383,22 +383,22 @@ public final class Constants {
     public static Transform3d ROBOT_TO_CAMERA_0 = createRobotToCamera0Transform();
 
     // Camera names, must match names configured on coprocessor
-    // public static final String CAMERA_1_NAME = RobotConfigLoader.getString("camera.1.name");
+    public static final String CAMERA_1_NAME = RobotConfigLoader.getString("camera.1.name");
 
-    // public static final double ROBOT_TO_CAMERA_1_X_METERS =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.x_meters");
-    // public static final double ROBOT_TO_CAMERA_1_Y_METERS =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.y_meters");
-    // public static final double ROBOT_TO_CAMERA_1_Z_METERS =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.z_meters");
-    // public static final double ROBOT_TO_CAMERA_1_ROLL_DEGREES =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.roll_degrees");
-    // public static final double ROBOT_TO_CAMERA_1_PITCH_DEGREES =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.pitch_degrees");
-    // public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
-    //     RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.yaw_degrees");
+    public static final double ROBOT_TO_CAMERA_1_X_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.x_meters");
+    public static final double ROBOT_TO_CAMERA_1_Y_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.y_meters");
+    public static final double ROBOT_TO_CAMERA_1_Z_METERS =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.z_meters");
+    public static final double ROBOT_TO_CAMERA_1_ROLL_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.roll_degrees");
+    public static final double ROBOT_TO_CAMERA_1_PITCH_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.pitch_degrees");
+    public static final double ROBOT_TO_CAMERA_1_YAW_DEGREES =
+        RobotConfigLoader.getDouble("photonvision.robot_to_camera_1.yaw_degrees");
 
-    // public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera1Transform();
+    public static Transform3d ROBOT_TO_CAMERA_1 = createRobotToCamera1Transform();
 
     public static final String CAMERA_2_NAME = RobotConfigLoader.getString("camera.2.name");
 
@@ -476,15 +476,15 @@ public final class Constants {
           ROBOT_TO_CAMERA_0_YAW_DEGREES);
     }
 
-    // public static Transform3d createRobotToCamera1Transform() {
-    //   return createRobotToCameraTransform(
-    //       ROBOT_TO_CAMERA_1_X_METERS,
-    //       ROBOT_TO_CAMERA_1_Y_METERS,
-    //       ROBOT_TO_CAMERA_1_Z_METERS,
-    //       ROBOT_TO_CAMERA_1_ROLL_DEGREES,
-    //       ROBOT_TO_CAMERA_1_PITCH_DEGREES,
-    //       ROBOT_TO_CAMERA_1_YAW_DEGREES);
-    // }
+    public static Transform3d createRobotToCamera1Transform() {
+      return createRobotToCameraTransform(
+          ROBOT_TO_CAMERA_1_X_METERS,
+          ROBOT_TO_CAMERA_1_Y_METERS,
+          ROBOT_TO_CAMERA_1_Z_METERS,
+          ROBOT_TO_CAMERA_1_ROLL_DEGREES,
+          ROBOT_TO_CAMERA_1_PITCH_DEGREES,
+          ROBOT_TO_CAMERA_1_YAW_DEGREES);
+    }
 
     public static Transform3d createRobotToCamera2Transform() {
       return createRobotToCameraTransform(
@@ -524,7 +524,9 @@ public final class Constants {
     }
 
     public static Transform3d[] createCameraTransformsArray() {
-      Transform3d[] array = {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3};
+      Transform3d[] array = {
+        ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3
+      };
       return array;
     }
 

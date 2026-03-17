@@ -118,7 +118,9 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVision(
-                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0));
+                    VisionConstants.CAMERA_0_NAME, VisionConstants.ROBOT_TO_CAMERA_0),
+                new VisionIOPhotonVision(
+                    VisionConstants.CAMERA_1_NAME, VisionConstants.ROBOT_TO_CAMERA_1));
         break;
 
       case SIM:
@@ -137,6 +139,10 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     VisionConstants.CAMERA_0_NAME,
                     VisionConstants.ROBOT_TO_CAMERA_0,
+                    drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.CAMERA_1_NAME,
+                    VisionConstants.ROBOT_TO_CAMERA_1,
                     drive::getPose));
         DriverStation.silenceJoystickConnectionWarning(true);
         break;
