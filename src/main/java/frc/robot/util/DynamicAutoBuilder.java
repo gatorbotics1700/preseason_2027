@@ -8,12 +8,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldCoordinates;
-import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommands.ShootOnTheMoveCommand;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
@@ -28,7 +26,6 @@ public class DynamicAutoBuilder {
 
   private final IntakeSubsystem intakeSubsystem;
   private final Drive drive;
-  private final ClimberSubsystem climberSubsystem;
   private final HoodSubsystem hoodSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final TurretSubsystem turretSubsystem;
@@ -39,7 +36,6 @@ public class DynamicAutoBuilder {
   public DynamicAutoBuilder(
       IntakeSubsystem intakeSubsystem,
       Drive drive,
-      ClimberSubsystem climberSubsystem,
       HoodSubsystem hoodSubsystem,
       ShooterSubsystem shooterSubsystem,
       TurretSubsystem turretSubsystem,
@@ -48,7 +44,6 @@ public class DynamicAutoBuilder {
       Supplier<ChassisSpeeds> chassisSpeeds) {
     this.intakeSubsystem = intakeSubsystem;
     this.drive = drive;
-    this.climberSubsystem = climberSubsystem;
     this.hoodSubsystem = hoodSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.turretSubsystem = turretSubsystem;
@@ -138,21 +133,14 @@ public class DynamicAutoBuilder {
     }
   }
 
-  /** Checks if the location is a depot (DR, DC, or DL). */
-  private boolean isDepot(String location) {
-    return location != null
-        && (location.equals("DR") || location.equals("DC") || location.equals("DL"));
-  }
-
   public Command buildAuto(
-      String alliance, String startPos, String dest1, String dest2, String dest3, boolean climb) {
+      String alliance, String startPos, String dest1, String dest2, String dest3) {
 
     System.out.println("============BUILD AUTO============");
     System.out.println("Alliance: " + alliance);
     System.out.println("First Destination: " + dest1);
     System.out.println("Second Destination: " + dest2);
     System.out.println("Third Destination: " + dest3);
-    System.out.println("Climb: " + climb);
 
     if (alliance == null || alliance.equals("None")) {
       System.out.println("DynamicAutoBuilder: Missing alliance");
@@ -164,8 +152,8 @@ public class DynamicAutoBuilder {
     }
 
     boolean hasDestination = dest1 != null && !dest1.equals("None");
-    if (!hasDestination && !climb) {
-      System.out.println("DynamicAutoBuilder: No destinations or climb selected");
+    if (!hasDestination) {
+      System.out.println("DynamicAutoBuilder: No destinations selected");
       return Commands.none();
     }
 
@@ -179,8 +167,7 @@ public class DynamicAutoBuilder {
             + " -> "
             + dest2
             + " -> "
-            + dest3
-            + (climb ? " -> Tower" : ""));
+            + dest3);
 
     List<Command> commandSequence = new ArrayList<>();
     String currentLocation = startPos;
@@ -228,33 +215,6 @@ public class DynamicAutoBuilder {
       }
     }
 
-    if (climb) {
-
-      if (isDepot(currentLocation)) {
-        Command depotToTower = loadDepotToTowerPath(alliance, currentLocation);
-        if (depotToTower != null) {
-          System.out.println("  Adding depot-to-tower path before climb");
-          commandSequence.add(depotToTower);
-          // Use ClimbWithoutDrive since we already drove to the tower
-          commandSequence.add(ClimbCommands.ClimbWithoutDrive(climberSubsystem));
-        } else {
-          System.out.println("  WARNING: No depot-to-tower path found for " + currentLocation);
-          // Fall back to normal climb with DriveToTower
-          try {
-            commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem));
-          } catch (Exception e) {
-            System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
-          }
-        }
-      } else {
-        try {
-          commandSequence.add(ClimbCommands.Climb(drive, climberSubsystem));
-        } catch (Exception e) {
-          System.out.println("DynamicAutoBuilder: Climb command not available - skipping");
-        }
-      }
-    }
-
     if (commandSequence.isEmpty()) {
       System.out.println("DynamicAutoBuilder: No paths loaded - running empty auto");
       return Commands.none();
@@ -264,7 +224,7 @@ public class DynamicAutoBuilder {
   }
 
   public Optional<String> getFirstPathName(
-      String alliance, String startPos, String dest1, String dest2, String dest3, boolean climb) {
+      String alliance, String startPos, String dest1, String dest2, String dest3) {
     if (isInvalid(alliance) || isInvalid(startPos)) {
       return Optional.empty();
     }

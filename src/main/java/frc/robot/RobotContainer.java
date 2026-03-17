@@ -42,7 +42,6 @@ import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveToFuelCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.drive.PointAtHubCommand;
-import frc.robot.commands.mech.ClimbCommands;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommands;
@@ -53,7 +52,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.mech.ClimberSubsystem;
 import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.IntakeSubsystem;
@@ -78,7 +76,6 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
 
-  private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final HopperFloorSubsystem hopperFloorSubsystem = new HopperFloorSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -181,11 +178,6 @@ public class RobotContainer {
                         ShootingCommands.StationaryShootingCommand(
                             shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose))));
     NamedCommands.registerCommand("Intaking Command", IntakeCommands.RunIntake(intakeSubsystem));
-    NamedCommands.registerCommand(
-        "Climb Command", ClimbCommands.ClimbWithoutDrive(climberSubsystem));
-    NamedCommands.registerCommand("Extend Climber", ClimbCommands.ExtendClimber(climberSubsystem));
-    NamedCommands.registerCommand(
-        "Retract Climber", ClimbCommands.RetractClimber(climberSubsystem));
     NamedCommands.registerCommand(
         "Stop Shooter Command",
         new InstantCommand(
@@ -925,22 +917,6 @@ public class RobotContainer {
                   () ->
                       CommandScheduler.getInstance()
                           .schedule(IntakeCommands.RunIntake(intakeSubsystem))));
-      // I am making the assumption that we are not using pathfinding to climb
-      controller_two.leftBumper().onTrue(ClimbCommands.ClimbWithoutDrive(climberSubsystem));
-      controller_two
-          .povUp()
-          .onTrue(
-              new InstantCommand(
-                  () ->
-                      CommandScheduler.getInstance()
-                          .schedule(ClimbCommands.ExtendClimber(climberSubsystem))));
-      controller_two
-          .povDown()
-          .onTrue(
-              new InstantCommand(
-                  () ->
-                      CommandScheduler.getInstance()
-                          .schedule(ClimbCommands.RetractClimber(climberSubsystem))));
     }
   }
 
@@ -1112,11 +1088,16 @@ public class RobotContainer {
       controller_two
           .x()
           .onTrue(
-              new ClimbCommands.HomeClimber(climberSubsystem)
-                  .andThen(new WaitCommand(1))
-                  .andThen(ClimbCommands.ExtendClimber(climberSubsystem))
-                  .andThen(new WaitCommand(1))
-                  .andThen(ClimbCommands.RetractClimber(climberSubsystem)));
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              MechStop(
+                                  turretSubsystem,
+                                  shooterSubsystem,
+                                  hopperFloorSubsystem,
+                                  hoodSubsystem,
+                                  intakeSubsystem))));
 
       controller_two
           .y()
@@ -1130,20 +1111,6 @@ public class RobotContainer {
       controller_two
           .leftBumper()
           .onTrue(new InstantCommand(() -> drive.runVelocity(new ChassisSpeeds(0.2, 0.0, 0.0))));
-
-      controller_two
-          .rightBumper()
-          .onTrue(
-              new InstantCommand(
-                  () ->
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              MechStop(
-                                  turretSubsystem,
-                                  shooterSubsystem,
-                                  hopperFloorSubsystem,
-                                  hoodSubsystem,
-                                  intakeSubsystem))));
 
       controller_two
           .leftTrigger()
@@ -1217,9 +1184,6 @@ public class RobotContainer {
                   shooterSubsystem.setDesiredTransitionVoltage(0);
                   hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
                   hoodSubsystem.setHoodVoltage(0);
-                  climberSubsystem.setDesiredPositionInches(
-                      climberSubsystem.getCurrentPositionInches());
-                  climberSubsystem.setClimberVoltage(0);
                 },
                 turretSubsystem,
                 shooterSubsystem,
@@ -1232,7 +1196,6 @@ public class RobotContainer {
 
   public Command HomeMechanisms() {
     return (HoodCommands.HomeHood(hoodSubsystem)
-            .alongWith(new ClimbCommands.HomeClimber(climberSubsystem))
             .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
         .withName("Home Mechansims");
@@ -1240,10 +1203,6 @@ public class RobotContainer {
 
   public TurretSubsystem getTurretSubsystem() {
     return turretSubsystem;
-  }
-
-  public ClimberSubsystem getClimberSubsystem() {
-    return climberSubsystem;
   }
 
   public IntakeSubsystem getIntakeSubsystem() {
