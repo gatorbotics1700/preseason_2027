@@ -33,7 +33,11 @@ public class DriveSystemsCheckCommands {
 
     @Override
     public boolean isFinished() {
-      return System.currentTimeMillis() - startTimeMillis > 3000;
+      if (System.currentTimeMillis() - startTimeMillis > 3000) {
+        drive.stop();
+        return true;
+      }
+      return false;
     }
   }
 
