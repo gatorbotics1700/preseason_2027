@@ -39,6 +39,7 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
+import frc.robot.commands.drive.DriveSystemsCheckCommands;
 import frc.robot.commands.drive.DriveToFuelCommand;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.drive.PointAtHubCommand;
@@ -849,6 +850,13 @@ public class RobotContainer {
                       new InstantCommand(
                           () ->
                               turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0))))));
+      controller_two
+          .rightTrigger()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(DriveSystemsCheckCommands.DriveSystemCheckCommand(drive))));
     }
   }
 
