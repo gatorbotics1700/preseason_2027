@@ -38,7 +38,6 @@ public class DriveUnderTrenchCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B TR A to N" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.BLUE_BUMP_AND_TRENCH_X) {
         pathToFollow =
@@ -46,18 +45,15 @@ public class DriveUnderTrenchCommand {
                 PathPlannerPath.fromPathFile("B TL A to N" + pathRotation), constraints);
         // System.out.println(PathPlannerPath.fromPathFile("B TL A to N" + pathRotation),
         // constraints).toString())
-        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.BLUE_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B TL N to A" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("B TR N to A" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       }
     } else { // RED
       if (pose.getY() < FieldCoordinates.FIELD_CENTER.getY()
@@ -65,24 +61,20 @@ public class DriveUnderTrenchCommand {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TL N to A" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       } else if (pose.getY() > FieldCoordinates.FIELD_CENTER.getY()
           && pose.getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TR N to A" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       } else if ((pose.getY() > FieldCoordinates.FIELD_CENTER.getY())
           && (pose.getX() > FieldCoordinates.RED_BUMP_AND_TRENCH_X)) {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TR A to N" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       } else {
         pathToFollow =
             AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("R TL A to N" + pathRotation), constraints);
-        shooterSubsystem.setShouldShoot(false);
       }
     }
     // System.out.println("drive under trench:"+pathRotation);

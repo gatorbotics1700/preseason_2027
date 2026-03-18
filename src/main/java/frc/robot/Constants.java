@@ -43,6 +43,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.Calculations;
 import frc.robot.util.RobotConfigLoader;
+import frc.robot.util.ShotParameters;
 import frc.robot.util.ValidStationaryShot;
 
 /**
@@ -659,17 +660,17 @@ public final class Constants {
             Calculations.mirrorPoseAcrossXAxis(BLUE_LEFT.pose),
             new Rotation2d(Math.toRadians(64.4)),
             62.2);
-    public static final ValidStationaryShot RED_SHOT =
-        new ValidStationaryShot(
+    public static final ShotParameters RED_SHOT =
+        new ShotParameters(
             new Pose2d(13.541, 4.035, new Rotation2d(Math.toRadians(180))),
             new Rotation2d(Math.toRadians(68)),
             53);
-    public static final ValidStationaryShot BLUE_SHOT =
-        new ValidStationaryShot(
+    public static final ShotParameters BLUE_SHOT =
+        new ShotParameters(
             Calculations.mirrorPoseAcrossAlliance(RED_SHOT.pose),
             new Rotation2d(Math.toRadians(68)),
             53);
-    public static final ValidStationaryShot[] STATIONARY_SHOT_ARRAY = {RED_SHOT, BLUE_SHOT};
+    public static final ShotParameters[] STATIONARY_SHOT_ARRAY = {RED_SHOT, BLUE_SHOT};
   }
 
   public static final class TurretConstants {

@@ -35,7 +35,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Slot0Configs leftFlywheelSlot0Configs;
   private static MotionMagicConfigs leftMotionMagicConfigs;
 
-  private BooleanSupplier shouldShoot;
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
@@ -94,11 +93,6 @@ public class ShooterSubsystem extends SubsystemBase {
     transitionMotor.getConfigurator().apply(transitionMotorConfigs);
 
     m_request = new MotionMagicVelocityVoltage(0);
-
-    shouldShoot =
-        () -> {
-          return false;
-        };
   }
 
   @Override
@@ -145,35 +139,6 @@ public class ShooterSubsystem extends SubsystemBase {
         / flyWheelSlip.get();
   }
 
-  public void toggleShouldShoot() {
-    if (shouldShoot.getAsBoolean()) {
-      shouldShoot =
-          () -> {
-            return false;
-          };
-    } else {
-      shouldShoot =
-          () -> {
-            return true;
-          };
-    }
-  }
-
-  /**
-   * Sets a supplier for the desired angle. This allows the desired angle to be calculated
-   * dynamically each cycle. The supplier will be called each time getDesiredAngle() is called.
-   */
-  public void setShouldShoot(boolean desiredShouldShootValue) {
-    shouldShoot =
-        () -> {
-          return desiredShouldShootValue;
-        };
-  }
-
-  /** Returns the desired angle, or null if no angle is set. */
-  public BooleanSupplier getShouldShoot() {
-    return shouldShoot;
-  }
 
   private void initSysIdRoutine() {
     // config for our test. Sets voltage ramps, limits, and a logging callback
@@ -236,8 +201,6 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.recordOutput("Mech/Shooter/Desired Transition Voltage", desiredTransitionVoltage);
     Logger.recordOutput(
         "Mech/Shooter/Kicker", (transitionMotor.getMotorVoltage().getValueAsDouble() != 0));
-
-    Logger.recordOutput("Mech/Shooter/Should Be Shooting", shouldShoot);
 
     Logger.recordOutput("Mech/Shooter/MAX SPEED", ShotCalculatorConditions.MAX_SHOT_SPEED);
 
