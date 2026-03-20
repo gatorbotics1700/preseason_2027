@@ -43,7 +43,7 @@ public class HoodSubsystem extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Hood/Angle", 68);
   private Rotation2d desiredAngle = getCurrentAngle(); // HoodConstants.RETRACTED_POSITION;
 
-  private static final double HOOD_CURRENT_LIMIT = 100; //TODO change
+  private static final double HOOD_CURRENT_LIMIT = 100; // TODO change
 
   // Tunable PID gains for hood control
   public static final LoggedNetworkNumber hoodKp = new LoggedNetworkNumber("/Tuning/Hood/kP", 4.8);
@@ -173,7 +173,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public boolean isCurrentLimitReached() {
-    if(hoodMotor.getStatorCurrent().getValueAsDouble() > HOOD_CURRENT_LIMIT){
+    if (hoodMotor.getStatorCurrent().getValueAsDouble() > HOOD_CURRENT_LIMIT) {
       return true;
     }
     return false;

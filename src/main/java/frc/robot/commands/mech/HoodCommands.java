@@ -1,6 +1,5 @@
 package frc.robot.commands.mech;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.subsystems.mech.HoodSubsystem;
@@ -61,12 +60,11 @@ public class HoodCommands {
     }
 
     @Override
-    public void initialize() {
-    }
+    public void initialize() {}
 
     @Override
-    public void execute(){
-        hoodSubsystem.setHoodVoltage(HoodConstants.FAST_HOMING_VOLTAGE);
+    public void execute() {
+      hoodSubsystem.setHoodVoltage(HoodConstants.FAST_HOMING_VOLTAGE);
     }
 
     @Override
