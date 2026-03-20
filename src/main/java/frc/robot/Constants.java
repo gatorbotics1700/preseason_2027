@@ -582,7 +582,7 @@ public final class Constants {
     public static final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
     /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
-    public static final double FAST_HOMING_VOLTAGE = 1; // TODO tune
+    public static final double FAST_HOMING_VOLTAGE = 0.5; // TODO tune
 
     public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
     // GEAR RATIOS

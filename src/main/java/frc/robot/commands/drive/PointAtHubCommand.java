@@ -3,6 +3,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import org.littletonrobotics.junction.Logger;
 
 public class PointAtHubCommand extends Command {
   private final Drive drive;
@@ -18,6 +19,8 @@ public class PointAtHubCommand extends Command {
   @Override
   public void execute() {
     drive.driveToPose(new Pose2d(drive.getPose().getTranslation(), drive.getDesiredHubAngle()));
+    Logger.recordOutput("PointAtHub/current angle", drive.getPose().getRotation().getDegrees());
+    Logger.recordOutput("PointAtHub/desired angle", drive.getDesiredHubAngle().getDegrees());
   }
 
   @Override

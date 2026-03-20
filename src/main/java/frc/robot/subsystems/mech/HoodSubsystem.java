@@ -281,6 +281,8 @@ public class HoodSubsystem extends SubsystemBase {
     Logger.recordOutput("Mech/Hood/Limit switch", isCurrentLimitReached());
     Logger.recordOutput(
         "Mech/Hood/Control Mode", positionControl ? "position control" : "voltage control");
+    Logger.recordOutput(
+        "Mech/Hood/Stator Current", hoodMotor.getStatorCurrent().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Hood/SysID/hoodSysIDRunning", sysIdRunning);
