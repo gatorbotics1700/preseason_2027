@@ -42,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
 
   private LoggedNetworkNumber desiredRotorVelo =
-      new LoggedNetworkNumber("Desired Rotor Velocity", 53);
+      new LoggedNetworkNumber("Mech/Shooter/Desired Rotor Velo", 53);
   private double desiredRotorVelocity = 0;
 
   public static LoggedNetworkNumber flyWheelSlip =
@@ -75,10 +75,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     leftFlywheelSlot0Configs = leftFlywheelTalonFXConfigs.Slot0;
 
-    leftFlywheelSlot0Configs.kS = 0.33676; // Add _ V output to overcome static friction
+    leftFlywheelSlot0Configs.kS = 0.37577; // Add _ V output to overcome static friction
     leftFlywheelSlot0Configs.kV =
-        0.12305; // A velocity target of 1 rps results in 0.12-0.2 V output
-    leftFlywheelSlot0Configs.kA = 0.027318;
+        0.12289; // A velocity target of 1 rps results in 0.12-0.2 V output
+    leftFlywheelSlot0Configs.kA = 0.023452;
     leftFlywheelSlot0Configs.kP = flywheelKP.get();
     leftFlywheelSlot0Configs.kI = flywheelKI.get();
     leftFlywheelSlot0Configs.kD = flywheelKD.get();
@@ -119,11 +119,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // Only control motors if SysID is not running
     if (!sysIdRunning) {
-      leftFlywheelMotor.setControl(m_request.withVelocity(desiredRotorVelocity));
+      leftFlywheelMotor.setControl(m_request.withVelocity(desiredRotorVelo.get()));
     }
 
-    transitionMotor.setVoltage(desiredTransitionVoltage * 2);
-    leftTransitionMotor.setVoltage(desiredTransitionVoltage * 1.25);
+    transitionMotor.setVoltage(desiredTransitionVoltage * 1.75);
+    leftTransitionMotor.setVoltage(desiredTransitionVoltage * 1.15);
     rightTransitionMotor.setVoltage(desiredTransitionVoltage);
 
     shooterLogs();

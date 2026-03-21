@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -34,6 +35,7 @@ public class HoodSubsystem extends SubsystemBase {
       new TalonFX(HoodConstants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
+  private static VelocityVoltage velocity_request = new VelocityVoltage(0.0);
 
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
@@ -46,7 +48,7 @@ public class HoodSubsystem extends SubsystemBase {
   private static final double HOOD_CURRENT_LIMIT = 60; // TODO change
 
   // Tunable PID gains for hood control
-  public static final LoggedNetworkNumber hoodKp = new LoggedNetworkNumber("/Tuning/Hood/kP", 4.8);
+  public static final LoggedNetworkNumber hoodKp = new LoggedNetworkNumber("/Tuning/Hood/kP", 5.3);
   public static final LoggedNetworkNumber hoodKi = new LoggedNetworkNumber("/Tuning/Hood/kI", 0.0);
   public static final LoggedNetworkNumber hoodKd = new LoggedNetworkNumber("/Tuning/Hood/kD", 0.1);
 
@@ -108,15 +110,15 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     // Skip limit switch safety during SysID - the isSysIdOutOfBounds() handles limits
-    if (limitSwitch.get() && !sysIdRunning) {
+    if (isCurrentLimitReached() && !sysIdRunning) {
       if (positionControl) {
         if (desiredAngle.getDegrees() > getCurrentAngle().getDegrees()) {
           desiredAngle = getCurrentAngle();
-          setHoodVoltage(0);
+          setHoodVelocity(0);
         }
       } else {
         if (hoodMotor.getMotorVoltage().getValueAsDouble() > 0) {
-          setHoodVoltage(0);
+          setHoodVelocity(0);
         }
       }
     }
@@ -167,9 +169,9 @@ public class HoodSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(hoodAngleDegrees));
   }
 
-  public void setHoodVoltage(double voltage) {
+  public void setHoodVelocity(double velocity) {
     positionControl = false;
-    hoodMotor.setVoltage(voltage);
+    hoodMotor.set(velocity);
   }
 
   public boolean isCurrentLimitReached() {
@@ -181,6 +183,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   public void zeroHood() {
     hoodMotor.setPosition(degreesToRevs(HoodConstants.RETRACTED_POSITION.getDegrees()));
+    setDesiredAngle(HoodConstants.RETRACTED_POSITION);
   }
 
   private double getVelocityRadPerSec() {
@@ -196,6 +199,10 @@ public class HoodSubsystem extends SubsystemBase {
     return launchAngle; // TODO: fix this to actually be right
   }
 
+  public void setPositionControl(boolean positionControl) {
+    this.positionControl = positionControl;
+  }
+
   private void initSysIdRoutine() {
     // config for our test. Sets voltage ramps, limits, and a logging callback
     SysIdRoutine.Config config =
@@ -203,9 +210,9 @@ public class HoodSubsystem extends SubsystemBase {
             // this is the ramp rate for voltage during a test
             Volts.per(Second).of(1),
             // this is the maximum voltage for the test
-            Volts.of(4),
+            Volts.of(1.5),
             // this is the duration of the test.
-            Seconds.of(1.5),
+            Seconds.of(2.5),
             (state) -> Logger.recordOutput("Mech/Hood/SysID/SysIdState", state.toString()));
 
     // mechanism for our test. Sets the voltage; we log voltage/position/velocity ourselves in
@@ -250,7 +257,7 @@ public class HoodSubsystem extends SubsystemBase {
         .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
         .finallyDo(
             () -> {
-              setHoodVoltage(0);
+              setHoodVelocity(0);
               sysIdRunning = false;
             })
         .withName("Hood SysId Quasistatic " + direction);
@@ -267,7 +274,7 @@ public class HoodSubsystem extends SubsystemBase {
         .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
         .finallyDo(
             () -> {
-              setHoodVoltage(0);
+              setHoodVelocity(0);
               sysIdRunning = false;
             })
         .withName("Hood SysId Dynamic " + direction);

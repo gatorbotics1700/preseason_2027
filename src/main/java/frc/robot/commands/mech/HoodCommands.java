@@ -64,7 +64,7 @@ public class HoodCommands {
 
     @Override
     public void execute() {
-      hoodSubsystem.setHoodVoltage(HoodConstants.FAST_HOMING_VOLTAGE);
+      hoodSubsystem.setHoodVelocity(HoodConstants.HOMING_VELOCITY);
     }
 
     @Override
@@ -75,6 +75,7 @@ public class HoodCommands {
     @Override
     public void end(boolean interrupted) {
       hoodSubsystem.zeroHood();
+      hoodSubsystem.setPositionControl(true);
     }
   }
 }

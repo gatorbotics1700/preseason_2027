@@ -582,9 +582,8 @@ public final class Constants {
     public static final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
 
     /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
-    public static final double FAST_HOMING_VOLTAGE = 3; // TODO tune
+    public static final double HOMING_VELOCITY = 0.3; // TODO tune
 
-    public static final double SLOW_HOMING_VOLTAGE = 0.5; // TODO tune
     // GEAR RATIOS
     public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
         RobotConfigLoader.getDouble("mech.hood_shaft_revs_per_mech_rev");
@@ -665,7 +664,7 @@ public final class Constants {
             62.2);
     public static final ShotParameters BLUE_HUB_CENTER_SHOT =
         new ShotParameters(
-            new Pose2d(3.347, 4.035, new Rotation2d(0)),
+            new Pose2d(3.584, 4.035, new Rotation2d(0)),
             new Rotation2d(Math.toRadians(65)), // TODO: change
             55); // TODO: change
     public static final ShotParameters RED_HUB_CENTER_SHOT =

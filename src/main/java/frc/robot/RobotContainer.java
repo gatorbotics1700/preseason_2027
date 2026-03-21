@@ -605,15 +605,19 @@ public class RobotContainer {
             .y()
             .onTrue(
                 new InstantCommand(
-                    () -> CommandScheduler.getInstance().schedule(HomeMechanisms())));
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem))));
 
-        // controller_two
-        //     .a()
-        //     .onTrue(
-        //         new InstantCommand(
-        //             () ->
-        //                 hopperFloorSubsystem.setDesiredHopperFloorVoltage(
-        //                     HopperFloorConstants.HOPPER_FLOOR_VOLTAGE)));
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> CommandScheduler.getInstance().schedule(TestShot(shooterSubsystem))));
+        // new InstantCommand(
+        //     () ->
+        //         hopperFloorSubsystem.setDesiredHopperFloorVoltage(
+        //             HopperFloorConstants.HOPPER_FLOOR_VOLTAGE)));\
 
         controller_two
             .rightBumper()
@@ -819,11 +823,13 @@ public class RobotContainer {
       //  controller_two.x().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
       // controller_two.y().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
-      // TODO: hood drivetrain sysid buttons -- uncomment for use
-      // controller.x().whileTrue(hoodSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      // controller.y().whileTrue(hoodSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      // controller.a().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      // controller.b().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // TODO: hood sysid buttons -- uncomment for use
+      controller_two.x().whileTrue(hoodSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      controller_two.y().whileTrue(hoodSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      controller_two.a().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      controller_two.b().whileTrue(hoodSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+
+      controller_two.rightTrigger().onTrue(new InstantCommand(() -> hoodSubsystem.zeroHood()));
 
       // TODO: intake
       // controller_two.x().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
@@ -852,14 +858,14 @@ public class RobotContainer {
       //     .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
       // TODO: turret
-      controller_two.x().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      controller_two.y().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      controller_two
-          .a()
-          .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      controller_two
-          .b()
-          .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // controller_two.x().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // controller_two.y().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // controller_two
+      //     .a()
+      //     .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // controller_two
+      //     .b()
+      //     .whileTrue(turretSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     }
   }
 
@@ -1072,7 +1078,7 @@ public class RobotContainer {
                   hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
                   shooterSubsystem.setDesiredTransitionVoltage(0);
                   hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
-                  hoodSubsystem.setHoodVoltage(0);
+                  hoodSubsystem.setHoodVelocity(0);
                 },
                 turretSubsystem,
                 shooterSubsystem,
@@ -1088,6 +1094,16 @@ public class RobotContainer {
             .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
         .withName("Home Mechansims");
+  }
+
+  public Command TestShot(ShooterSubsystem shooterSubsystem) {
+    return (new InstantCommand(
+            () -> {
+              // shooterSubsystem.setDesiredRotorVelocity(40);
+              shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
+            },
+            shooterSubsystem)
+        .withName("TestShot"));
   }
 
   public TurretSubsystem getTurretSubsystem() {
