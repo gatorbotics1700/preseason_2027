@@ -551,7 +551,7 @@ public class RobotContainer {
         // TODO SHOOTING TESTING BUTTONS UNCOMMENT FOR USE
 
         controller_two // first stage of shooting from stationary fixed spots
-            .x()
+            .b()
             .onTrue(
                 new InstantCommand(
                     () ->

@@ -122,8 +122,8 @@ public class ShooterSubsystem extends SubsystemBase {
       leftFlywheelMotor.setControl(m_request.withVelocity(desiredRotorVelocity));
     }
 
-    transitionMotor.setVoltage(desiredTransitionVoltage);
-    leftTransitionMotor.setVoltage(desiredTransitionVoltage);
+    transitionMotor.setVoltage(desiredTransitionVoltage * 2);
+    leftTransitionMotor.setVoltage(desiredTransitionVoltage * 1.25);
     rightTransitionMotor.setVoltage(desiredTransitionVoltage);
 
     shooterLogs();

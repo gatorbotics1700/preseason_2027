@@ -632,7 +632,7 @@ public final class Constants {
     public static final int LEFT_TRANSITION_MOTOR_CAN_ID = 18;
     public static final int RIGHT_TRANSITION_MOTOR_CAN_ID = 19;
 
-    public static final double TRANSITION_VOLTAGE = 10;
+    public static final double TRANSITION_VOLTAGE = 5;
     public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
     public static final double FLYWHEEL_SLIP = 0.17; // 0.7; // TODO TUNE!!!
@@ -671,8 +671,8 @@ public final class Constants {
     public static final ShotParameters RED_HUB_CENTER_SHOT =
         new ShotParameters(
             Calculations.mirrorPoseAcrossAlliance(BLUE_HUB_CENTER_SHOT.pose),
-            new Rotation2d(Math.toRadians(65)),
-            55);
+            new Rotation2d(Math.toRadians(73)),
+            52);
     public static final ShotParameters BLUE_RIGHT_CORNER_SHOT =
         new ShotParameters(
             new Pose2d(0.62, 0.576, new Rotation2d(37)),
