@@ -608,11 +608,14 @@ public final class Constants {
 
     public static final double EXTENDED_ANGLE_DEGREES = 95;
     public static final double RETRACTED_ANGLE_DEGREES = 0;
+    public static final double HALF_EXTENDED_ANGLE_DEGREES = 45;
 
     public static final Rotation2d EXTENDED_POSITION =
         new Rotation2d(Math.toRadians(EXTENDED_ANGLE_DEGREES));
     public static final Rotation2d RETRACTED_POSITION =
         new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES));
+    public static final Rotation2d HALF_EXTENDED_POSITION =
+        new Rotation2d(Math.toRadians(HALF_EXTENDED_ANGLE_DEGREES));
 
     public static final double HOMING_VOLTAGE = -1; // TODO tune
     public static final double RETRACTING_VOLTAGE = -3; // TODO: tune

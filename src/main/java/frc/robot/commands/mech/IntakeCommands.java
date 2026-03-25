@@ -78,6 +78,19 @@ public class IntakeCommands {
         .withName("Stop Intake");
   }
 
+  public static Command AgitateIntake(IntakeSubsystem intakeSubsystem) {
+    return new InstantCommand(
+            () -> {
+              intakeSubsystem.setDesiredAngle(IntakeConstants.EXTENDED_POSITION);
+            })
+        .andThen(new WaitCommand(0.5))
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  intakeSubsystem.setDesiredAngle(IntakeConstants.HALF_EXTENDED_POSITION);
+                }));
+  }
+
   public static class DeployIntakeCommand extends Command {
 
     private final IntakeSubsystem intakeSubsystem;

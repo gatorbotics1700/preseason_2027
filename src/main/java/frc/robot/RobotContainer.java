@@ -18,8 +18,10 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -528,25 +530,25 @@ public class RobotContainer {
             .rightBumper()
             .onTrue(
                 new InstantCommand(
-                    () -> {
-                      hoodSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(70.0)));
-                    }));
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new IntakeCommands.DeployIntakeCommand(intakeSubsystem))));
 
         controller_two
             .leftBumper()
             .onTrue(
                 new InstantCommand(
-                    () -> {
-                      hoodSubsystem.setDesiredAngle(HoodConstants.RETRACTED_POSITION);
-                    }));
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new IntakeCommands.RetractIntakeCommand(intakeSubsystem))));
 
         controller_two
             .leftTrigger()
             .onTrue(
                 new InstantCommand(
-                    () -> {
-                      hoodSubsystem.setDesiredAngle(HoodConstants.MIN_ANGLE);
-                    }));
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem))));
         // controller_two
         // .y()
         // .onTrue(
@@ -558,18 +560,28 @@ public class RobotContainer {
 
         // TODO SHOOTING TESTING BUTTONS UNCOMMENT FOR USE
 
+        // controller_two // first stage of shooting from stationary fixed spots
+        //     .b()
+        //     .onTrue(
+        //         new InstantCommand(
+        //             () ->
+        //                 CommandScheduler.getInstance()
+        //                     .schedule(
+        //                         ShootingCommands.StationaryShootingCommand(
+        //                             shooterSubsystem,
+        //                             hoodSubsystem,
+        //                             hopperFloorSubsystem,
+        //                             robotPose))));
+
         controller_two // first stage of shooting from stationary fixed spots
             .b()
             .onTrue(
-                new InstantCommand(
-                    () ->
-                        CommandScheduler.getInstance()
-                            .schedule(
-                                ShootingCommands.StationaryShootingCommand(
-                                    shooterSubsystem,
-                                    hoodSubsystem,
-                                    hopperFloorSubsystem,
-                                    robotPose))));
+                new ShootingCommands.ShootingCommand(
+                    shooterSubsystem,
+                    hoodSubsystem,
+                    hopperFloorSubsystem,
+                    robotPose,
+                    ShooterConstants.BLUE_LEFT_CORNER_SHOT));
 
         // controller_two // second stage shooting from stationary spots across field with pointing
         //     // drive train
@@ -1088,6 +1100,42 @@ public class RobotContainer {
 
     Logger.recordOutput("DriveToFuel/Fuel", vision.getFuelPose(drive.getPose()));
     Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
+
+    Logger.recordOutput("Mech/Valid Shot", getValidShot());
+  }
+
+  public boolean getValidShot() {
+    Translation3d target;
+
+    if (FieldCoordinates.BLUE_BUMP_AND_TRENCH_X <= drive.getPose().getX()
+        && drive.getPose().getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
+      if (FieldCoordinates.FIELD_CENTER.getY() < drive.getPose().getY()) {
+        target =
+            DriverStation.getAlliance().get() == Alliance.Blue
+                ? FieldCoordinates.BLUE_RIGHT_FUNNELING
+                : FieldCoordinates.RED_LEFT_FUNNELING;
+
+      } else {
+        target =
+            DriverStation.getAlliance().get() == Alliance.Blue
+                ? FieldCoordinates.BLUE_LEFT_FUNNELING
+                : FieldCoordinates.RED_RIGHT_FUNNELING;
+      }
+
+    } else {
+      target =
+          DriverStation.getAlliance().get() == Alliance.Blue
+              ? FieldCoordinates.BLUE_HUB
+              : FieldCoordinates.RED_HUB;
+    }
+
+    ShotParameters params =
+        ShotCalculator.calculateShot(drive.getPose(), chassisSpeeds.get(), target);
+
+    if (params.shotSpeed == 0) {
+      return false;
+    }
+    return true;
   }
 
   public Command MechStop(
