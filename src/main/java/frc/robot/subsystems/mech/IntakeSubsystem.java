@@ -128,7 +128,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     m_request = new MotionMagicExpoVoltage(0);
 
-    intakeMotor.setVoltage(0);
+    intakeMotor.set(0);
 
     isDeployed =
         () -> {
@@ -182,17 +182,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public Rotation2d getDesiredAngle() {
     return desiredAngle;
   }
-
-  // public void setDeployVoltage(double voltage) {
-  //   useDeployPositionControl = false;
-  //   desiredDeploySpeed = voltage;
-  //   deployMotor.setVoltage(desiredDeploySpeed);
-  // }
-
-  // public void setIntakeVoltage(double voltage) {
-  //   desiredIntakeSpeed = voltage;
-  //   intakeMotor.setVoltage(desiredIntakeSpeed);
-  // }
 
   public void setDeploySpeed(double speed) {
     useDeployPositionControl = false;

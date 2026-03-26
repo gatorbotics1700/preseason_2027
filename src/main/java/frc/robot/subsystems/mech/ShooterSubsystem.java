@@ -59,14 +59,13 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem() {
     leftFlywheelMotor =
         new TalonFX(ShooterConstants.LEFT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
-    kickerMotor =
-        new TalonFX(ShooterConstants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
+    kickerMotor = new TalonFX(ShooterConstants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     leftTransitionMotor =
         new TalonFX(ShooterConstants.LEFT_TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     rightTransitionMotor =
         new TalonFX(ShooterConstants.RIGHT_TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
-    // TALONFX & MOTIONMAGIC CONFIGS 
+    // TALONFX & MOTIONMAGIC CONFIGS
     leftFlywheelTalonFXConfigs = new TalonFXConfiguration();
 
     leftFlywheelTalonFXConfigs.withMotorOutput(
@@ -104,9 +103,10 @@ public class ShooterSubsystem extends SubsystemBase {
     rightTransitionMotorConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
-    applyTransitionMotorCurrentLimits(transitionMotorConfigs);
-    applyTransitionMotorCurrentLimits(leftTransitionMotorConfigs);
-    applyTransitionMotorCurrentLimits(rightTransitionMotorConfigs);
+    // transitionMotorConfigs.CurrentLimits.StatorCurrentLimit = 65;
+    // applyTransitionMotorCurrentLimits(transitionMotorConfigs);
+    // applyTransitionMotorCurrentLimits(leftTransitionMotorConfigs);
+    // applyTransitionMotorCurrentLimits(rightTransitionMotorConfigs);
 
     leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
     kickerMotor.getConfigurator().apply(transitionMotorConfigs);
@@ -126,9 +126,9 @@ public class ShooterSubsystem extends SubsystemBase {
           m_request.withVelocity(desiredRotorVelocity)); // desiredRotorVelo.get()));
     }
 
-    kickerMotor.setVoltage(desiredTransitionSpeed * 1.75);
-    leftTransitionMotor.setVoltage(desiredTransitionSpeed * 1.15);
-    rightTransitionMotor.setVoltage(desiredTransitionSpeed);
+    kickerMotor.set(desiredTransitionSpeed * 1.75);
+    leftTransitionMotor.set(desiredTransitionSpeed * 1.15);
+    rightTransitionMotor.set(desiredTransitionSpeed);
 
     shooterLogs();
   }
@@ -224,11 +224,15 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.recordOutput("Mech/Shooter/Desired Transition Voltage", desiredTransitionSpeed);
     Logger.recordOutput(
         "Mech/Shooter/Transition", (kickerMotor.getMotorVoltage().getValueAsDouble() != 0));
-    
+
     Logger.recordOutput(
         "Mech/Shooter/Kicker Current", kickerMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Mech/Shooter/Left Transition Current", leftTransitionMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Mech/Shooter/Right Transition Current", rightTransitionMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Shooter/Left Transition Current",
+        leftTransitionMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Mech/Shooter/Right Transition Current",
+        rightTransitionMotor.getStatorCurrent().getValueAsDouble());
 
     Logger.recordOutput("Mech/Shooter/MAX SPEED", ShotCalculatorConditions.MAX_SHOT_SPEED);
 
@@ -258,8 +262,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private static void applyTransitionMotorCurrentLimits(TalonFXConfiguration config) {
-    config.CurrentLimits.StatorCurrentLimit =
-        ShooterConstants.TRANSITION_STATOR_CURRENT_LIMIT_AMPS;
+    config.CurrentLimits.StatorCurrentLimit = ShooterConstants.TRANSITION_STATOR_CURRENT_LIMIT_AMPS;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
   }
 

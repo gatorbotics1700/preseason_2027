@@ -539,7 +539,7 @@ public class RobotContainer {
         // .y()
         // .onTrue(
         // HoodCommands.HomeHood(
-        // hoodSubsystem)); 
+        // hoodSubsystem));
         // controller_two.a().onTrue(RunMechWheels());
         // controller_two.b().onTrue(MechStop());
 
@@ -557,7 +557,6 @@ public class RobotContainer {
         //                             hoodSubsystem,
         //                             hopperFloorSubsystem,
         //                             robotPose))));
-
 
         // controller_two // second stage shooting from stationary spots across field with pointing
         //     // drive train
@@ -965,8 +964,7 @@ public class RobotContainer {
               new InstantCommand(
                   () -> {
                     shooterSubsystem.setDesiredRotorVelocity(80);
-                    shooterSubsystem.setDesiredTransitionSpeed(
-                        ShooterConstants.TRANSITION_SPEED);
+                    shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
                     hopperFloorSubsystem.setDesiredHopperFloorSpeed(
                         HopperFloorConstants.HOPPER_FLOOR_SPEED);
                     intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKING_SPEED);

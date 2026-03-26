@@ -1,7 +1,5 @@
 package frc.robot.commands.mech;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,7 +13,6 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
-import frc.robot.util.Calculations;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotParameters;
 import java.util.function.Supplier;
@@ -208,8 +205,7 @@ public class ShootingCommands {
         turretSubsystem.setDesiredAngle(params.turretAngle);
         shooterSubsystem.setDesiredRotorVelocity(
             desiredRotorVelocity); // set velocity to our desired velocity
-        hopperFloorSubsystem.setDesiredHopperFloorSpeed(
-            HopperFloorConstants.HOPPER_FLOOR_SPEED);
+        hopperFloorSubsystem.setDesiredHopperFloorSpeed(HopperFloorConstants.HOPPER_FLOOR_SPEED);
         hoodSubsystem.setDesiredAngle(HoodSubsystem.launchAngleToHoodAngle(params.hoodAngle));
         if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - desiredRotorVelocity)
             < ShooterConstants.FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to

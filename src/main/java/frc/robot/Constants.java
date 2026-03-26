@@ -555,13 +555,9 @@ public final class Constants {
 
     // retracted position is the max hood angle, because we measure from vertical
     public static final Rotation2d RETRACTED_POSITION =
-        new Rotation2d(
-            Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_retracted_degrees")));
+        new Rotation2d(Math.toRadians(RobotConfigLoader.getInt("mech.hood_retracted_degrees")));
     public static final Rotation2d MIN_ANGLE =
-        new Rotation2d(
-            Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_min_angle_degrees")));
+        new Rotation2d(Math.toRadians(RobotConfigLoader.getInt("mech.hood_min_angle_degrees")));
 
     public static final double HOOD_POSITION_DEADBAND_DEGREES = 1;
 
@@ -617,7 +613,7 @@ public final class Constants {
     public static final int LEFT_TRANSITION_MOTOR_CAN_ID = 18;
     public static final int RIGHT_TRANSITION_MOTOR_CAN_ID = 19;
 
-    public static final double TRANSITION_SPEED = 0.4;
+    public static final double TRANSITION_SPEED = 0.8;
 
     /**
      * Stator current limit for transition rollers (A). Limits torque when a ball is jammed so the
@@ -630,9 +626,7 @@ public final class Constants {
     public static final double FLYWHEEL_SLIP = 0.17; // TODO: tune?
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
-    public static final Translation3d BOT_TO_SHOOTER =
-        new Translation3d(
-            0.127, 0, 0.429);
+    public static final Translation3d BOT_TO_SHOOTER = new Translation3d(0.127, 0, 0.429);
   }
 
   public static final class TurretConstants {
