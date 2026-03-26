@@ -618,6 +618,13 @@ public final class Constants {
     public static final int RIGHT_TRANSITION_MOTOR_CAN_ID = 19;
 
     public static final double TRANSITION_SPEED = 0.4;
+
+    /**
+     * Stator current limit for transition rollers (A). Limits torque when a ball is jammed so the
+     * motors do not overheat; tune if normal indexing trips the limit.
+     */
+    public static final double TRANSITION_STATOR_CURRENT_LIMIT_AMPS = 35.0;
+
     public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
     public static final double FLYWHEEL_SLIP = 0.17; // TODO: tune?

@@ -122,6 +122,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     currentLimitConfigs = deployTalonFXConfigs.CurrentLimits;
     currentLimitConfigs.StatorCurrentLimit = 10;
+    currentLimitConfigs.StatorCurrentLimitEnable = true;
 
     deployMotor.getConfigurator().apply(deployTalonFXConfigs);
 
