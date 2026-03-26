@@ -45,7 +45,7 @@ public class IntakeCommands {
 
     @Override
     public void initialize() {
-      intakeSubsystem.setDeployVoltage(IntakeConstants.HOMING_VOLTAGE);
+      intakeSubsystem.setDeploySpeed(IntakeConstants.HOMING_SPEED);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class IntakeCommands {
   public static Command RunIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
             () -> {
-              intakeSubsystem.setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
+              intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKING_SPEED);
             })
         .withName("Run Intake");
   }
@@ -73,7 +73,7 @@ public class IntakeCommands {
   public static Command StopIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
             () -> {
-              intakeSubsystem.setIntakeVoltage(0);
+              intakeSubsystem.setIntakeSpeed(0);
             })
         .withName("Stop Intake");
   }

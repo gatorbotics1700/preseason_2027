@@ -64,7 +64,7 @@ public class HoodCommands {
 
     @Override
     public void execute() {
-      hoodSubsystem.setHoodVelocity(HoodConstants.HOMING_VELOCITY);
+      hoodSubsystem.setHoodSpeed(HoodConstants.HOMING_SPEED);
     }
 
     @Override

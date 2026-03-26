@@ -66,13 +66,13 @@ public class ShootingCommands {
       //     ShooterSubsystem.launchSpeedToRotorSpeed(validStationaryShot.shotSpeed);
       shooterSubsystem.setDesiredRotorVelocity(
           shotParameters.shotSpeed); // set velocity to our desired velocity
-      hopperFloorSubsystem.setDesiredHopperFloorVoltage(HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
+      hopperFloorSubsystem.setDesiredHopperFloorSpeed(HopperFloorConstants.HOPPER_FLOOR_SPEED);
       hoodSubsystem.setDesiredAngle(HoodSubsystem.launchAngleToHoodAngle(shotParameters.hoodAngle));
       if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - shotParameters.shotSpeed)
           < ShooterConstants
               .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired velocity
         // turretSubsystem.setDesiredAngle(shotParameters.turretAngle);
-        shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
+        shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
       }
     }
 
@@ -83,8 +83,8 @@ public class ShootingCommands {
 
     @Override
     public void end(boolean interrupted) {
-      hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
-      shooterSubsystem.setDesiredTransitionVoltage(0);
+      hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
+      shooterSubsystem.setDesiredTransitionSpeed(0);
     }
   }
 
@@ -107,8 +107,8 @@ public class ShootingCommands {
     public void execute() {
       if (shooterSubsystem.getFlywheelRotorVelocity() != 0) {
         shooterSubsystem.setDesiredRotorVelocity(0);
-        shooterSubsystem.setDesiredTransitionVoltage(0);
-        hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
+        shooterSubsystem.setDesiredTransitionSpeed(0);
+        hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
       } else {
         System.out.println("SHOOTER ALREADY STOPPED");
       }
@@ -121,60 +121,6 @@ public class ShootingCommands {
       }
       return false;
     }
-  }
-
-  public static Command StationaryShootingCommand(
-      ShooterSubsystem shooterSubsystem,
-      HoodSubsystem hoodSubsystem,
-      HopperFloorSubsystem hopperFloorSubsystem,
-      Supplier<Pose2d> drivetrainPose) {
-    System.out.println("NEW STATIONARY SHOT");
-    ShotParameters closestShotParameters = null;
-    Logger.recordOutput(
-        "Mech/Shooter/Stationary/RED_RIGHT", ShooterConstants.RED_HUB_CENTER_SHOT.pose);
-    Logger.recordOutput(
-        "Mech/Shooter/Stationary/BLUE_LEFT", ShooterConstants.BLUE_HUB_CENTER_SHOT.pose);
-    Logger.recordOutput(
-        "Mech/Shooter/Stationary/RED_RIGHT distance",
-        Calculations.distanceToPoseInMeters(drivetrainPose.get(), ShooterConstants.RED_RIGHT.pose));
-    Logger.recordOutput(
-        "Mech/Shooter/Stationary/BLUE_LEFT distance",
-        Calculations.distanceToPoseInMeters(drivetrainPose.get(), ShooterConstants.BLUE_LEFT.pose));
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      for (ShotParameters shot : ShooterConstants.STATIONARY_BLUE_SHOTS_ARRAY) {
-        if (closestShotParameters == null
-            || Calculations.distanceToPoseInMeters(drivetrainPose.get(), shot.pose)
-                < Calculations.distanceToPoseInMeters(
-                    drivetrainPose.get(), closestShotParameters.pose)) {
-          closestShotParameters = shot;
-        }
-      }
-    } else {
-      for (ShotParameters shot : ShooterConstants.STATIONARY_RED_SHOTS_ARRAY) {
-        Logger.recordOutput("Mech/ShootingCommand/current shot from array", shot.pose);
-        System.out.println("CURRENT SHOT FROM ARRAY:" + shot.pose);
-        if (closestShotParameters == null
-            || Calculations.distanceToPoseInMeters(drivetrainPose.get(), shot.pose)
-                < Calculations.distanceToPoseInMeters(
-                    drivetrainPose.get(), closestShotParameters.pose)) {
-          closestShotParameters = shot;
-        }
-      }
-    }
-
-    Logger.recordOutput("Mech/ShootingCommand/Closest shot parameter", closestShotParameters.pose);
-
-    return AutoBuilder.pathfindToPose(
-            closestShotParameters.pose,
-            new PathConstraints(4, 12, Math.toRadians(700), Math.toRadians(1000)))
-        .andThen(
-            new ShootingCommand(
-                shooterSubsystem,
-                hoodSubsystem,
-                hopperFloorSubsystem,
-                drivetrainPose,
-                closestShotParameters))
-        .withName("StationaryShootingCommand");
   }
 
   public static class ShootOnTheMoveCommand extends Command {
@@ -256,19 +202,19 @@ public class ShootingCommands {
 
       if (params.shotSpeed == 0) { // if we dont have a valid shot
         shooterSubsystem.setDesiredRotorVelocity(0);
-        shooterSubsystem.setDesiredTransitionVoltage(0);
-        hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
+        shooterSubsystem.setDesiredTransitionSpeed(0);
+        hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
       } else {
         turretSubsystem.setDesiredAngle(params.turretAngle);
         shooterSubsystem.setDesiredRotorVelocity(
             desiredRotorVelocity); // set velocity to our desired velocity
-        hopperFloorSubsystem.setDesiredHopperFloorVoltage(
-            HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
+        hopperFloorSubsystem.setDesiredHopperFloorSpeed(
+            HopperFloorConstants.HOPPER_FLOOR_SPEED);
         hoodSubsystem.setDesiredAngle(HoodSubsystem.launchAngleToHoodAngle(params.hoodAngle));
         if (Math.abs(shooterSubsystem.getFlywheelRotorVelocity() - desiredRotorVelocity)
             < ShooterConstants.FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to
           // our desired velocity
-          shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
+          shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
         }
       }
     }
@@ -280,8 +226,8 @@ public class ShootingCommands {
 
     @Override
     public void end(boolean interrupted) {
-      hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
-      shooterSubsystem.setDesiredTransitionVoltage(0);
+      hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
+      shooterSubsystem.setDesiredTransitionSpeed(0);
       shooterSubsystem.setDesiredRotorVelocity(0);
     }
   }

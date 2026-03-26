@@ -25,7 +25,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX leftTransitionMotor;
   private final TalonFX rightTransitionMotor;
 
-  private double desiredTransitionVoltage;
+  private double desiredTransitionSpeed;
 
   private static MotionMagicVelocityVoltage m_request;
 
@@ -66,8 +66,7 @@ public class ShooterSubsystem extends SubsystemBase {
     rightTransitionMotor =
         new TalonFX(ShooterConstants.RIGHT_TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
-    // TALONFX & MOTIONMAGIC CONFIGS // TODO everything needs tuning; might not need all values for
-    // flywheel
+    // TALONFX & MOTIONMAGIC CONFIGS 
     leftFlywheelTalonFXConfigs = new TalonFXConfiguration();
 
     leftFlywheelTalonFXConfigs.withMotorOutput(
@@ -123,9 +122,9 @@ public class ShooterSubsystem extends SubsystemBase {
           m_request.withVelocity(desiredRotorVelocity)); // desiredRotorVelo.get()));
     }
 
-    transitionMotor.setVoltage(desiredTransitionVoltage * 1.75);
-    leftTransitionMotor.setVoltage(desiredTransitionVoltage * 1.15);
-    rightTransitionMotor.setVoltage(desiredTransitionVoltage);
+    transitionMotor.setVoltage(desiredTransitionSpeed * 1.75);
+    leftTransitionMotor.setVoltage(desiredTransitionSpeed * 1.15);
+    rightTransitionMotor.setVoltage(desiredTransitionSpeed);
 
     shooterLogs();
   }
@@ -138,8 +137,8 @@ public class ShooterSubsystem extends SubsystemBase {
     return leftFlywheelMotor.getRotorVelocity().getValueAsDouble();
   }
 
-  public void setDesiredTransitionVoltage(double desiredTransitionVoltage) {
-    this.desiredTransitionVoltage = desiredTransitionVoltage;
+  public void setDesiredTransitionSpeed(double desiredTransitionSpeed) {
+    this.desiredTransitionSpeed = desiredTransitionSpeed;
   }
 
   public double getExitVelocity() {
@@ -218,7 +217,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     Logger.recordOutput(
         "Mech/Shooter/Transition Voltage", transitionMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Mech/Shooter/Desired Transition Voltage", desiredTransitionVoltage);
+    Logger.recordOutput("Mech/Shooter/Desired Transition Voltage", desiredTransitionSpeed);
     Logger.recordOutput(
         "Mech/Shooter/Kicker", (transitionMotor.getMotorVoltage().getValueAsDouble() != 0));
 

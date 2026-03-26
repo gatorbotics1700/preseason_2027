@@ -72,8 +72,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private Rotation2d desiredAngle = new Rotation2d();
   private boolean useDeployPositionControl = false;
-  private double desiredIntakeVoltage;
-  private double desiredDeployVoltage;
+  private double desiredIntakeSpeed;
+  private double desiredDeploySpeed;
   private BooleanSupplier isDeployed;
 
   public IntakeSubsystem() {
@@ -81,7 +81,7 @@ public class IntakeSubsystem extends SubsystemBase {
     deployMotor =
         new TalonFX(IntakeConstants.INTAKE_DEPLOY_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
-    desiredIntakeVoltage = 0;
+    desiredIntakeSpeed = 0;
     hallEffect = new DigitalInput(IntakeConstants.INTAKE_HALL_EFFECT_PORT);
 
     intakeMotor
@@ -97,7 +97,6 @@ public class IntakeSubsystem extends SubsystemBase {
     deployTalonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-    // TODO: TUNE ALL OF THESE
     slot0Configs = deployTalonFXConfigs.Slot0;
 
     slot0Configs.kG = intakeKg.get(); // 0.2128 vaguely works
@@ -183,15 +182,26 @@ public class IntakeSubsystem extends SubsystemBase {
     return desiredAngle;
   }
 
-  public void setDeployVoltage(double voltage) {
+  // public void setDeployVoltage(double voltage) {
+  //   useDeployPositionControl = false;
+  //   desiredDeploySpeed = voltage;
+  //   deployMotor.setVoltage(desiredDeploySpeed);
+  // }
+
+  // public void setIntakeVoltage(double voltage) {
+  //   desiredIntakeSpeed = voltage;
+  //   intakeMotor.setVoltage(desiredIntakeSpeed);
+  // }
+
+  public void setDeploySpeed(double speed) {
     useDeployPositionControl = false;
-    desiredDeployVoltage = voltage;
-    deployMotor.setVoltage(desiredDeployVoltage);
+    desiredDeploySpeed = speed;
+    deployMotor.set(desiredDeploySpeed);
   }
 
-  public void setIntakeVoltage(double voltage) {
-    desiredIntakeVoltage = voltage;
-    intakeMotor.setVoltage(desiredIntakeVoltage);
+  public void setIntakeSpeed(double speed) {
+    desiredIntakeSpeed = speed;
+    intakeMotor.set(desiredIntakeSpeed);
   }
 
   public Rotation2d getCurrentAngle() {
@@ -365,12 +375,12 @@ public class IntakeSubsystem extends SubsystemBase {
   public void intakeLogs() {
     Logger.recordOutput("Mech/Intake/Current Deploy Angle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Intake/Desired Deploy Angle", desiredAngle.getDegrees());
-    Logger.recordOutput("Mech/Intake/Desired Deploy Voltage", desiredDeployVoltage);
+    Logger.recordOutput("Mech/Intake/Desired Deploy Voltage", desiredDeploySpeed);
     Logger.recordOutput("Mech/Intake/Current Deploy Motor Output", deployMotor.get());
     Logger.recordOutput("Mech/Intake/Intake Hall Effect", isHallEffectTriggered());
     Logger.recordOutput("Mech/Intake/IsDeployed", isDeployed.getAsBoolean());
     Logger.recordOutput("Mech/Intake/Current Intake Motor Output", intakeMotor.get());
-    Logger.recordOutput("Mech/Intake/Desired Intake Voltage", desiredIntakeVoltage);
+    Logger.recordOutput("Mech/Intake/Desired Intake Voltage", desiredIntakeSpeed);
 
     Logger.recordOutput(
         "Mech/Intake/ClosedLoopReference", deployMotor.getClosedLoopReference().getValueAsDouble());

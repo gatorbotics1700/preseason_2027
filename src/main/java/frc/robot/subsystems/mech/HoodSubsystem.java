@@ -7,13 +7,11 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -24,8 +22,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class HoodSubsystem extends SubsystemBase {
 
-  private final DigitalInput limitSwitch;
-
   // when false, run voltage control
   private boolean positionControl = true;
 
@@ -35,7 +31,6 @@ public class HoodSubsystem extends SubsystemBase {
       new TalonFX(HoodConstants.HOOD_MOTOR_CAN_ID, TunerConstants.mechCANBus);
   private TalonFXConfiguration talonFXConfigs;
   private static MotionMagicExpoVoltage m_request;
-  private static VelocityVoltage velocity_request = new VelocityVoltage(0.0);
 
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
@@ -43,7 +38,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   public static final LoggedNetworkNumber desiredHoodAngle =
       new LoggedNetworkNumber("/Tuning/Hood/Angle", 68);
-  private Rotation2d desiredAngle = getCurrentAngle(); // HoodConstants.RETRACTED_POSITION;
+  private Rotation2d desiredAngle = getCurrentAngle();
 
   private static final double HOOD_CURRENT_LIMIT = 60; // TODO change
 
@@ -66,18 +61,13 @@ public class HoodSubsystem extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Hood/MM kA", 0.1);
 
   public HoodSubsystem() {
-    // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
+    // MOTION MAGIC PID/FEEDFORWARD CONFIGS
     talonFXConfigs = new TalonFXConfiguration();
 
-    // if (RobotConfigLoader.getSerialNumber().equals(RobotConfigLoader.NILE_SERIAL)) {
-    //   talonFXConfigs.withMotorOutput(
-    //       new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    // } else {
     talonFXConfigs.withMotorOutput(
         new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake));
-    // }
 
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
@@ -106,8 +96,6 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.getConfigurator().apply(talonFXConfigs);
 
     m_request = new MotionMagicExpoVoltage(0);
-
-    limitSwitch = new DigitalInput(HoodConstants.HOOD_LIMIT_SWITCH_PORT);
   }
 
   @Override
@@ -142,16 +130,16 @@ public class HoodSubsystem extends SubsystemBase {
       hoodMotor.getConfigurator().apply(talonFXConfigs);
     }
 
-    // Skip limit switch safety during SysID - the isSysIdOutOfBounds() handles limits
+    // Skip current switch safety during SysID - the isSysIdOutOfBounds() handles limits
     if (isCurrentLimitReached() && !sysIdRunning) {
       if (positionControl) {
         if (desiredAngle.getDegrees() > getCurrentAngle().getDegrees()) {
           desiredAngle = getCurrentAngle();
-          setHoodVelocity(0);
+          setHoodSpeed(0);
         }
       } else {
         if (hoodMotor.getMotorVoltage().getValueAsDouble() > 0) {
-          setHoodVelocity(0);
+          setHoodSpeed(0);
         }
       }
     }
@@ -206,7 +194,7 @@ public class HoodSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(hoodAngleDegrees));
   }
 
-  public void setHoodVelocity(double velocity) {
+  public void setHoodSpeed(double velocity) {
     positionControl = false;
     hoodMotor.set(velocity);
   }
@@ -290,7 +278,7 @@ public class HoodSubsystem extends SubsystemBase {
         .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
         .finallyDo(
             () -> {
-              setHoodVelocity(0);
+              setHoodSpeed(0);
               sysIdRunning = false;
             })
         .withName("Hood SysId Quasistatic " + direction);
@@ -307,7 +295,7 @@ public class HoodSubsystem extends SubsystemBase {
         .until(this::isSysIdOutOfBounds) // temporarily disabled for testing
         .finallyDo(
             () -> {
-              setHoodVelocity(0);
+              setHoodSpeed(0);
               sysIdRunning = false;
             })
         .withName("Hood SysId Dynamic " + direction);

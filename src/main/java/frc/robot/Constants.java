@@ -42,10 +42,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.util.Calculations;
 import frc.robot.util.RobotConfigLoader;
-import frc.robot.util.ShotParameters;
-import frc.robot.util.ValidStationaryShot;
 
 /**
  * This class defines the runtime mode used by AdvantageKit and loads robot-specific configuration
@@ -552,19 +549,6 @@ public final class Constants {
         2.5; // TODO change based off real life
   }
 
-  public static final class ClimberConstants {
-    public static final int CLIMBER_MOTOR_CAN_ID = 36;
-    public static final int CLIMBER_HALL_EFFECT_PORT = 7;
-    public static final double L1_EXTENSION_INCHES = 20; // TODO get a real number
-    public static final int CLIMBER_GEAR_RATIO = 25; // TODO get a real number
-    public static final double WINCH_INCHES_PER_REV = (0.75) * Math.PI; // diameter in inches * pi
-    // TODO decide if we want to measure climber extension from the floor or from stage 0 of the arm
-    public static final double MAX_EXTENSION_INCHES = 5.58; // TODO get a real number
-    public static final double RETRACTED_HEIGHT_INCHES = 0; // TODO get a real number
-    public static final double HOMING_VOLTAGE = -4; // TODO get a real number
-    public static final double POSITION_DEADBAND = 0.5; // TODO get a real number
-  }
-
   public static final class HoodConstants {
     public static final int HOOD_MOTOR_CAN_ID = 17;
     public static final int HOOD_LIMIT_SWITCH_PORT = 9;
@@ -573,16 +557,16 @@ public final class Constants {
     public static final Rotation2d RETRACTED_POSITION =
         new Rotation2d(
             Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_retracted_degrees"))); // TODO: check number
+                RobotConfigLoader.getInt("mech.hood_retracted_degrees")));
     public static final Rotation2d MIN_ANGLE =
         new Rotation2d(
             Math.toRadians(
-                RobotConfigLoader.getInt("mech.hood_min_angle_degrees"))); // TODO: check number
+                RobotConfigLoader.getInt("mech.hood_min_angle_degrees")));
 
-    public static final double HOOD_POSITION_DEADBAND_DEGREES = 1; // TODO: tune
+    public static final double HOOD_POSITION_DEADBAND_DEGREES = 1;
 
     /** Voltage applied when running toward retract limit (tune sign for your mechanism). */
-    public static final double HOMING_VELOCITY = 0.3; // TODO tune
+    public static final double HOMING_SPEED = 0.3;
 
     // GEAR RATIOS
     public static final double HOOD_SHAFT_REVS_PER_MECH_REV =
@@ -593,8 +577,7 @@ public final class Constants {
 
   public static final class HopperFloorConstants {
     public static final int HOPPER_MOTOR_CAN_ID = 35;
-    public static final double HOPPER_FLOOR_VOLTAGE = 8;
-    public static final double HOPPER_FLOOR_VELOCITY = 0.5; // TODO find a real number
+    public static final double HOPPER_FLOOR_SPEED = 0.67; // TODO: tune this value
   }
 
   public static final class IntakeConstants {
@@ -617,9 +600,9 @@ public final class Constants {
     public static final Rotation2d HALF_EXTENDED_POSITION =
         new Rotation2d(Math.toRadians(HALF_EXTENDED_ANGLE_DEGREES));
 
-    public static final double HOMING_VOLTAGE = -1; // TODO tune
-    public static final double RETRACTING_VOLTAGE = -3; // TODO: tune
-    public static final double INTAKING_VOLTAGE = -13;
+    public static final double HOMING_SPEED = -0.1; // TODO tune
+    public static final double RETRACTING_SPEED = -0.25; // TODO: tune
+    public static final double INTAKING_SPEED = -0.8; // TODO: tune
 
     public static final double POSITION_DEADBAND = 3;
 
@@ -634,80 +617,20 @@ public final class Constants {
     public static final int LEFT_TRANSITION_MOTOR_CAN_ID = 18;
     public static final int RIGHT_TRANSITION_MOTOR_CAN_ID = 19;
 
-    public static final double TRANSITION_VOLTAGE = 5;
+    public static final double TRANSITION_SPEED = 0.4;
     public static final double FLYWHEEL_SPEED_DEADBAND = 2;
     public static final double FLYWHEEL_GEAR_RATIO = 30.0 / 14.0;
-    public static final double FLYWHEEL_SLIP = 0.17; // 0.7; // TODO TUNE!!!
+    public static final double FLYWHEEL_SLIP = 0.17; // TODO: tune?
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER =
         new Translation3d(
-            0.127, 0,
-            0.429); // TODO figure out what part of the shooter to measure from (this is the center
-    // of the turret plate but at the height of the flywheel center)
-    public static final ValidStationaryShot RED_RIGHT =
-        new ValidStationaryShot(
-            new Pose2d(14.17, 1.25, new Rotation2d(Math.toRadians(129))),
-            new Rotation2d(Math.toRadians(64.4)),
-            62.2);
-    public static final ValidStationaryShot BLUE_LEFT =
-        new ValidStationaryShot(
-            Calculations.mirrorPoseAcrossAlliance(RED_RIGHT.pose),
-            new Rotation2d(Math.toRadians(64.4)),
-            62.2);
-    public static final ValidStationaryShot RED_LEFT =
-        new ValidStationaryShot(
-            Calculations.mirrorPoseAcrossXAxis(RED_RIGHT.pose),
-            new Rotation2d(Math.toRadians(64.4)),
-            62.2);
-    public static final ValidStationaryShot BLUE_RIGHT =
-        new ValidStationaryShot(
-            Calculations.mirrorPoseAcrossXAxis(BLUE_LEFT.pose),
-            new Rotation2d(Math.toRadians(64.4)),
-            62.2);
-    public static final ShotParameters BLUE_HUB_CENTER_SHOT =
-        new ShotParameters(
-            new Pose2d(3.584, 4.035, new Rotation2d(0)),
-            new Rotation2d(Math.toRadians(65)), // TODO: change
-            55); // TODO: change
-    public static final ShotParameters RED_HUB_CENTER_SHOT =
-        new ShotParameters(
-            Calculations.mirrorPoseAcrossAlliance(BLUE_HUB_CENTER_SHOT.pose),
-            new Rotation2d(Math.toRadians(73)),
-            52);
-    public static final ShotParameters BLUE_RIGHT_CORNER_SHOT =
-        new ShotParameters(
-            new Pose2d(0.62, 0.576, new Rotation2d(37)),
-            new Rotation2d(Math.toRadians(65)), // TODO: change
-            55); // TODO: change
-    public static final ShotParameters RED_LEFT_CORNER_SHOT =
-        new ShotParameters(
-            Calculations.mirrorPoseAcrossAlliance(BLUE_RIGHT_CORNER_SHOT.pose),
-            new Rotation2d(Math.toRadians(65)),
-            55);
-    public static final ShotParameters BLUE_LEFT_CORNER_SHOT =
-        new ShotParameters(
-            new Pose2d(0.62, 7.494, new Rotation2d(37)),
-            new Rotation2d(Math.toRadians(65)), // TODO: change
-            55); // TODO: change
-    public static final ShotParameters RED_RIGHT_CORNER_SHOT =
-        new ShotParameters(
-            Calculations.mirrorPoseAcrossAlliance(BLUE_LEFT_CORNER_SHOT.pose),
-            new Rotation2d(Math.toRadians(65)),
-            55);
-
-    public static final ShotParameters[] STATIONARY_BLUE_SHOTS_ARRAY = {
-      BLUE_HUB_CENTER_SHOT, BLUE_RIGHT_CORNER_SHOT, BLUE_LEFT_CORNER_SHOT
-    };
-    public static final ShotParameters[] STATIONARY_RED_SHOTS_ARRAY = {
-      RED_HUB_CENTER_SHOT, RED_RIGHT_CORNER_SHOT, RED_LEFT_CORNER_SHOT
-    };
+            0.127, 0, 0.429);
   }
 
   public static final class TurretConstants {
     public static final int TURRET_MOTOR_CAN_ID = 15;
     public static final int TURRET_BORE_ENCODER_PORT = 1;
-    // public static final int TURRET_HALL_EFFECT_PORT = 8;
 
     public static final double TURRET_DEADBAND = 0.75;
 

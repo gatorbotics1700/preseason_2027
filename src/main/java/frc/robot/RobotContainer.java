@@ -174,16 +174,21 @@ public class RobotContainer {
             () ->
                 CommandScheduler.getInstance()
                     .schedule(
-                        ShootingCommands.StationaryShootingCommand(
-                            shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose))));
+                        new ShootingCommands.ShootOnTheMoveCommand(
+                            shooterSubsystem,
+                            hoodSubsystem,
+                            hopperFloorSubsystem,
+                            turretSubsystem,
+                            robotPose,
+                            chassisSpeeds))));
     NamedCommands.registerCommand("Intaking Command", IntakeCommands.RunIntake(intakeSubsystem));
     NamedCommands.registerCommand(
         "Stop Shooter Command",
         new InstantCommand(
             () -> {
               shooterSubsystem.setDesiredRotorVelocity(0);
-              shooterSubsystem.setDesiredTransitionVoltage(0);
-              hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
+              shooterSubsystem.setDesiredTransitionSpeed(0);
+              hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
             }));
 
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
@@ -291,12 +296,6 @@ public class RobotContainer {
       //                     shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose),
       //             Set.of(shooterSubsystem, hoodSubsystem, hopperFloorSubsystem)));
 
-      controller
-          .y()
-          .onTrue(
-              ShootingCommands.StationaryShootingCommand(
-                  shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
-
       // drive under trench
       // controller
       //     .x()
@@ -379,17 +378,6 @@ public class RobotContainer {
                     drive.setSlowDrive();
                   },
                   drive));
-
-      controller
-          .rightTrigger()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    CommandScheduler.getInstance()
-                        .schedule(
-                            ShootingCommands.StationaryShootingCommand(
-                                shooterSubsystem, hoodSubsystem, hopperFloorSubsystem, robotPose));
-                  }));
     }
   }
 
@@ -551,8 +539,7 @@ public class RobotContainer {
         // .y()
         // .onTrue(
         // HoodCommands.HomeHood(
-        // hoodSubsystem)); // TODO: test and make sure this still works (calling it
-        // // differently)
+        // hoodSubsystem)); 
         // controller_two.a().onTrue(RunMechWheels());
         // controller_two.b().onTrue(MechStop());
 
@@ -571,15 +558,6 @@ public class RobotContainer {
         //                             hopperFloorSubsystem,
         //                             robotPose))));
 
-        controller_two // first stage of shooting from stationary fixed spots
-            .b()
-            .onTrue(
-                new ShootingCommands.ShootingCommand(
-                    shooterSubsystem,
-                    hoodSubsystem,
-                    hopperFloorSubsystem,
-                    robotPose,
-                    ShooterConstants.BLUE_LEFT_CORNER_SHOT));
 
         // controller_two // second stage shooting from stationary spots across field with pointing
         //     // drive train
@@ -820,18 +798,6 @@ public class RobotContainer {
                                           turretSubsystem,
                                           robotPose,
                                           chassisSpeeds)))));
-      controller
-          .a()
-          .onTrue(
-              Commands.runOnce(
-                  () ->
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              ShootingCommands.StationaryShootingCommand(
-                                  shooterSubsystem,
-                                  hoodSubsystem,
-                                  hopperFloorSubsystem,
-                                  robotPose))));
 
       controller_two
           .y()
@@ -877,7 +843,7 @@ public class RobotContainer {
 
       controller_two.rightTrigger().onTrue(new InstantCommand(() -> hoodSubsystem.zeroHood()));
 
-      // TODO: intake
+      // TODO: intake sysid buttons -- uncomment for use
       // controller_two.x().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
       // controller_two.y().whileTrue(intakeSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       // controller_two
@@ -893,7 +859,7 @@ public class RobotContainer {
       //         new InstantCommand(() ->
       // intakeSubsystem.zeroIntakeDeploy()).ignoringDisable(true));
 
-      // TODO: shooter
+      // TODO: shooter sysid buttons -- uncomment for use
       // controller_two.x().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
       // controller_two.y().whileTrue(shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       // controller_two
@@ -903,7 +869,7 @@ public class RobotContainer {
       //     .b()
       //     .whileTrue(shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
-      // TODO: turret
+      // TODO: turret sysid buttons -- uncomment for use
       // controller_two.x().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
       // controller_two.y().whileTrue(turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       // controller_two
@@ -999,11 +965,11 @@ public class RobotContainer {
               new InstantCommand(
                   () -> {
                     shooterSubsystem.setDesiredRotorVelocity(80);
-                    shooterSubsystem.setDesiredTransitionVoltage(
-                        ShooterConstants.TRANSITION_VOLTAGE);
-                    hopperFloorSubsystem.setDesiredHopperFloorVoltage(
-                        HopperFloorConstants.HOPPER_FLOOR_VOLTAGE);
-                    intakeSubsystem.setIntakeVoltage(IntakeConstants.INTAKING_VOLTAGE);
+                    shooterSubsystem.setDesiredTransitionSpeed(
+                        ShooterConstants.TRANSITION_SPEED);
+                    hopperFloorSubsystem.setDesiredHopperFloorSpeed(
+                        HopperFloorConstants.HOPPER_FLOOR_SPEED);
+                    intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKING_SPEED);
                   }));
 
       controller_two
@@ -1157,10 +1123,10 @@ public class RobotContainer {
                 () -> {
                   turretSubsystem.setDesiredAngle(turretSubsystem.getCurrentAngle());
                   shooterSubsystem.setDesiredRotorVelocity(0);
-                  hopperFloorSubsystem.setDesiredHopperFloorVoltage(0);
-                  shooterSubsystem.setDesiredTransitionVoltage(0);
+                  hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
+                  shooterSubsystem.setDesiredTransitionSpeed(0);
                   hoodSubsystem.setDesiredAngle(hoodSubsystem.getCurrentAngle());
-                  hoodSubsystem.setHoodVelocity(0);
+                  hoodSubsystem.setHoodSpeed(0);
                 },
                 turretSubsystem,
                 shooterSubsystem,
@@ -1182,7 +1148,7 @@ public class RobotContainer {
     return (new InstantCommand(
             () -> {
               // shooterSubsystem.setDesiredRotorVelocity(40);
-              shooterSubsystem.setDesiredTransitionVoltage(ShooterConstants.TRANSITION_VOLTAGE);
+              shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
             },
             shooterSubsystem)
         .withName("TestShot"));
