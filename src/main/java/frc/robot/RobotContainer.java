@@ -42,8 +42,6 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveSystemsCheckCommands;
-import frc.robot.commands.drive.DriveToFuelCommand;
-import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.drive.PointAtHubCommand;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
@@ -739,45 +737,45 @@ public class RobotContainer {
                       drive)
                   .ignoringDisable(true));
 
-      controller
-          .a()
-          .onTrue(
-              Commands.runOnce(
-                  () ->
-                      CommandScheduler.getInstance()
-                          .schedule(new DriveToFuelCommand(drive, vision, robotPose)),
-                  drive,
-                  vision));
+      // controller
+      //     .a()
+      //     .onTrue(
+      //         Commands.runOnce(
+      //             () ->
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(new DriveToFuelCommand(drive, vision, robotPose)),
+      //             drive,
+      //             vision));
 
-      controller
-          .rightTrigger()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    try {
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem)
-                                  .withName("DriveOverBump"));
-                    } catch (Exception e) {
-                      e.printStackTrace();
-                    }
-                  }));
+      // controller
+      //     .rightTrigger()
+      //     .onTrue(
+      //         new InstantCommand(
+      //             () -> {
+      //               try {
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(
+      //                         DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem)
+      //                             .withName("DriveOverBump"));
+      //               } catch (Exception e) {
+      //                 e.printStackTrace();
+      //               }
+      //             }));
 
-      controller
-          .leftTrigger()
-          .onTrue(
-              new InstantCommand(
-                  () -> {
-                    try {
-                      CommandScheduler.getInstance()
-                          .schedule(
-                              DriveUnderTrenchCommand.driveUnderTrench(drive, shooterSubsystem)
-                                  .withName("DriveUnderTrench"));
-                    } catch (Exception e) {
-                      e.printStackTrace();
-                    }
-                  }));
+      // controller
+      //     .leftTrigger()
+      //     .onTrue(
+      //         new InstantCommand(
+      //             () -> {
+      //               try {
+      //                 CommandScheduler.getInstance()
+      //                     .schedule(
+      //                         DriveUnderTrenchCommand.driveUnderTrench(drive, shooterSubsystem)
+      //                             .withName("DriveUnderTrench"));
+      //               } catch (Exception e) {
+      //                 e.printStackTrace();
+      //               }
+      //             }));
     }
   }
 
@@ -810,7 +808,18 @@ public class RobotContainer {
           .rightTrigger()
           .onTrue(
               Commands.runOnce(
-                  () -> CommandScheduler.getInstance().schedule((new PointAtHubCommand(drive)))));
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              (new PointAtHubCommand(drive))
+                                  .andThen(
+                                      new ShootingCommands.ShootOnTheMoveCommand(
+                                          shooterSubsystem,
+                                          hoodSubsystem,
+                                          hopperFloorSubsystem,
+                                          turretSubsystem,
+                                          robotPose,
+                                          chassisSpeeds)))));
       controller
           .a()
           .onTrue(
