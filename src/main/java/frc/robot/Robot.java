@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
 import frc.robot.util.ShotCalculator;
@@ -175,6 +176,10 @@ public class Robot extends LoggedRobot {
             });
 
     CommandScheduler.getInstance().schedule(robotContainer.HomeMechanisms());
+    CommandScheduler.getInstance()
+        .schedule(IntakeCommands.DeployIntake(robotContainer.getIntakeSubsystem()));
+    CommandScheduler.getInstance()
+        .schedule(IntakeCommands.RunIntake(robotContainer.getIntakeSubsystem()));
     // CommandScheduler.getInstance()
     //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
 

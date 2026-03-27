@@ -168,23 +168,16 @@ public class RobotContainer {
         };
 
     // Register named commands for PathPlanner autos
-    NamedCommands.registerCommand(
-        "Point At Hub Command",
-        Commands.runOnce(
-            () -> CommandScheduler.getInstance().schedule((new PointAtHubCommand(drive)))));
+    NamedCommands.registerCommand("Point At Hub Command", new PointAtHubCommand(drive));
     NamedCommands.registerCommand(
         "Shooter Command",
-        Commands.runOnce(
-            () ->
-                CommandScheduler.getInstance()
-                    .schedule(
-                        new ShootingCommands.ShootOnTheMoveCommand(
-                            shooterSubsystem,
-                            hoodSubsystem,
-                            hopperFloorSubsystem,
-                            turretSubsystem,
-                            robotPose,
-                            chassisSpeeds))));
+        new ShootingCommands.ShootOnTheMoveCommand(
+            shooterSubsystem,
+            hoodSubsystem,
+            hopperFloorSubsystem,
+            turretSubsystem,
+            robotPose,
+            chassisSpeeds));
     NamedCommands.registerCommand("Intaking Command", IntakeCommands.RunIntake(intakeSubsystem));
     NamedCommands.registerCommand(
         "Stop Shooter Command",
@@ -620,22 +613,23 @@ public class RobotContainer {
         controller_two
             .a()
             .onTrue(
-                new InstantCommand(
-                    () -> {
-                      shooterSubsystem.setDesiredRotorVelocity(80);
-                      shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
-                      hopperFloorSubsystem.setDesiredHopperFloorSpeed(
-                          HopperFloorConstants.HOPPER_FLOOR_SPEED);
-                    }));
-        // new PointAtHubCommand(drive)
-        //     .andThen(
-        //         new ShootingCommands.ShootOnTheMoveCommand(
-        //             shooterSubsystem,
-        //             hoodSubsystem,
-        //             hopperFloorSubsystem,
-        //             turretSubsystem,
-        //             robotPose,
-        //             chassisSpeeds)));
+                // new InstantCommand(
+                //     () -> {
+                //       shooterSubsystem.setDesiredRotorVelocity(80);
+                //
+                // shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
+                //       hopperFloorSubsystem.setDesiredHopperFloorSpeed(
+                //           HopperFloorConstants.HOPPER_FLOOR_SPEED);
+                //     }));
+                new PointAtHubCommand(drive)
+                    .andThen(
+                        new ShootingCommands.ShootOnTheMoveCommand(
+                            shooterSubsystem,
+                            hoodSubsystem,
+                            hopperFloorSubsystem,
+                            turretSubsystem,
+                            robotPose,
+                            chassisSpeeds)));
 
         // new InstantCommand(
         //     () ->
@@ -1147,9 +1141,16 @@ public class RobotContainer {
   }
 
   public Command HomeMechanisms() {
-    return (new HoodCommands.HoodHomingCommand(hoodSubsystem)
+    return (new InstantCommand(
+                () ->
+                    CommandScheduler.getInstance()
+                        .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem)))
             .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
-            .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
+            .alongWith(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))))
         .withName("Home Mechansims");
   }
 
