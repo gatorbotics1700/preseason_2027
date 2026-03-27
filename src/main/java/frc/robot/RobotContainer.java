@@ -1141,16 +1141,9 @@ public class RobotContainer {
   }
 
   public Command HomeMechanisms() {
-    return (new InstantCommand(
-                () ->
-                    CommandScheduler.getInstance()
-                        .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem)))
-            .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret()))
-            .alongWith(
-                new InstantCommand(
-                    () ->
-                        CommandScheduler.getInstance()
-                            .schedule(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))))
+    return (new HoodCommands.HoodHomingCommand(hoodSubsystem)
+            .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem))
+            .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret(), turretSubsystem)))
         .withName("Home Mechansims");
   }
 
