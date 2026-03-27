@@ -181,8 +181,6 @@ public class Robot extends LoggedRobot {
                 .HomeMechanisms()
                 .andThen(IntakeCommands.DeployIntake(robotContainer.getIntakeSubsystem()))
                 .andThen(IntakeCommands.RunIntake(robotContainer.getIntakeSubsystem())));
-    // CommandScheduler.getInstance()
-    //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -202,9 +200,6 @@ public class Robot extends LoggedRobot {
 
     CommandScheduler.getInstance().cancelAll();
     robotContainer.teleopInit();
-    // robotContainer.getShooterSubsystem().setDesiredFlywheelVelocity(0);
-    // robotContainer.getShooterSubsystem().setDesiredTransitionVoltage(0);
-    // robotContainer.getIntakeSubsystem().setIntakeVoltage(0);
     CommandScheduler.getInstance()
         .schedule(
             robotContainer.MechStop(
@@ -214,15 +209,6 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
     System.out.println("IN TELEOP INIT");
-    // CommandScheduler.getInstance()
-    //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
-    // CommandScheduler.getInstance()
-    //     .schedule(new ClimbCommands.HomeClimber(robotContainer.getClimberSubsystem()));
-    // CommandScheduler.getInstance()
-    //     .schedule(new InstantCommand(() -> robotContainer.getTurretSubsystem().homeTurret()));
-    // CommandScheduler.getInstance()
-    //     .schedule(new InstantCommand(() ->
-    // robotContainer.getIntakeSubsystem().zeroIntakeDeploy()));
     // CommandScheduler.getInstance()
     //     .schedule(
     //         robotContainer.HomeMechanisms()); // TODO we don't want to actually do this in comps
@@ -253,12 +239,8 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHopperFloorSubsystem(),
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
-    // CommandScheduler.getInstance()
-    //     .schedule(HoodCommands.HomeHood(robotContainer.getHoodSubsystem()));
     // robotContainer.configureSysIdButtons();
     robotContainer.configureSystemCheckButtons();
-    // robotContainer.getHoodSubsystem().zeroHood();
-
   }
 
   /** This function is called periodically during test mode. */
