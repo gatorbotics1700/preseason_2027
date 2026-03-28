@@ -2,6 +2,7 @@ package frc.robot.subsystems.mech;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -29,6 +30,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   private static Slot0Configs slot0Configs;
   private static MotionMagicConfigs motionMagicConfigs;
+  private static CurrentLimitsConfigs turretCurrentLimitsConfigs;
 
   private static final double SYSID_LIMIT_MARGIN_DEGREES = 10.0;
   private boolean sysIdRunning = false;
@@ -79,6 +81,10 @@ public class TurretSubsystem extends SubsystemBase {
         new MotorOutputConfigs()
             .withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake));
+
+    turretCurrentLimitsConfigs = talonFXConfigs.CurrentLimits;
+    turretCurrentLimitsConfigs.StatorCurrentLimit = 80;
+    turretCurrentLimitsConfigs.StatorCurrentLimitEnable = true;
 
     slot0Configs = talonFXConfigs.Slot0;
 
@@ -275,7 +281,8 @@ public class TurretSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Mech/Turret/closed loop error", turretMotor.getClosedLoopError().getValueAsDouble());
 
-    Logger.recordOutput("All Stator Currents/Turret",turretMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "All Stator Currents/Turret", turretMotor.getStatorCurrent().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Turret/SysID/turretSysIDRunning", sysIdRunning);

@@ -41,6 +41,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
   public void hopperFloorLogs() {
     Logger.recordOutput("Mech/Hopper Floor/Desired Speed", desiredHopperSpeed);
     Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
-    Logger.recordOutput("All Stator Currents/Hopper Floor",hopperMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "All Stator Currents/Hopper Floor", hopperMotor.getStatorCurrent().getValueAsDouble());
   }
 }

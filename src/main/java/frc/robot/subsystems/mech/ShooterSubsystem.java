@@ -241,7 +241,8 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "All Stator Currents/Right Transition",
         rightTransitionMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("All Stator Currents/Flywheel",leftFlywheelMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "All Stator Currents/Flywheel", leftFlywheelMotor.getStatorCurrent().getValueAsDouble());
 
     Logger.recordOutput("Mech/Shooter/MAX SPEED", ShotCalculatorConditions.MAX_SHOT_SPEED);
 

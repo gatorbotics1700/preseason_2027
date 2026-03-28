@@ -78,7 +78,7 @@ public class IntakeSubsystem extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Intake/Expo kV", 0.1);
 
   public static final LoggedNetworkNumber intakeCurrentLimit =
-      new LoggedNetworkNumber("/Tuning/Intake/Intake Current Limit", 20);
+      new LoggedNetworkNumber("/Tuning/Intake/Intake Current Limit", 25);
 
   private Rotation2d desiredAngle = new Rotation2d();
   private boolean useDeployPositionControl = false;
@@ -128,7 +128,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // and slower
 
     intakeCurrentLimitConfigs = intakeTalonFXConfigs.CurrentLimits;
-    intakeCurrentLimitConfigs.StatorCurrentLimit = 20;
+    intakeCurrentLimitConfigs.StatorCurrentLimit = 25;
     intakeCurrentLimitConfigs.StatorCurrentLimitEnable = true;
 
     deployCurrentLimitConfigs = deployTalonFXConfigs.CurrentLimits;
@@ -162,11 +162,21 @@ public class IntakeSubsystem extends SubsystemBase {
           && getCurrentAngle().getDegrees() > 30) {
         deployCurrentLimitConfigs.StatorCurrentLimit = 10;
         deployMotor.getConfigurator().apply(deployTalonFXConfigs);
-      } else if ((!isDeployed.getAsBoolean() || getCurrentAngle().getDegrees() < 30)
+      }
+      if ((!isDeployed.getAsBoolean() || getCurrentAngle().getDegrees() < 30)
           && deployCurrentLimitConfigs.StatorCurrentLimit != 60) {
         deployCurrentLimitConfigs.StatorCurrentLimit = 60;
         deployMotor.getConfigurator().apply(deployTalonFXConfigs);
       }
+
+      // if (!isDeployed.getAsBoolean()) {
+      //   if (!isHallEffectTriggered()) {
+      //     setDeploySpeed(IntakeConstants.HOMING_SPEED);
+      //   } else {
+      //     setDeploySpeed(0.0);
+      //     zeroIntakeDeploy();
+      //   }
+      // }
     }
 
     intakeLogs();
