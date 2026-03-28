@@ -188,7 +188,7 @@ public class RobotContainer {
               hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
             }));
 
-    NamedCommands.registerCommand("Home Mechanisms", HomeMechanisms());
+    NamedCommands.registerCommand("Auto Init", HomeMechanisms());
 
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
     autoChooser =

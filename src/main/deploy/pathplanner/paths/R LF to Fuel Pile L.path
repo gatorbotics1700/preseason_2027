@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 8.689594,
-        "y": 1.305
+        "x": 9.19346824363426,
+        "y": 1.1459058159722224
       },
       "prevControl": {
-        "x": 10.801566771384477,
-        "y": 0.6551827739197539
+        "x": 11.305441015018738,
+        "y": 0.49608858989197635
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.66320543924597
+    "rotation": -68.58032313689544
   },
   "reversed": false,
   "folder": "Red Starters",
