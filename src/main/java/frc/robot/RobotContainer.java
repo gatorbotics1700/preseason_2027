@@ -388,7 +388,7 @@ public class RobotContainer {
                           .schedule(IntakeCommands.StopIntake(intakeSubsystem))));
 
       // Right Bumper -- Deploy / Retract Intake Toggle
-      controller_two
+      controller
           .rightBumper()
           .onTrue(
               new InstantCommand(
@@ -463,6 +463,15 @@ public class RobotContainer {
                                               params.hoodAngle);
                                         })))));
       } else {
+        // B -- Deploy / Retract Intake Toggle
+      controller_two
+          .b()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
+                          
         // X -- Mech Stop
         controller_two
             .x()
@@ -665,7 +674,7 @@ public class RobotContainer {
                           .schedule(IntakeCommands.StopIntake(intakeSubsystem))));
 
       // Right Bumper -- Deploy / Retract Intake Toggle
-      controller_two
+      controller
           .rightBumper()
           .onTrue(
               new InstantCommand(
@@ -687,6 +696,15 @@ public class RobotContainer {
         controller_two = new CommandXboxController(1);
       }
 
+      // B -- Deploy / Retract Intake Toggle
+      controller_two
+          .b()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.ToggleIntake(intakeSubsystem))));
+      
       // X -- Mech Stop
       controller_two
           .x()
