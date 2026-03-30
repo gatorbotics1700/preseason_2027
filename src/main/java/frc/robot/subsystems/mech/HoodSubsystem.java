@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.util.logging.TalonFXLogger;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -302,17 +303,13 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void hoodLogs() {
+    TalonFXLogger.log(hoodMotor, "Mech", "Hood");
+
     Logger.recordOutput("Mech/Hood/Desired Angle", desiredAngle.getDegrees());
     Logger.recordOutput("Mech/Hood/Current Angle", getCurrentAngle().getDegrees());
-    Logger.recordOutput("Mech/Hood/Motor Output", hoodMotor.get());
-    Logger.recordOutput("Mech/Hood/Current velocity", hoodMotor.getVelocity().getValueAsDouble());
-    Logger.recordOutput("Mech/Hood/Limit switch", isCurrentLimitReached());
+    Logger.recordOutput("Mech/Hood/Current Limit Reached", isCurrentLimitReached());
     Logger.recordOutput(
         "Mech/Hood/Control Mode", positionControl ? "position control" : "voltage control");
-    Logger.recordOutput(
-        "Mech/Hood/Stator Current", hoodMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Hood", hoodMotor.getStatorCurrent().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Hood/SysID/hoodSysIDRunning", sysIdRunning);

@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.util.logging.TalonFXLogger;
 import org.littletonrobotics.junction.Logger;
 
 public class HopperFloorSubsystem extends SubsystemBase {
@@ -39,9 +40,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
   }
 
   public void hopperFloorLogs() {
+    TalonFXLogger.log(hopperMotor, "Mech", "Hopper Floor");
     Logger.recordOutput("Mech/Hopper Floor/Desired Speed", desiredHopperSpeed);
-    Logger.recordOutput("Mech/Hopper Floor/Motor Output", hopperMotor.get());
-    Logger.recordOutput(
-        "All Stator Currents/Hopper Floor", hopperMotor.getStatorCurrent().getValueAsDouble());
   }
 }

@@ -13,8 +13,8 @@ import frc.robot.subsystems.mech.HoodSubsystem;
 import frc.robot.subsystems.mech.HopperFloorSubsystem;
 import frc.robot.subsystems.mech.ShooterSubsystem;
 import frc.robot.subsystems.mech.TurretSubsystem;
-import frc.robot.util.ShotCalculator;
-import frc.robot.util.ShotParameters;
+import frc.robot.util.shooting.ShotCalculator;
+import frc.robot.util.shooting.ShotParameters;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 

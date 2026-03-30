@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.auto;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;

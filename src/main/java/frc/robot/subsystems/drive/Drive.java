@@ -188,11 +188,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
-              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+              "Drive/Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
-          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+          Logger.recordOutput("Drive/Odometry/TrajectorySetpoint", targetPose);
         });
 
     // Configure SysId
@@ -269,7 +269,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     Rotation2d hubAngle = getDesiredHubAngle();
     Logger.recordOutput(
-        "Drivetrain/Desired Drivetrain Angle to Hub (Degrees)",
+        "Drive/Desired Drivetrain Angle to Hub (Degrees)",
         hubAngle != null ? hubAngle.getDegrees() : Double.NaN);
 
     // Back-compat key for existing dashboards/logs (this is NOT the hub angle; it's the drive's
@@ -390,7 +390,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   /** Returns the current odometry pose. */
-  @AutoLogOutput(key = "Odometry/Robot")
+  @AutoLogOutput(key = "Drive/Odometry/Robot")
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
   }

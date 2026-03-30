@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;

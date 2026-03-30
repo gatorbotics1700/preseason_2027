@@ -629,6 +629,12 @@ public final class Constants {
     public static final Translation3d BOT_TO_SHOOTER = new Translation3d(0.127, 0, 0.429);
   }
 
+  /** REV PDH / CTRE PDP CAN ID and logging. */
+  public static final class PowerConstants {
+    /** CAN ID of the Power Distribution Hub (default REV PDH is 1). */
+    public static final int PDH_CAN_ID = 1;
+  }
+
   public static final class TurretConstants {
     public static final int TURRET_MOTOR_CAN_ID = 15;
     public static final int TURRET_BORE_ENCODER_PORT = 1;

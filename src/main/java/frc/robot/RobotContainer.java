@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -36,11 +37,14 @@ import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.HopperFloorConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.PowerConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveSystemsCheckCommands;
+import frc.robot.commands.drive.DriveUnderTrenchCommand;
 import frc.robot.commands.drive.PointAtHubCommand;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
@@ -60,11 +64,11 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CommandSimMacXboxController;
-import frc.robot.util.GamePieceSimulation;
-// import frc.robot.util.MultiStepAutoChooser; // COMMENTED OUT - using PathPlanner pre-made autos
 import frc.robot.util.RobotConfigLoader;
-import frc.robot.util.ShotCalculator;
-import frc.robot.util.ShotParameters;
+import frc.robot.util.logging.PDHLogger;
+import frc.robot.util.shooting.GamePieceSimulation;
+import frc.robot.util.shooting.ShotCalculator;
+import frc.robot.util.shooting.ShotParameters;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -93,6 +97,9 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> chassisSpeeds;
+
+  /** Null when {@link Constants.Mode#REPLAY} (no hardware). */
+  private final PowerDistribution pdh;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -155,6 +162,12 @@ public class RobotContainer {
         vision = new Vision(drive);
 
         break;
+    }
+
+    if (Constants.currentMode == Constants.Mode.REPLAY) {
+      pdh = null;
+    } else {
+      pdh = new PowerDistribution(PowerConstants.PDH_CAN_ID, PowerDistribution.ModuleType.kRev);
     }
 
     robotPose =
@@ -745,48 +758,36 @@ public class RobotContainer {
                       },
                       drive)
                   .ignoringDisable(true));
-      // controller.a().onTrue(new InstantCommand(() -> intakeSubsystem.setDeploySpeed(0.1)));
-      // controller.b().onTrue(new InstantCommand(() -> intakeSubsystem.setDeploySpeed(0)));
 
-      // controller
-      //     .a()
-      //     .onTrue(
-      //         Commands.runOnce(
-      //             () ->
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(new DriveToFuelCommand(drive, vision, robotPose)),
-      //             drive,
-      //             vision));
+      controller
+          .rightTrigger()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem)
+                                  .withName("DriveOverBump"));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
 
-      // controller
-      //     .rightTrigger()
-      //     .onTrue(
-      //         new InstantCommand(
-      //             () -> {
-      //               try {
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(
-      //                         DriveOverBumpCommand.driveOverBump(drive, shooterSubsystem)
-      //                             .withName("DriveOverBump"));
-      //               } catch (Exception e) {
-      //                 e.printStackTrace();
-      //               }
-      //             }));
-
-      // controller
-      //     .leftTrigger()
-      //     .onTrue(
-      //         new InstantCommand(
-      //             () -> {
-      //               try {
-      //                 CommandScheduler.getInstance()
-      //                     .schedule(
-      //                         DriveUnderTrenchCommand.driveUnderTrench(drive, shooterSubsystem)
-      //                             .withName("DriveUnderTrench"));
-      //               } catch (Exception e) {
-      //                 e.printStackTrace();
-      //               }
-      //             }));
+      controller
+          .leftTrigger()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    try {
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              DriveUnderTrenchCommand.driveUnderTrench(drive, shooterSubsystem)
+                                  .withName("DriveUnderTrench"));
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }));
     }
   }
 
@@ -831,6 +832,21 @@ public class RobotContainer {
                                           turretSubsystem,
                                           robotPose,
                                           chassisSpeeds)))));
+
+      controller_two
+          .a()
+          .onTrue(
+              Commands.runOnce(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(
+                              new ShootingCommands.ShootOnTheMoveCommand(
+                                  shooterSubsystem,
+                                  hoodSubsystem,
+                                  hopperFloorSubsystem,
+                                  turretSubsystem,
+                                  robotPose,
+                                  chassisSpeeds))));
 
       controller_two
           .y()
@@ -1087,10 +1103,6 @@ public class RobotContainer {
     // Print path name to console me thinks
     // String selectedPathName = multiStepAutoChooser.getSelectedPathName();
     // System.out.flush(); // Ensure output appears immediately
-
-    // shotParameters =
-    // ShotCalculator.calculateShot(
-    // drive.getPose(), drive.getChassisSpeeds(), Constants.BLUE_HUB, 10);
   }
 
   public void robotContainerLogs() {
@@ -1110,9 +1122,11 @@ public class RobotContainer {
         driveCmd != null ? driveCmd.getName().equals("DriveToFuel") : false);
 
     Logger.recordOutput("DriveToFuel/Fuel", vision.getFuelPose(drive.getPose()));
-    Logger.recordOutput("Odometry/Fuel", vision.getFuelPose(drive.getPose()));
+    Logger.recordOutput("Drive/Odometry/Fuel", vision.getFuelPose(drive.getPose()));
 
     Logger.recordOutput("Mech/Valid Shot", getValidShot());
+
+    PDHLogger.log(pdh);
   }
 
   public boolean getValidShot() {
@@ -1176,14 +1190,14 @@ public class RobotContainer {
   public Command HomeMechanisms() {
     return (new HoodCommands.HoodHomingCommand(hoodSubsystem)
             .alongWith(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem)))
-        // .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret(), turretSubsystem)))
+        .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret(), turretSubsystem))
         .withName("Home Mechansims");
   }
 
   public Command TestShot(ShooterSubsystem shooterSubsystem) {
     return (new InstantCommand(
             () -> {
-              // shooterSubsystem.setDesiredRotorVelocity(40);
+              shooterSubsystem.setDesiredRotorVelocity(40);
               shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
             },
             shooterSubsystem)

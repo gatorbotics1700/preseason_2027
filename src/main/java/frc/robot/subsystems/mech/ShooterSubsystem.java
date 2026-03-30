@@ -16,11 +16,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotCalculatorConditions;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.util.logging.TalonFXLogger;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private final TalonFX leftFlywheelMotor;
+  private final TalonFX flywheelMotor;
   private final TalonFX kickerMotor;
   private final TalonFX leftTransitionMotor;
   private final TalonFX rightTransitionMotor;
@@ -29,13 +30,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private static MotionMagicVelocityVoltage m_request;
 
-  private static TalonFXConfiguration leftFlywheelTalonFXConfigs;
+  private static TalonFXConfiguration flywheelTalonFXConfigs;
   private static TalonFXConfiguration transitionMotorConfigs;
   private static TalonFXConfiguration leftTransitionMotorConfigs;
   private static TalonFXConfiguration rightTransitionMotorConfigs;
 
-  private static Slot0Configs leftFlywheelSlot0Configs;
-  private static MotionMagicConfigs leftMotionMagicConfigs;
+  private static Slot0Configs flywheelSlot0Configs;
+  private static MotionMagicConfigs flywheelMotionMagicConfigs;
 
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
@@ -57,7 +58,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Shooter/Flywheel kD", 0.002);
 
   public ShooterSubsystem() {
-    leftFlywheelMotor =
+    flywheelMotor =
         new TalonFX(ShooterConstants.LEFT_FLYWHEEL_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     kickerMotor = new TalonFX(ShooterConstants.TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     leftTransitionMotor =
@@ -66,27 +67,26 @@ public class ShooterSubsystem extends SubsystemBase {
         new TalonFX(ShooterConstants.RIGHT_TRANSITION_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
     // TALONFX & MOTIONMAGIC CONFIGS
-    leftFlywheelTalonFXConfigs = new TalonFXConfiguration();
+    flywheelTalonFXConfigs = new TalonFXConfiguration();
 
-    leftFlywheelTalonFXConfigs.withMotorOutput(
+    flywheelTalonFXConfigs.withMotorOutput(
         new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
-    leftFlywheelSlot0Configs = leftFlywheelTalonFXConfigs.Slot0;
+    flywheelSlot0Configs = flywheelTalonFXConfigs.Slot0;
 
-    leftFlywheelSlot0Configs.kS = 0.37577; // Add _ V output to overcome static friction
-    leftFlywheelSlot0Configs.kV =
-        0.12289; // A velocity target of 1 rps results in 0.12-0.2 V output
-    leftFlywheelSlot0Configs.kA = 0.023452;
-    leftFlywheelSlot0Configs.kP = flywheelKP.get();
-    leftFlywheelSlot0Configs.kI = flywheelKI.get();
-    leftFlywheelSlot0Configs.kD = flywheelKD.get();
+    flywheelSlot0Configs.kS = 0.37577; // Add _ V output to overcome static friction
+    flywheelSlot0Configs.kV = 0.12289; // A velocity target of 1 rps results in 0.12-0.2 V output
+    flywheelSlot0Configs.kA = 0.023452;
+    flywheelSlot0Configs.kP = flywheelKP.get();
+    flywheelSlot0Configs.kI = flywheelKI.get();
+    flywheelSlot0Configs.kD = flywheelKD.get();
 
     // MOTION MAGIC EXPO
-    leftMotionMagicConfigs = leftFlywheelTalonFXConfigs.MotionMagic;
+    flywheelMotionMagicConfigs = flywheelTalonFXConfigs.MotionMagic;
 
-    leftMotionMagicConfigs.MotionMagicAcceleration =
+    flywheelMotionMagicConfigs.MotionMagicAcceleration =
         400; // Target acceleration of 400 rps/s (0.25 seconds to max)
-    leftMotionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0/1 seconds)
+    flywheelMotionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0/1 seconds)
 
     transitionMotorConfigs = new TalonFXConfiguration();
 
@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
     applyTransitionMotorCurrentLimits(leftTransitionMotorConfigs);
     applyTransitionMotorCurrentLimits(rightTransitionMotorConfigs);
 
-    leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
+    flywheelMotor.getConfigurator().apply(flywheelTalonFXConfigs);
     kickerMotor.getConfigurator().apply(transitionMotorConfigs);
     leftTransitionMotor.getConfigurator().apply(leftTransitionMotorConfigs);
     rightTransitionMotor.getConfigurator().apply(rightTransitionMotorConfigs);
@@ -121,7 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // Only control motors if SysID is not running
     if (!sysIdRunning) {
-      leftFlywheelMotor.setControl(
+      flywheelMotor.setControl(
           m_request.withVelocity(desiredRotorVelocity)); // desiredRotorVelo.get()));
     }
 
@@ -137,7 +137,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getFlywheelRotorVelocity() {
-    return leftFlywheelMotor.getRotorVelocity().getValueAsDouble();
+    return flywheelMotor.getRotorVelocity().getValueAsDouble();
   }
 
   public void setDesiredTransitionSpeed(double desiredTransitionSpeed) {
@@ -181,7 +181,7 @@ public class ShooterSubsystem extends SubsystemBase {
             (voltage) -> {
               sysIdRunning = true;
               // leftFlywheelMotor.setControl(sysIdVoltageRequest.withOutput(voltage.in(Volts)));
-              leftFlywheelMotor.setControl(sysIdVoltageRequest.withOutput(voltage.in(Volts)));
+              flywheelMotor.setControl(sysIdVoltageRequest.withOutput(voltage.in(Volts)));
             },
             null, // Log via AdvantageKit in periodic() so data goes to the same log file
             this,
@@ -215,45 +215,25 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void shooterLogs() {
-    Logger.recordOutput("Mech/Shooter/Flywheel Rotor Velocity", getFlywheelRotorVelocity());
-    Logger.recordOutput("Mech/Shooter/Desired Rotor Velocity", desiredRotorVelocity);
+    TalonFXLogger.log(flywheelMotor, "Mech", "Shooter", "Flywheel");
+    Logger.recordOutput(
+        "Mech/Shooter/Flywheel/Flywheel Rotor Velocity", getFlywheelRotorVelocity());
+    Logger.recordOutput("Mech/Shooter/Flywheel/Desired Rotor Velocity", desiredRotorVelocity);
 
-    Logger.recordOutput(
-        "Mech/Shooter/Kicker Voltage", kickerMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Mech/Shooter/Desired Transition Voltage", desiredTransitionSpeed);
-    Logger.recordOutput(
-        "Mech/Shooter/Transition", (kickerMotor.getMotorVoltage().getValueAsDouble() != 0));
+    Logger.recordOutput("Mech/Shooter/Desired Transition Speed", desiredTransitionSpeed);
 
+    TalonFXLogger.log(kickerMotor, "Mech", "Shooter", "Kicker");
     Logger.recordOutput(
-        "Mech/Shooter/Kicker Current", kickerMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Shooter/Left Transition Current",
-        leftTransitionMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Shooter/Right Transition Current",
-        rightTransitionMotor.getStatorCurrent().getValueAsDouble());
+        "Mech/Shooter/Kicker/Kicker Running",
+        (kickerMotor.getMotorVoltage().getValueAsDouble() != 0));
 
-    Logger.recordOutput(
-        "All Stator Currents/Kicker", kickerMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Left Transition",
-        leftTransitionMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Right Transition",
-        rightTransitionMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Flywheel", leftFlywheelMotor.getStatorCurrent().getValueAsDouble());
+    TalonFXLogger.log(leftTransitionMotor, "Mech", "Shooter", "Left Transition");
+    TalonFXLogger.log(rightTransitionMotor, "Mech", "Shooter", "Right Transition");
 
     Logger.recordOutput("Mech/Shooter/MAX SPEED", ShotCalculatorConditions.MAX_SHOT_SPEED);
-
     Logger.recordOutput(
         "Mech/Shooter/MAX ROTOR SPEED",
         launchSpeedToRotorSpeed(ShotCalculatorConditions.MAX_SHOT_SPEED));
-    Logger.recordOutput(
-        "Mech/Shooter/ClosedLoopReference",
-        leftFlywheelMotor.getClosedLoopReference().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Shooter/ClosedLoopError", leftFlywheelMotor.getClosedLoopError().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Shooter/SysID/shooterSysIDRunning", sysIdRunning);
@@ -261,13 +241,13 @@ public class ShooterSubsystem extends SubsystemBase {
       // Left flywheel
       Logger.recordOutput(
           "Mech/Shooter/SysID/leftShooterVoltage",
-          leftFlywheelMotor.getMotorVoltage().getValueAsDouble());
+          flywheelMotor.getMotorVoltage().getValueAsDouble());
       Logger.recordOutput(
           "Mech/Shooter/SysID/leftShooterPosition",
-          leftFlywheelMotor.getPosition().getValueAsDouble()); // rotations
+          flywheelMotor.getPosition().getValueAsDouble()); // rotations
       Logger.recordOutput(
           "Mech/Shooter/SysID/leftShooterVelocity",
-          leftFlywheelMotor.getVelocity().getValueAsDouble()); // output rot/s
+          flywheelMotor.getVelocity().getValueAsDouble()); // output rot/s
     }
   }
 
@@ -281,13 +261,13 @@ public class ShooterSubsystem extends SubsystemBase {
     double newFlywheelKP = flywheelKP.get();
     double newFlywheelKI = flywheelKI.get();
     double newFlywheelKD = flywheelKD.get();
-    if (newFlywheelKP != leftFlywheelSlot0Configs.kP
-        || newFlywheelKI != leftFlywheelSlot0Configs.kI
-        || newFlywheelKD != leftFlywheelSlot0Configs.kD) {
-      leftFlywheelSlot0Configs.kP = newFlywheelKP;
-      leftFlywheelSlot0Configs.kI = newFlywheelKI;
-      leftFlywheelSlot0Configs.kD = newFlywheelKD;
-      leftFlywheelMotor.getConfigurator().apply(leftFlywheelTalonFXConfigs);
+    if (newFlywheelKP != flywheelSlot0Configs.kP
+        || newFlywheelKI != flywheelSlot0Configs.kI
+        || newFlywheelKD != flywheelSlot0Configs.kD) {
+      flywheelSlot0Configs.kP = newFlywheelKP;
+      flywheelSlot0Configs.kI = newFlywheelKI;
+      flywheelSlot0Configs.kD = newFlywheelKD;
+      flywheelMotor.getConfigurator().apply(flywheelTalonFXConfigs);
     }
   }
 }

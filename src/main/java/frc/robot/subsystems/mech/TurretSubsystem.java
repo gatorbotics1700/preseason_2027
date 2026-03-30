@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.util.logging.TalonFXLogger;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -49,8 +50,6 @@ public class TurretSubsystem extends SubsystemBase {
   private final int ENCODER_REVS_PER_TURRET_REV = 10;
   private DutyCycleEncoder boreEncoder =
       new DutyCycleEncoder(TurretConstants.TURRET_BORE_ENCODER_PORT);
-  // private final DigitalInput hallEffect = new
-  // DigitalInput(TurretConstants.TURRET_HALL_EFFECT_PORT);
 
   private Rotation2d desiredAngle;
 
@@ -88,18 +87,13 @@ public class TurretSubsystem extends SubsystemBase {
 
     slot0Configs = talonFXConfigs.Slot0;
 
-    slot0Configs.kS =
-        turretKs
-            .get(); // Add 0.01 V output to overcome static friction (just a guesstimate, but this
-    // might
-    // just be 0
-    slot0Configs.kV = turretKv.get(); // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kA = turretKa.get(); // An acceleration of 1 rps/s requires 0.01 V output
+    slot0Configs.kS = turretKs.get();
+    slot0Configs.kV = turretKv.get();
+    slot0Configs.kA = turretKa.get();
 
-    // Initial PID gains come from tunable LoggedNetworkNumbers
-    slot0Configs.kP = turretKp.get(); // A position error of 2.5 rotations results in 12V output
-    slot0Configs.kI = turretKi.get(); // no output for integrated error
-    slot0Configs.kD = turretKd.get(); // a velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kP = turretKp.get();
+    slot0Configs.kI = turretKi.get();
+    slot0Configs.kD = turretKd.get();
 
     // MOTION MAGIC EXPO
     motionMagicConfigs = talonFXConfigs.MotionMagic;
@@ -118,6 +112,8 @@ public class TurretSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID gains from NetworkTables if they've changed, and reapply configs
+    // TODO: for any tuning of the turret, make sure to use this. once homing works without this,
+    // bring it back and confirm it still works
     // updateSlot0Configs();
 
     if (!sysIdRunning) {
@@ -158,10 +154,6 @@ public class TurretSubsystem extends SubsystemBase {
     return turretAngleDegrees / 360.0 * GEAR_REVS_PER_TURRET_REV * TURRET_GEARBOX_RATIO;
   }
 
-  // public boolean isHallEffectTriggered() {
-  //   return !hallEffect.get();
-  // }
-
   public void setMotorVoltage(double voltage) {
     turretMotor.setVoltage(voltage);
   }
@@ -171,6 +163,8 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void homeTurret() {
+    // TODO: try calling the other version of homeTurret in robotInit, my theory is
+    // the bore encoder isn't connected by the time we call this
     turretMotor.setPosition(0);
     // turretMotor.setPosition(
     //     getCurrentToOffsetError()
@@ -267,12 +261,14 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void turretLogs() {
-    Logger.recordOutput("Mech/Turret/boreEncoder", boreEncoder.get());
-    Logger.recordOutput("Mech/Turret/boreEncoder isConnected", boreEncoder.isConnected());
+    TalonFXLogger.log(turretMotor, "Mech", "Turret");
     Logger.recordOutput("Mech/Turret/currentAngle", getCurrentAngle().getDegrees());
     Logger.recordOutput("Mech/Turret/desiredAngle", desiredAngle.getDegrees());
-    Logger.recordOutput("Mech/Turret/get bore offset", getCurrentToOffsetError());
-    Logger.recordOutput("Mech/Turret/motor position", turretMotor.getPosition().getValueAsDouble());
+
+    Logger.recordOutput("Mech/Turret/Encoder/boreEncoder", boreEncoder.get());
+    Logger.recordOutput("Mech/Turret/Encoder/boreEncoder isConnected", boreEncoder.isConnected());
+    Logger.recordOutput("Mech/Turret/Encoder/get bore offset", getCurrentToOffsetError());
+
     Logger.recordOutput(
         "Mech/Turret/what home turret thinks its doing",
         getCurrentToOffsetError()
@@ -280,21 +276,6 @@ public class TurretSubsystem extends SubsystemBase {
                 * TURRET_GEARBOX_RATIO
                 * GEAR_REVS_PER_TURRET_REV
             + degreesToRevs(TurretConstants.TURRET_HOMING_ANGLE));
-
-    // Logger.recordOutput("Mech/Turret/hallEffect", isHallEffectTriggered());
-    Logger.recordOutput(
-        "Mech/Turret/motor output", turretMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Turret/closed loop feed foward",
-        turretMotor.getClosedLoopFeedForward().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Turret/closed loop reference",
-        turretMotor.getClosedLoopReference().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Turret/closed loop error", turretMotor.getClosedLoopError().getValueAsDouble());
-
-    Logger.recordOutput(
-        "All Stator Currents/Turret", turretMotor.getStatorCurrent().getValueAsDouble());
 
     // SysID
     Logger.recordOutput("Mech/Turret/SysID/turretSysIDRunning", sysIdRunning);

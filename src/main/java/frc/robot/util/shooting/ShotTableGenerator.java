@@ -1,13 +1,9 @@
-package frc.robot.tools;
+package frc.robot.util.shooting;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotCalculatorConditions;
-import frc.robot.util.ShotCalculator;
-import frc.robot.util.ShotParameters;
-import frc.robot.util.ShotTableData;
-import frc.robot.util.ShotTableIO;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

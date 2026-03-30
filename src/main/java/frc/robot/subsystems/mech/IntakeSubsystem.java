@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.util.logging.TalonFXLogger;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -395,32 +396,20 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void intakeLogs() {
-    Logger.recordOutput("Mech/Intake/Current Deploy Angle", getCurrentAngle().getDegrees());
-    Logger.recordOutput("Mech/Intake/Desired Deploy Angle", desiredAngle.getDegrees());
-    Logger.recordOutput("Mech/Intake/Desired Deploy Voltage", desiredDeploySpeed);
-    Logger.recordOutput("Mech/Intake/Current Deploy Motor Output", deployMotor.get());
+    TalonFXLogger.log(deployMotor, "Mech", "Intake", "Deploy");
+    TalonFXLogger.log(intakeMotor, "Mech", "Intake", "Intake");
+
+    Logger.recordOutput("Mech/Intake/Deploy/Current Angle", getCurrentAngle().getDegrees());
+    Logger.recordOutput("Mech/Intake/Deploy/Desired Angle", desiredAngle.getDegrees());
+    Logger.recordOutput("Mech/Intake/Deploy/Desired Speed", desiredDeploySpeed);
+    Logger.recordOutput(
+        "Mech/Intake/Deploy/Current Limit", deployCurrentLimitConfigs.StatorCurrentLimit);
+
     Logger.recordOutput("Mech/Intake/Intake Hall Effect", isHallEffectTriggered());
     Logger.recordOutput("Mech/Intake/IsDeployed", isDeployed.getAsBoolean());
-    Logger.recordOutput("Mech/Intake/Current Intake Motor Output", intakeMotor.get());
-    Logger.recordOutput("Mech/Intake/Desired Intake Voltage", desiredIntakeSpeed);
-
+    Logger.recordOutput("Mech/Intake/Intake/Desired Intake Speed", desiredIntakeSpeed);
     Logger.recordOutput(
-        "Mech/Intake/ClosedLoopReference", deployMotor.getClosedLoopReference().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Intake/ClosedLoopError", deployMotor.getClosedLoopError().getValueAsDouble());
-
-    Logger.recordOutput(
-        "Mech/Intake/Deploy Stator Current", deployMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Intake/Intake Stator Current", intakeMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Deploy", deployMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "All Stator Currents/Intake", intakeMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Mech/Intake/Intake Current Limit", intakeCurrentLimitConfigs.StatorCurrentLimit);
-    Logger.recordOutput(
-        "Mech/Intake/Deploy Current Limit", deployCurrentLimitConfigs.StatorCurrentLimit);
+        "Mech/Intake/Intake/Current Limit", intakeCurrentLimitConfigs.StatorCurrentLimit);
 
     // SysID
     Logger.recordOutput("Mech/Intake/SysID/intakeSysIDRunning", sysIdRunning);

@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.util.Elastic;
 import frc.robot.util.RobotConfigLoader;
-import frc.robot.util.ShotCalculator;
+import frc.robot.util.shooting.ShotCalculator;
 import java.util.Optional;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;

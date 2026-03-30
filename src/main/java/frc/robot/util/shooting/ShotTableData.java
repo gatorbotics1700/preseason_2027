@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.shooting;
 
 /**
  * Serialized form of the shot lookup table.
