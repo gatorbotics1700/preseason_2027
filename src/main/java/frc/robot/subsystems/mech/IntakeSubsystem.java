@@ -136,7 +136,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeCurrentLimitConfigs.StatorCurrentLimitEnable = true;
 
     deployCurrentLimitConfigs = deployTalonFXConfigs.CurrentLimits;
-    deployCurrentLimitConfigs.StatorCurrentLimit = 10;
+    deployCurrentLimitConfigs.StatorCurrentLimit = 20;
     deployCurrentLimitConfigs.StatorCurrentLimitEnable = true;
 
     deployMotor.getConfigurator().apply(deployTalonFXConfigs);
@@ -162,9 +162,9 @@ public class IntakeSubsystem extends SubsystemBase {
     if (!sysIdRunning && useDeployPositionControl) {
       deployMotor.setControl(m_request.withPosition(degreesToRevs(desiredAngle.getDegrees())));
       if (isDeployed.getAsBoolean()
-          && deployCurrentLimitConfigs.StatorCurrentLimit != 10
+          && deployCurrentLimitConfigs.StatorCurrentLimit != 20
           && getCurrentAngle().getDegrees() > 30) {
-        deployCurrentLimitConfigs.StatorCurrentLimit = 10;
+        deployCurrentLimitConfigs.StatorCurrentLimit = 20;
         deployMotor.getConfigurator().apply(deployTalonFXConfigs);
       }
       if ((!isDeployed.getAsBoolean() || getCurrentAngle().getDegrees() < 30)

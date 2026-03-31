@@ -134,20 +134,16 @@ public class IntakeCommands {
 
     @Override
     public boolean isFinished() {
-      return intakeSubsystem.isHallEffectTriggered()
+      if (intakeSubsystem.isHallEffectTriggered()
           || (Math.abs(
                   IntakeConstants.RETRACTED_ANGLE_DEGREES
                       - intakeSubsystem.getCurrentAngle().getDegrees())
-              <= IntakeConstants.POSITION_DEADBAND);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-      if (!intakeSubsystem.isHallEffectTriggered()) {
+              <= IntakeConstants.POSITION_DEADBAND)) {
         CommandScheduler.getInstance()
             .schedule(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
+        return true;
       } else {
-        intakeSubsystem.zeroIntakeDeploy();
+        return false;
       }
     }
   }

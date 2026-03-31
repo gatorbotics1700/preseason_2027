@@ -281,9 +281,9 @@ public class RobotContainer {
                     }
                   }));
 
-      // B -- Reset Heading
+      // Start -- Reset Heading
       controller
-          .b()
+          .start()
           .onTrue(
               Commands.runOnce(
                       () -> {
@@ -303,9 +303,9 @@ public class RobotContainer {
                       drive)
                   .ignoringDisable(true));
 
-      // X -- Drive Over Bump
+      // Y -- Drive Over Bump
       controller
-          .x()
+          .y()
           .onTrue(
               new InstantCommand(
                   () -> {
@@ -319,9 +319,9 @@ public class RobotContainer {
                     }
                   }));
 
-      // Y -- Slow Drive Toggle
+      // Back -- Slow Drive Toggle
       controller
-          .y()
+          .back()
           .onTrue(
               Commands.runOnce(
                   () -> {
@@ -348,7 +348,7 @@ public class RobotContainer {
 
       // Back -- Point @ Hub & Shoot (without turret) (while true)
       controller
-          .back()
+          .x()
           .whileTrue(
               Commands.runOnce(
                   () ->
@@ -696,7 +696,7 @@ public class RobotContainer {
         controller_two = new CommandXboxController(1);
       }
 
-      // B -- etract Intake
+      // B -- Retract Intake
       controller_two
           .b()
           .onTrue(
