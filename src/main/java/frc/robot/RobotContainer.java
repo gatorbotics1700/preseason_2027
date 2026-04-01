@@ -466,14 +466,23 @@ public class RobotContainer {
                                               params.hoodAngle);
                                         })))));
       } else {
-        // B -- Retract Intake
+        // A -- Retract Intake
+        controller_two
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.RetractIntake(intakeSubsystem))));
+
+        // B -- Deploy Intake
         controller_two
             .b()
             .onTrue(
                 new InstantCommand(
                     () ->
                         CommandScheduler.getInstance()
-                            .schedule(IntakeCommands.RetractIntake(intakeSubsystem))));
+                            .schedule(IntakeCommands.DeployIntake(intakeSubsystem))));
 
         // X -- Mech Stop
         controller_two

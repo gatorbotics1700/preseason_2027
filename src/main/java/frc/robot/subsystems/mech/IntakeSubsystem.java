@@ -159,6 +159,11 @@ public class IntakeSubsystem extends SubsystemBase {
     hallAssistActive = false;
 
     if (!sysIdRunning) {
+      if(isDeployedHallEffectTriggered()){
+        zeroIntakeDeploy(false);
+      }else{
+        zeroIntakeDeploy(true);
+      }
       if (isIntakeDeployMotionCommandActive()) {
         if (useDeployPositionControl) {
           applyDeployPositionControl();
