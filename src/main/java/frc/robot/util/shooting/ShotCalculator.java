@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -526,6 +527,19 @@ public class ShotCalculator {
       double radialVelo,
       double range,
       double elevation) {
+
+    System.out.println("RANGE: " + range);
+    System.out.println("MAX RANGE: " + Constants.ShotCalculatorConditions.MAX_RANGE);
+    if (range > Constants.ShotCalculatorConditions.MAX_RANGE) {
+      // out of range
+      return new ShotParameters(new Rotation2d(), new Rotation2d(), 0);
+    } else if (tangentialVelo > Constants.ShotCalculatorConditions.MAX_COMPONENT_VELO) {
+      // out of range
+      return new ShotParameters(new Rotation2d(), new Rotation2d(), 0);
+    } else if (radialVelo > Constants.ShotCalculatorConditions.MAX_COMPONENT_VELO) {
+      // out of range
+      return new ShotParameters(new Rotation2d(), new Rotation2d(), 0);
+    }
 
     Rotation2d turretAngle =
         new Rotation2d(turretAngleInterpolator.value(tangentialVelo, radialVelo, range));

@@ -164,7 +164,8 @@ public class IntakeSubsystem extends SubsystemBase {
           applyDeployPositionControl();
         }
       } else {
-        // No deploy/retract/home sequence running: nudge toward the correct hall if state disagrees.
+        // No deploy/retract/home sequence running: nudge toward the correct hall if state
+        // disagrees.
         boolean wantDeployed = isDeployed.getAsBoolean();
         if (wantDeployed && !isDeployedHallEffectTriggered()) {
           hallAssistActive = true;
