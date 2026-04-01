@@ -436,8 +436,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     };
   }
 
-  public void setSlowDrive() {
+  public void toggleSlowDrive() {
     slowDrive = !slowDrive;
+  }
+
+  public void setSlowDrive(boolean slowDrive) {
+    this.slowDrive = slowDrive;
   }
 
   public boolean getSlowDrive() {

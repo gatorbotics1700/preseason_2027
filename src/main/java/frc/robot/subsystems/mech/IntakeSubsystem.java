@@ -241,8 +241,17 @@ public class IntakeSubsystem extends SubsystemBase {
         * IntakeConstants.DEPLOY_GEARBOX_RATIO;
   }
 
-  public void zeroIntakeDeploy() {
-    deployMotor.setPosition(IntakeConstants.RETRACTED_POSITION.getDegrees());
+  public boolean isRetractedHomingCurrentLimitReached() {
+    return deployMotor.getStatorCurrent().getValueAsDouble() > 60;
+  }
+
+  public void zeroIntakeDeploy(boolean isRetracted) {
+    if (isRetracted) {
+      deployMotor.setPosition(IntakeConstants.RETRACTED_POSITION.getDegrees());
+
+    } else {
+      deployMotor.setPosition(IntakeConstants.EXTENDED_POSITION.getDegrees());
+    }
   }
 
   public boolean isHallEffectTriggered() {

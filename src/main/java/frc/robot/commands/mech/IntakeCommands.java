@@ -55,14 +55,14 @@ public class IntakeCommands {
 
     @Override
     public void end(boolean interrupted) {
-      intakeSubsystem.zeroIntakeDeploy();
+      intakeSubsystem.zeroIntakeDeploy(true);
       intakeSubsystem.setDesiredAngle(
           IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
       intakeSubsystem.setIsDeployedToFalse();
     }
   }
 
-   public static class HomeIntakeDeploy extends Command {
+  public static class HomeIntakeDeploy extends Command {
     private final IntakeSubsystem intakeSubsystem;
 
     public HomeIntakeDeploy(IntakeSubsystem intakeSubsystem) {
@@ -78,15 +78,15 @@ public class IntakeCommands {
 
     @Override
     public boolean isFinished() {
-      return intakeSubsystem.isHallEffectTriggered();
+      return intakeSubsystem.isRetractedHomingCurrentLimitReached();
     }
 
     @Override
     public void end(boolean interrupted) {
-      intakeSubsystem.zeroIntakeDeploy();
+      intakeSubsystem.zeroIntakeDeploy(false);
       intakeSubsystem.setDesiredAngle(
-          IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians((2)))));
-      intakeSubsystem.setIsDeployedToFalse();
+          IntakeConstants.EXTENDED_POSITION.minus(new Rotation2d(Math.toRadians((2)))));
+      intakeSubsystem.setIsDeployedToTrue();
     }
   }
 

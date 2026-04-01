@@ -325,7 +325,7 @@ public class RobotContainer {
           .onTrue(
               Commands.runOnce(
                   () -> {
-                    drive.setSlowDrive();
+                    drive.toggleSlowDrive();
                   },
                   drive));
 
@@ -338,13 +338,16 @@ public class RobotContainer {
                       CommandScheduler.getInstance()
                           .schedule(
                               new ShootingCommands.ShootOnTheMoveCommand(
-                                  shooterSubsystem,
-                                  hoodSubsystem,
-                                  hopperFloorSubsystem,
-                                  turretSubsystem,
-                                  robotPose,
-                                  chassisSpeeds))))
-          .onFalse(new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem));
+                                      shooterSubsystem,
+                                      hoodSubsystem,
+                                      hopperFloorSubsystem,
+                                      turretSubsystem,
+                                      robotPose,
+                                      chassisSpeeds)
+                                  .alongWith(new InstantCommand(() -> drive.setSlowDrive(true))))))
+          .onFalse(
+              new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem)
+                  .alongWith(new InstantCommand(() -> drive.setSlowDrive(false))));
 
       // Back -- Point @ Hub & Shoot (without turret) (while true)
       controller
@@ -621,7 +624,7 @@ public class RobotContainer {
           .onTrue(
               Commands.runOnce(
                   () -> {
-                    drive.setSlowDrive();
+                    drive.toggleSlowDrive();
                   },
                   drive));
 
