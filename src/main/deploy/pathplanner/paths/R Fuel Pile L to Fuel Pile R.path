@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.727174189814814,
-        "y": 2.0589419849537034
+        "x": 8.84599486400463,
+        "y": 1.406445240162037
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.69594357638889,
-        "y": 3.8856704282407417
+        "x": 8.814764250578706,
+        "y": 3.233173683449076
       },
       "isLocked": false,
       "linkedName": null
@@ -48,7 +48,7 @@
   "folder": "Fuel Pile Inner Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -91.23529706887848
+    "rotation": -70.14345863810594
   },
   "useDefaultConstraints": true
 }

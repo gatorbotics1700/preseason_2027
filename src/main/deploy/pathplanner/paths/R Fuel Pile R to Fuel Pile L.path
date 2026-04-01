@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 8.74351121238426,
-        "y": 5.905621889467593
+        "y": 6.741762514467593
       },
       "prevControl": null,
       "nextControl": {
         "x": 8.698305555555557,
-        "y": 3.9523963396990744
+        "y": 4.788536964699074
       },
       "isLocked": false,
       "linkedName": null
@@ -48,7 +48,7 @@
   "folder": "Fuel Pile Inner Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.82167095665896
+    "rotation": 72.74354435009433
   },
   "useDefaultConstraints": true
 }
