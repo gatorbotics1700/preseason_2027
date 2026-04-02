@@ -174,6 +174,8 @@ public class ShotCalculator {
     Translation3d fieldToShooter =
         getFieldToShooter(drivetrainPose, ShooterConstants.BOT_TO_SHOOTER);
 
+    Logger.recordOutput("Mech/ShotCalculator/shooterPose", fieldToShooter);
+
     Rotation2d uncompTurretToTargetAngle = getFieldRelativeYaw(fieldToShooter, target);
 
     Translation2d shooterVelo =
@@ -537,7 +539,7 @@ public class ShotCalculator {
         > Constants.ShotCalculatorConditions.MAX_RANGE - ShotCalculatorConditions.RANGE_INCREMENT) {
       // out of range
       return new ShotParameters(new Rotation2d(), new Rotation2d(), 0);
-    } else if (tangentialVelo
+    } else if (Math.abs(tangentialVelo)
         > Constants.ShotCalculatorConditions.MAX_COMPONENT_VELO
             - ShotCalculatorConditions.VELO_INCREMENT) {
       // out of range
