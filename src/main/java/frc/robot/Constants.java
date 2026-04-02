@@ -699,7 +699,7 @@ public final class Constants {
 
     public static final double VELO_INCREMENT = 0.25; // mps
     public static final double RANGE_INCREMENT = 0.25; // m
-    public static final double MAX_COMPONENT_VELO = 1.5; // mps
+    public static final double MAX_COMPONENT_VELO = 1.5 + VELO_INCREMENT; // mps
     public static final double RANGE_FUDGE = 0;
     public static final double MAX_RANGE =
         8; // m //TODO calculate furthest distance we would ever want to shoot from
