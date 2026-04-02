@@ -2,7 +2,6 @@ package frc.robot.commands.mech;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.IntakeConstants;
@@ -22,6 +21,7 @@ public class IntakeCommands {
 
   public static Command RetractIntake(IntakeSubsystem intakeSubsystem) {
     return new RetractIntakeCommand(intakeSubsystem)
+        .andThen(new HomeIntakeRetract(intakeSubsystem))
         .andThen(
             Commands.waitSeconds(0.75)
                 .alongWith(Commands.run(() -> {}, intakeSubsystem))
@@ -32,6 +32,7 @@ public class IntakeCommands {
 
   public static Command DeployIntake(IntakeSubsystem intakeSubsystem) {
     return new DeployIntakeCommand(intakeSubsystem)
+        .andThen(new HomeIntakeDeploy(intakeSubsystem))
         .andThen(
             Commands.waitSeconds(0.75)
                 .alongWith(Commands.run(() -> {}, intakeSubsystem))
@@ -91,7 +92,7 @@ public class IntakeCommands {
     public void end(boolean interrupted) {
       intakeSubsystem.zeroIntakeDeploy(false);
       intakeSubsystem.setDesiredAngle(
-          IntakeConstants.EXTENDED_POSITION.minus(new Rotation2d(Math.toRadians((2)))));
+          IntakeConstants.EXTENDED_POSITION.minus(new Rotation2d(Math.toRadians(2))));
       intakeSubsystem.setIsDeployedToTrue();
     }
   }
@@ -145,15 +146,10 @@ public class IntakeCommands {
 
     @Override
     public boolean isFinished() {
-      if (Math.abs(
+      return Math.abs(
               IntakeConstants.EXTENDED_ANGLE_DEGREES
                   - intakeSubsystem.getCurrentAngle().getDegrees())
-          <= IntakeConstants.POSITION_DEADBAND) {
-        // CommandScheduler.getInstance()
-        //     .schedule(new IntakeCommands.HomeIntakeDeploy(intakeSubsystem));
-        return true;
-      }
-      return false;
+          <= IntakeConstants.POSITION_DEADBAND;
     }
   }
 
@@ -173,17 +169,11 @@ public class IntakeCommands {
 
     @Override
     public boolean isFinished() {
-      if (intakeSubsystem.isHallEffectTriggered()
+      return intakeSubsystem.isHallEffectTriggered()
           || (Math.abs(
                   IntakeConstants.RETRACTED_ANGLE_DEGREES
                       - intakeSubsystem.getCurrentAngle().getDegrees())
-              <= IntakeConstants.POSITION_DEADBAND)) {
-        CommandScheduler.getInstance()
-            .schedule(new IntakeCommands.HomeIntakeRetract(intakeSubsystem));
-        return true;
-      } else {
-        return false;
-      }
+              <= IntakeConstants.POSITION_DEADBAND);
     }
   }
 }

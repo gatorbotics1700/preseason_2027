@@ -86,6 +86,14 @@ public class IntakeSubsystem extends SubsystemBase {
   /** True while periodic is driving deploy open-loop to find a hall (not a command). */
   private boolean hallAssistActive = false;
 
+  /**
+   * Tracks open-loop hall-seek so we can rehome once when the hall trips, before PID takes over
+   * again.
+   */
+  private boolean wasSeekingRetractHall = false;
+
+  private boolean wasSeekingDeployHall = false;
+
   public IntakeSubsystem() {
     intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_CAN_ID, TunerConstants.mechCANBus);
     deployMotor =
@@ -159,7 +167,39 @@ public class IntakeSubsystem extends SubsystemBase {
     hallAssistActive = false;
 
     if (!sysIdRunning) {
-      applyDeployPositionControl();
+      if (isIntakeDeployMotionCommandActive()) {
+        wasSeekingRetractHall = false;
+        wasSeekingDeployHall = false;
+        if (useDeployPositionControl) {
+          applyDeployPositionControl();
+        }
+      } else {
+        // No deploy/retract/home sequence running: nudge toward the correct hall if state disagrees.
+        boolean wantDeployed = isDeployed.getAsBoolean();
+        if (wantDeployed && !isDeployedHallEffectTriggered()) {
+          hallAssistActive = true;
+          deployMotor.set(-IntakeConstants.HOMING_SPEED);
+          wasSeekingDeployHall = true;
+          wasSeekingRetractHall = false;
+        } else if (!wantDeployed && !isHallEffectTriggered()) {
+          hallAssistActive = true;
+          deployMotor.set(IntakeConstants.HOMING_SPEED);
+          wasSeekingRetractHall = true;
+          wasSeekingDeployHall = false;
+        } else {
+          if (wasSeekingRetractHall && isHallEffectTriggered()) {
+            rehomeDeployAfterHallSeekRetract();
+            wasSeekingRetractHall = false;
+          }
+          if (wasSeekingDeployHall && isDeployedHallEffectTriggered()) {
+            rehomeDeployAfterHallSeekDeploy();
+            wasSeekingDeployHall = false;
+          }
+          if (useDeployPositionControl) {
+            applyDeployPositionControl();
+          }
+        }
+      }
     }
 
     intakeLogs();
@@ -196,6 +236,26 @@ public class IntakeSubsystem extends SubsystemBase {
       deployCurrentLimitConfigs.StatorCurrentLimit = 60;
       deployMotor.getConfigurator().apply(deployTalonFXConfigs);
     }
+  }
+
+  /**
+   * After open-loop hall assist finds the retract hall, zero and apply the same +2° retract
+   * setpoint offset used when homing on that hall so closed-loop does not command against a stale
+   * encoder.
+   */
+  private void rehomeDeployAfterHallSeekRetract() {
+    zeroIntakeDeploy(true);
+    setDesiredAngle(
+        IntakeConstants.RETRACTED_POSITION.plus(new Rotation2d(Math.toRadians(2))));
+    Logger.recordOutput("Mech/Intake/Deploy/RehomeFromHallAssist", "retract");
+  }
+
+  /** After open-loop hall assist finds the deployed hall, zero and apply the -2° deployed offset. */
+  private void rehomeDeployAfterHallSeekDeploy() {
+    zeroIntakeDeploy(false);
+    setDesiredAngle(
+        IntakeConstants.EXTENDED_POSITION.minus(new Rotation2d(Math.toRadians(2))));
+    Logger.recordOutput("Mech/Intake/Deploy/RehomeFromHallAssist", "deploy");
   }
 
   public void retractDeployMotor() {
