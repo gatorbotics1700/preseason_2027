@@ -66,9 +66,14 @@ task(replayWatch, type: JavaExec) {
 
 // Generate shot lookup table JSON into src/main/deploy (runs on your computer).
 task(generateShotTable, type: JavaExec) {
+    dependsOn extractReleaseNative
     mainClass = "frc.robot.util.shooting.ShotTableGenerator"
     classpath = sourceSets.main.runtimeClasspath
     workingDir(projectDir)
+    def jniRelease = file("$buildDir/jni/release")
+    systemProperty "java.library.path", jniRelease.absolutePath
+    environment "DYLD_LIBRARY_PATH", jniRelease.absolutePath
+    environment "LD_LIBRARY_PATH", jniRelease.absolutePath
     args "--name", "AlectoHub"
 }
 
