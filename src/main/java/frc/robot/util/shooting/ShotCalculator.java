@@ -24,16 +24,16 @@ public class ShotCalculator {
   // hit the target's
   // height ("land" on the target)
   public static Translation3d landingCoords = new Translation3d();
-  // public static ShotParameters[][][] hubLookupTable;
-  // private static double[] x_values;
-  // private static double[] y_values;
-  // private static double[] z_values;
-  // private static double[][][] turretAngleTable;
-  // private static double[][][] hoodAngleTable;
-  // private static double[][][] shotSpeedTable;
-  // private static TricubicInterpolatingFunction shotSpeedInterpolator;
-  // private static TricubicInterpolatingFunction hoodAngleInterpolator;
-  // private static TricubicInterpolatingFunction turretAngleInterpolator;
+  public static ShotParameters[][][] hubLookupTable;
+  private static double[] x_values;
+  private static double[] y_values;
+  private static double[] z_values;
+  private static double[][][] turretAngleTable;
+  private static double[][][] hoodAngleTable;
+  private static double[][][] shotSpeedTable;
+  private static TricubicInterpolatingFunction shotSpeedInterpolator;
+  private static TricubicInterpolatingFunction hoodAngleInterpolator;
+  private static TricubicInterpolatingFunction turretAngleInterpolator;
 
   public static final LoggedNetworkNumber rangeMult =
       new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1.1);
