@@ -14,6 +14,8 @@ import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShotCalculatorConditions;
+import java.io.IOException;
+import java.nio.file.Path;
 import org.apache.commons.math3.analysis.interpolation.*;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -47,16 +49,16 @@ public class ShotCalculator {
   // like hood angles or
   // max speeds), run ./gradlew generateShotTable in terminal!
   public ShotCalculator() {
-    // hubLookupTable =
-    //     loadLookupTableOrGenerate(
-    //         FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ());
-    // createInterpolationHelperArrays();
-    // shotSpeedInterpolator =
-    //     new TricubicInterpolator().interpolate(x_values, y_values, z_values, shotSpeedTable);
-    // hoodAngleInterpolator =
-    //     new TricubicInterpolator().interpolate(x_values, y_values, z_values, hoodAngleTable);
-    // turretAngleInterpolator =
-    //     new TricubicInterpolator().interpolate(x_values, y_values, z_values, turretAngleTable);
+    hubLookupTable =
+        loadLookupTableOrGenerate(
+            FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ());
+    createInterpolationHelperArrays();
+    shotSpeedInterpolator =
+        new TricubicInterpolator().interpolate(x_values, y_values, z_values, shotSpeedTable);
+    hoodAngleInterpolator =
+        new TricubicInterpolator().interpolate(x_values, y_values, z_values, hoodAngleTable);
+    turretAngleInterpolator =
+        new TricubicInterpolator().interpolate(x_values, y_values, z_values, turretAngleTable);
   }
 
   private void createInterpolationHelperArrays() {
