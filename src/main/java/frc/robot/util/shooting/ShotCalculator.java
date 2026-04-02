@@ -231,19 +231,19 @@ public class ShotCalculator {
     Logger.recordOutput("Mech/ShotCalculator/target", target);
     Logger.recordOutput("Mech/ShotCalculator/uncomprange", uncompRange);
 
-    if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
-      trajectoryRelativeParams =
-          lookupShot(
-              hubLookupTable,
-              tangentialVelo,
-              radialVelo,
-              uncompRange,
-              fieldRelativeShooterToTarget.getZ());
-    } else {
-      trajectoryRelativeParams =
-          sweepTrajectories(
-              tangentialVelo, radialVelo, uncompRange, fieldRelativeShooterToTarget.getZ());
-    }
+    // if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
+    //   trajectoryRelativeParams =
+    //       lookupShot(
+    //           hubLookupTable,
+    //           tangentialVelo,
+    //           radialVelo,
+    //           uncompRange,
+    //           fieldRelativeShooterToTarget.getZ());
+    // } else {
+    trajectoryRelativeParams =
+        sweepTrajectories(
+            tangentialVelo, radialVelo, uncompRange, fieldRelativeShooterToTarget.getZ());
+    // }
 
     ShotParameters botRelativeParams =
         new ShotParameters(
@@ -300,6 +300,8 @@ public class ShotCalculator {
     } else {
       maxHeight = ShotCalculatorConditions.MV_MAX_SHOT_HEIGHT;
     }
+
+    Logger.recordOutput("Mech/ShotCalculator/maxHeight", maxHeight);
 
     Rotation2d testHoodAngle = hoodMinAngle;
     double testShotSpeed = 0;
