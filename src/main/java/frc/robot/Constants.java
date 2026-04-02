@@ -637,7 +637,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int TURRET_MOTOR_CAN_ID = 50; // 15;
+    public static final int TURRET_MOTOR_CAN_ID = 15;
     public static final int TURRET_BORE_ENCODER_PORT = 1;
 
     public static final double TURRET_DEADBAND = 0.75;

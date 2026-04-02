@@ -194,7 +194,8 @@ public class RobotContainer {
         "Auto Init",
         HomeMechanisms()
             .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
-            .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
+           // .andThen(IntakeCommands.RunIntake(intakeSubsystem))
+           );
 
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
     autoChooser =
