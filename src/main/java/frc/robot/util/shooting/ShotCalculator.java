@@ -52,7 +52,8 @@ public class ShotCalculator {
     hubLookupTable =
         loadLookupTableOrGenerate(
             FieldCoordinates.BLUE_HUB.getZ() - ShooterConstants.BOT_TO_SHOOTER.getZ());
-    createInterpolationHelperArrays();
+    // we need to pass in the lookup table here so we match its velocity and range increments
+    createInterpolationHelperArrays(hubLookupTable);
     shotSpeedInterpolator =
         new TricubicInterpolator().interpolate(x_values, y_values, z_values, shotSpeedTable);
     hoodAngleInterpolator =
@@ -61,14 +62,11 @@ public class ShotCalculator {
         new TricubicInterpolator().interpolate(x_values, y_values, z_values, turretAngleTable);
   }
 
-  private void createInterpolationHelperArrays() {
-    int veloIncrements =
-        (int)
-            (ShotCalculatorConditions.MAX_COMPONENT_VELO
-                * 2
-                / ShotCalculatorConditions.VELO_INCREMENT); // times 2 to account for negative velo
-    int rangeIncrements =
-        (int) (ShotCalculatorConditions.MAX_RANGE / ShotCalculatorConditions.RANGE_INCREMENT);
+  private void createInterpolationHelperArrays(ShotParameters[][][] table) {
+    // instead of doing the calculation of range/velo increments here,
+    // pull them from the lookup table so we match its shape.
+    int veloIncrements = table.length;
+    int rangeIncrements = table[0][0].length;
 
     x_values = new double[veloIncrements];
     y_values = new double[veloIncrements];
@@ -128,7 +126,14 @@ public class ShotCalculator {
               HoodConstants.MIN_ANGLE.getRadians());
       // if (data.schemaVersion == ShotTableIO.SCHEMA_VERSION
       // && expectedHash.equals(data.configHash)) {
-      System.out.println("ShotCalculator: Loaded lookup table from " + path);
+      ShotParameters[][][] table = ShotTableIO.toLookupTable(data);
+      int veloIncrements = table.length;
+      int rangeIncrements = table[0][0].length;
+      System.out.println(
+          String.format(
+              "ShotCalculator: Loaded lookup table from %s. veloIncrements: %d, rangeIncrements: %d",
+              path, veloIncrements, rangeIncrements));
+
       return ShotTableIO.toLookupTable(data);
       // }
       // System.err.println(
