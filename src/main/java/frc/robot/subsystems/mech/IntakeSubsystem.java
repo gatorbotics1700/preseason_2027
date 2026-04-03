@@ -157,13 +157,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   private void updateDeployStatorLimitForPosition() {
-    if (isDeployedHallEffectTriggered()
-        && deployCurrentLimitConfigs.StatorCurrentLimit != 25) {
+    if (isDeployedHallEffectTriggered() && deployCurrentLimitConfigs.StatorCurrentLimit != 25) {
       deployCurrentLimitConfigs.StatorCurrentLimit = 25;
       deployMotor.getConfigurator().apply(deployTalonFXConfigs);
     }
-    if (!isDeployedHallEffectTriggered()
-        && deployCurrentLimitConfigs.StatorCurrentLimit != 60) {
+    if (!isDeployedHallEffectTriggered() && deployCurrentLimitConfigs.StatorCurrentLimit != 60) {
       deployCurrentLimitConfigs.StatorCurrentLimit = 60;
       deployMotor.getConfigurator().apply(deployTalonFXConfigs);
     }
@@ -287,10 +285,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     SysIdRoutine.Mechanism mechanism =
         new SysIdRoutine.Mechanism(
-            (voltage) -> deployMotor.setVoltage(voltage.in(Volts)),
-            null,
-            this,
-            "intake");
+            (voltage) -> deployMotor.setVoltage(voltage.in(Volts)), null, this, "intake");
     return new SysIdRoutine(config, mechanism);
   }
 
@@ -356,8 +351,7 @@ public class IntakeSubsystem extends SubsystemBase {
       Logger.recordOutput(
           "Mech/Intake/SysID/intakeVoltage", deployMotor.getMotorVoltage().getValueAsDouble());
       Logger.recordOutput(
-          "Mech/Intake/SysID/intakePosition",
-          getCurrentAngle().getRadians() / (2.0 * Math.PI));
+          "Mech/Intake/SysID/intakePosition", getCurrentAngle().getRadians() / (2.0 * Math.PI));
       Logger.recordOutput(
           "Mech/Intake/SysID/intakeVelocity", getVelocityRadPerSec() / (2.0 * Math.PI));
     }

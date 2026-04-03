@@ -27,7 +27,9 @@ public class IntakeCommands {
             intakeSubsystem),
         Commands.deadline(
                 Commands.waitUntil(intakeSubsystem::isHallEffectTriggered).withTimeout(10),
-                Commands.run(() -> intakeSubsystem.setDeploySpeed(IntakeConstants.HOMING_SPEED), intakeSubsystem))
+                Commands.run(
+                    () -> intakeSubsystem.setDeploySpeed(IntakeConstants.HOMING_SPEED),
+                    intakeSubsystem))
             .finallyDo(intakeSubsystem::clearDeployManualControl),
         new InstantCommand(() -> intakeSubsystem.setDeployGoalExtended(false), intakeSubsystem));
   }
