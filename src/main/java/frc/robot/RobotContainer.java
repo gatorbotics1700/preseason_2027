@@ -43,7 +43,7 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveOverBumpCommand;
 import frc.robot.commands.drive.DriveSystemsCheckCommands;
 import frc.robot.commands.drive.DriveUnderTrenchCommand;
-import frc.robot.commands.drive.PointAtHubCommand;
+import frc.robot.commands.drive.PointAtTargetCommand;
 import frc.robot.commands.mech.HoodCommands;
 import frc.robot.commands.mech.IntakeCommands;
 import frc.robot.commands.mech.ShootingCommands;
@@ -170,7 +170,10 @@ public class RobotContainer {
         };
 
     // Register named commands for PathPlanner autos
-    NamedCommands.registerCommand("Point At Hub Command", new PointAtHubCommand(drive));
+    NamedCommands.registerCommand("Home Mechanisms", HomeMechanisms());
+
+    NamedCommands.registerCommand(
+        "Point At Hub Command", new PointAtTargetCommand(drive, robotPose));
     NamedCommands.registerCommand(
         "Shooter Command",
         new ShootingCommands.ShootOnTheMoveCommand(
@@ -368,7 +371,7 @@ public class RobotContainer {
                   () ->
                       CommandScheduler.getInstance()
                           .schedule(
-                              (new PointAtHubCommand(drive))
+                              (new PointAtTargetCommand(drive, robotPose))
                                   .andThen(
                                       new ShootingCommands.ShootOnTheMoveCommand(
                                           shooterSubsystem,
@@ -661,7 +664,7 @@ public class RobotContainer {
                   () ->
                       CommandScheduler.getInstance()
                           .schedule(
-                              (new PointAtHubCommand(drive))
+                              (new PointAtTargetCommand(drive, robotPose))
                                   .andThen(
                                       new ShootingCommands.ShootOnTheMoveCommand(
                                           shooterSubsystem,

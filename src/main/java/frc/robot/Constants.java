@@ -623,7 +623,7 @@ public final class Constants {
     public static final double FLYWHEEL_COAST_STOPPED_RPS = 4.0;
 
     public static final double FLYWHEEL_GEAR_RATIO = 24.0 / 18.0;
-    public static final double FLYWHEEL_SLIP = 0.245; // TODO: tune?
+    public static final double FLYWHEEL_SLIP = 0.265; // TODO: tune?
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER = new Translation3d(0.127, 0, 0.429);
