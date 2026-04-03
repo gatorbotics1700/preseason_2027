@@ -254,8 +254,8 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHopperFloorSubsystem(),
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
-    robotContainer.configureSysIdButtons();
-    // robotContainer.configureSystemCheckButtons();
+    // robotContainer.configureSysIdButtons();
+    robotContainer.configureSystemCheckButtons();
   }
 
   /** This function is called periodically during test mode. */

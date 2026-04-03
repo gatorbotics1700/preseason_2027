@@ -36,6 +36,7 @@ public class ShotCalculator {
   private static TricubicInterpolatingFunction shotSpeedInterpolator;
   private static TricubicInterpolatingFunction hoodAngleInterpolator;
   private static TricubicInterpolatingFunction turretAngleInterpolator;
+  public static Rotation2d hoodOffset = new Rotation2d(Math.toRadians(-5));
 
   public static final LoggedNetworkNumber rangeMult =
       new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1.25);
@@ -231,19 +232,19 @@ public class ShotCalculator {
     Logger.recordOutput("Mech/ShotCalculator/target", target);
     Logger.recordOutput("Mech/ShotCalculator/uncomprange", uncompRange);
 
-    if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
-      trajectoryRelativeParams =
-          lookupShot(
-              hubLookupTable,
-              tangentialVelo,
-              radialVelo,
-              uncompRange,
-              fieldRelativeShooterToTarget.getZ());
-    } else {
+    // if (target.equals(FieldCoordinates.BLUE_HUB) || target.equals(FieldCoordinates.RED_HUB)) {
+    //   trajectoryRelativeParams =
+    //       lookupShot(
+    //           hubLookupTable,
+    //           tangentialVelo,
+    //           radialVelo,
+    //           uncompRange,
+    //           fieldRelativeShooterToTarget.getZ());
+    // } else {
     trajectoryRelativeParams =
         sweepTrajectories(
             tangentialVelo, radialVelo, uncompRange, fieldRelativeShooterToTarget.getZ());
-    }
+    // }
 
     ShotParameters botRelativeParams =
         new ShotParameters(
@@ -251,7 +252,8 @@ public class ShotCalculator {
                 .turretAngle
                 .plus(uncompTurretToTargetAngle)
                 .minus(drivetrainPose.getRotation()),
-            trajectoryRelativeParams.hoodAngle, // .minus(new Rotation2d(Math.toRadians(3))),
+            trajectoryRelativeParams.hoodAngle.plus(
+                hoodOffset), // .minus(new Rotation2d(Math.toRadians(3))),
             trajectoryRelativeParams.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/turretAngle", botRelativeParams.turretAngle);
     Logger.recordOutput("Mech/ShotCalculator/landingCoords", landingCoords);
@@ -263,7 +265,6 @@ public class ShotCalculator {
     Logger.recordOutput("Mech/ShotCalculator/TurretAdjust", botRelativeParams.turretAngle);
     Logger.recordOutput("Mech/ShotCalculator/ShotSpeed", botRelativeParams.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/validShot", botRelativeParams.shotSpeed != 0);
-
     return botRelativeParams;
   }
 
@@ -274,8 +275,8 @@ public class ShotCalculator {
         radialVelo,
         uncompRange,
         elevation,
-        HoodConstants.MIN_ANGLE,
-        HoodConstants.RETRACTED_POSITION);
+        HoodConstants.MIN_ANGLE.minus(hoodOffset),
+        HoodConstants.RETRACTED_POSITION.minus(hoodOffset));
   }
 
   public static ShotParameters sweepTrajectories(

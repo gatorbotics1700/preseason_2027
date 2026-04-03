@@ -71,7 +71,7 @@ public class TurretSubsystem extends SubsystemBase {
   public TurretSubsystem() {
     turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
-    desiredAngle = getCurrentAngle();
+    desiredAngle = new Rotation2d(); // getCurrentAngle();
 
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
