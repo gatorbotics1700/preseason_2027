@@ -40,7 +40,7 @@ public class JoystickDriveWithAutoRotation {
 
                 if (previousAngle == null) {
                   // First time setting an angle - reset the controller
-                  System.out.println("previous angle being set");
+                  // System.out.println("previous angle being set");
                   goalChanged = true;
                 } else {
                   // Check if the goal has changed

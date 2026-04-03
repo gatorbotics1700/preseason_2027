@@ -221,7 +221,7 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHopperFloorSubsystem(),
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
-    System.out.println("IN TELEOP INIT");
+    // System.out.println("IN TELEOP INIT");
     CommandScheduler.getInstance()
         .schedule(new HoodCommands.HoodHomingCommand(robotContainer.getHoodSubsystem()));
     // CommandScheduler.getInstance()
@@ -254,8 +254,8 @@ public class Robot extends LoggedRobot {
                 robotContainer.getHopperFloorSubsystem(),
                 robotContainer.getHoodSubsystem(),
                 robotContainer.getIntakeSubsystem()));
-    robotContainer.configureSysIdButtons();
-    // robotContainer.configureSystemCheckButtons();
+    // robotContainer.configureSysIdButtons();
+    robotContainer.configureSystemCheckButtons();
   }
 
   /** This function is called periodically during test mode. */

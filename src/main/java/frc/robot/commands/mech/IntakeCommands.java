@@ -84,6 +84,14 @@ public class IntakeCommands {
         .withName("Run Intake");
   }
 
+  public static Command ReverseIntake(IntakeSubsystem intakeSubsystem) {
+    return new InstantCommand(
+            () -> {
+              intakeSubsystem.setIntakeSpeed(-IntakeConstants.INTAKING_SPEED);
+            })
+        .withName("Reverse Intake");
+  }
+
   public static Command StopIntake(IntakeSubsystem intakeSubsystem) {
     return new InstantCommand(
             () -> {

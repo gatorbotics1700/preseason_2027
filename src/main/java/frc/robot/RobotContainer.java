@@ -186,8 +186,9 @@ public class RobotContainer {
         new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem));
 
     NamedCommands.registerCommand(
-        "Auto Init", HomeMechanisms().andThen(IntakeCommands.DeployIntake(intakeSubsystem))
-        //  .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
+        "Auto Init", HomeMechanisms()
+        // .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
+        // .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
         );
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
     autoChooser =
@@ -296,6 +297,20 @@ public class RobotContainer {
                       drive)
                   .ignoringDisable(true));
 
+      // B -- reverse intake
+      controller
+          .b()
+          .whileTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.ReverseIntake(intakeSubsystem))))
+          .onFalse(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.StopIntake(intakeSubsystem))));
+
       // Y -- Drive Over Bump
       controller
           .y()
@@ -325,6 +340,8 @@ public class RobotContainer {
       // Left Trigger -- Shoot with Turret (while true)
       controller
           .leftTrigger()
+          //   .whileTrue(new InstantCommand(() -> shooterSubsystem.runHardCodedShot()))
+          //   .onFalse(new InstantCommand(() -> shooterSubsystem.setDesiredTransitionSpeed(0)));
           .whileTrue(
               Commands.runOnce(
                   () ->
@@ -342,7 +359,7 @@ public class RobotContainer {
               new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem)
                   .alongWith(new InstantCommand(() -> drive.setSlowDrive(false))));
 
-      // Back -- Point @ Hub & Shoot (without turret) (while true)
+      // X - Point @ Hub & Shoot (without turret) (while true)
       controller
           .x()
           .whileTrue(
@@ -475,9 +492,8 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(
                     () ->
-                        // CommandScheduler.getInstance()
-                        //     .schedule(IntakeCommands.RetractIntake(intakeSubsystem))));
-                        turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-7)))));
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.DeployIntake(intakeSubsystem))));
 
         // X -- Mech Stop
         controller_two
@@ -494,59 +510,26 @@ public class RobotContainer {
                                     hoodSubsystem,
                                     intakeSubsystem))));
 
-        // Y -- Turret Angle 0˚
-        controller_two
-            .y()
-            .onTrue(
-                new InstantCommand(
-                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
-
-        // Left Trigger -- Home Turret
+        // Left Trigger -- Turret Angle 0˚
         controller_two
             .leftTrigger()
             .onTrue(
                 new InstantCommand(
-                    () ->
-                        // turretSubsystem.homeTurret()).ignoringDisable(true));
-                        turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(70)))));
+                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
 
-        // Left Bumper -- Home Hood
+        // Left Bumper -- Home Turret
         controller_two
             .leftBumper()
-            .onTrue(
-                new InstantCommand(
-                    () ->
-                        // CommandScheduler.getInstance()
-                        //     .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem))));
-                        turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-70)))));
+            .onTrue(new InstantCommand(() -> turretSubsystem.homeTurret()).ignoringDisable(true));
 
+        // Right Bumper -- Home Hood
         controller_two
             .rightBumper()
             .onTrue(
                 new InstantCommand(
-                        () ->
-                            // CommandScheduler.getInstance()
-                            //     .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem))));
-                            hoodSubsystem.setDesiredAngle(HoodConstants.MIN_ANGLE))
-                    .andThen(new InstantCommand(() -> shooterSubsystem.setDesiredRotorVelocity(80)))
-                    .andThen(
-                        new InstantCommand(
-                            () ->
-                                shooterSubsystem.setDesiredTransitionSpeed(
-                                    ShooterConstants.TRANSITION_SPEED))));
-
-        // turret testing buttons
-        controller_two
-            .povRight()
-            .onTrue(
-                new InstantCommand(
-                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(36)))));
-
-        controller_two
-            .povLeft()
-            .onTrue(
-                new InstantCommand(
-                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(-100)))));
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(new HoodCommands.HoodHomingCommand(hoodSubsystem))));
       }
     }
   }
@@ -965,10 +948,6 @@ public class RobotContainer {
                   .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
                   .andThen(new WaitCommand(1))
                   .andThen(IntakeCommands.RetractIntake(intakeSubsystem)));
-
-      controller_two
-          .leftBumper()
-          .onTrue(new InstantCommand(() -> drive.runVelocity(new ChassisSpeeds(0.2, 0.0, 0.0))));
 
       controller_two
           .leftTrigger()

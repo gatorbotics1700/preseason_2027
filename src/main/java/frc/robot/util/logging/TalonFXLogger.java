@@ -27,10 +27,10 @@ public final class TalonFXLogger {
   }
 
   public static void configureTelemetryUpdateHz(TalonFX motor) {
-    System.out.println(
-        String.format(
-            "Setting update frequency for %s to %.2f Hz",
-            motor.getDeviceID(), SIGNAL_UPDATE_HZ.in(Hertz.getBaseUnit())));
+    // System.out.println(
+    //     String.format(
+    //         "Setting update frequency for %s to %.2f Hz",
+    //         motor.getDeviceID(), SIGNAL_UPDATE_HZ.in(Hertz.getBaseUnit())));
     BaseStatusSignal.setUpdateFrequencyForAll(
         SIGNAL_UPDATE_HZ.in(Hertz.getBaseUnit()),
         motor.getVelocity(),

@@ -36,9 +36,6 @@ public class HoodSubsystem extends SubsystemBase {
   private boolean sysIdRunning = false;
   private SysIdRoutine sysIdRoutine;
   private final VoltageOut sysIdVoltageRequest = new VoltageOut(0);
-
-  public static final LoggedNetworkNumber desiredHoodAngle =
-      new LoggedNetworkNumber("/Tuning/Hood/Angle", 68);
   private Rotation2d desiredAngle = getCurrentAngle();
 
   private static final double HOOD_CURRENT_LIMIT = 60; // TODO change
@@ -57,6 +54,9 @@ public class HoodSubsystem extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Hood/MM kV", 0.16);
   public static final LoggedNetworkNumber hoodMMKa =
       new LoggedNetworkNumber("/Tuning/Hood/MM kA", 0.1);
+  public static final LoggedNetworkNumber tunableHoodAngle =
+      new LoggedNetworkNumber(
+          "/Tuning/Hood/tunableHoodAngle", HoodConstants.RETRACTED_POSITION.getDegrees());
 
   public HoodSubsystem() {
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS
@@ -98,6 +98,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // desiredAngle = new Rotation2d(Math.toRadians(tunableHoodAngle.get()));
     // Update PID gains from NetworkTables if they've changed, and reapply configs
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
@@ -245,7 +246,7 @@ public class HoodSubsystem extends SubsystemBase {
             null, // Log via AdvantageKit in periodic() so data goes to the same log file
             this,
             "hood");
-    System.out.println("CREATING NEW SYSID ROUTINE");
+    // System.out.println("CREATING NEW SYSID ROUTINE");
     sysIdRoutine = new SysIdRoutine(config, mechanism);
   }
 
@@ -267,7 +268,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   // run under a series of "flat" voltages to measure velocity behavior
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    System.out.println("RUNNING SYSID QUASISTATIC");
+    // System.out.println("RUNNING SYSID QUASISTATIC");
     if (sysIdRoutine == null) {
       initSysIdRoutine();
     }
@@ -284,7 +285,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   // measure acceleration behavior
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    System.out.println("RUNNING SYSID DYNAMIC");
+    // System.out.println("RUNNING SYSID DYNAMIC");
     if (sysIdRoutine == null) {
       initSysIdRoutine();
     }

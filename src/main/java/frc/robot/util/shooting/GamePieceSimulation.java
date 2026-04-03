@@ -87,8 +87,8 @@ public class GamePieceSimulation {
       return; // Only simulate in sim mode and if the shotSpeed is non-zero
     }
 
-    System.out.println(
-        "LAUNCHING BALL AT " + shotSpeed + " MPS WITH DRIVETRAIN SPEED " + chassisSpeeds);
+    // System.out.println(
+    //     "LAUNCHING BALL AT " + shotSpeed + " MPS WITH DRIVETRAIN SPEED " + chassisSpeeds);
     Rotation2d turretAngle = turretAngleRobotRelative.plus(drivetrainHeading);
 
     Translation2d shooterVelo =

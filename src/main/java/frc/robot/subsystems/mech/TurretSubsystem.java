@@ -71,7 +71,7 @@ public class TurretSubsystem extends SubsystemBase {
   public TurretSubsystem() {
     turretMotor = new TalonFX(TurretConstants.TURRET_MOTOR_CAN_ID, TunerConstants.mechCANBus);
 
-    desiredAngle = getCurrentAngle();
+    desiredAngle = new Rotation2d(); // getCurrentAngle();
 
     // MOTION MAGIC PID/FEEDFORWARD CONFIGS // TODO: must tune everything!!
     talonFXConfigs = new TalonFXConfiguration();
@@ -173,7 +173,7 @@ public class TurretSubsystem extends SubsystemBase {
                 * TURRET_GEARBOX_RATIO
                 * GEAR_REVS_PER_TURRET_REV
             + degreesToRevs(TurretConstants.TURRET_HOMING_ANGLE));
-    System.out.println("ANGLE AT END OF TURRET HOMING: " + getCurrentAngle().getDegrees());
+    // System.out.println("ANGLE AT END OF TURRET HOMING: " + getCurrentAngle().getDegrees());
     setDesiredAngle((new Rotation2d(Math.toRadians(0))));
   }
 

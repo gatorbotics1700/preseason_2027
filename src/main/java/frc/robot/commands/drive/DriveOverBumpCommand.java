@@ -20,7 +20,7 @@ public class DriveOverBumpCommand {
         new PathConstraints(8, 8, Units.degreesToRadians(700), Units.degreesToRadians(1000));
 
     Pose2d pose = drive.getPose();
-    System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
+    // System.out.println("*********************DRIVE OVER BUMP COMMAND*******************");
     Command pathToFollow;
 
     String pathRotation;

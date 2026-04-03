@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.FieldCoordinates;
 import frc.robot.Constants.HopperFloorConstants;
@@ -145,27 +144,28 @@ public class ShootingCommands {
     public void execute() {
       Translation3d target;
 
-      if (FieldCoordinates.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
-          && drivetrainPose.get().getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
-        if (FieldCoordinates.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
-          target =
-              DriverStation.getAlliance().get() == Alliance.Blue
-                  ? FieldCoordinates.BLUE_RIGHT_FUNNELING
-                  : FieldCoordinates.RED_LEFT_FUNNELING;
+      // if (FieldCoordinates.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
+      //     && drivetrainPose.get().getX() < FieldCoordinates.RED_BUMP_AND_TRENCH_X) {
+      //   if (FieldCoordinates.FIELD_CENTER.getY() < drivetrainPose.get().getY()) {
+      //     target =
+      //         DriverStation.getAlliance().get() == Alliance.Blue
+      //             ? FieldCoordinates.BLUE_RIGHT_FUNNELING
+      //             : FieldCoordinates.RED_LEFT_FUNNELING;
 
-        } else {
-          target =
-              DriverStation.getAlliance().get() == Alliance.Blue
-                  ? FieldCoordinates.BLUE_LEFT_FUNNELING
-                  : FieldCoordinates.RED_RIGHT_FUNNELING;
-        }
+      //   } else {
+      //     target =
+      //         DriverStation.getAlliance().get() == Alliance.Blue
+      //             ? FieldCoordinates.BLUE_LEFT_FUNNELING
+      //             : FieldCoordinates.RED_RIGHT_FUNNELING;
+      //   }
 
-      } else {
-        target =
-            DriverStation.getAlliance().get() == Alliance.Blue
-                ? FieldCoordinates.BLUE_HUB
-                : FieldCoordinates.RED_HUB;
-      }
+      // } else {
+      //   target =
+      //       DriverStation.getAlliance().get() == Alliance.Blue
+      //           ? FieldCoordinates.BLUE_HUB
+      //           : FieldCoordinates.RED_HUB;
+      // }
+      target = FieldCoordinates.RED_HUB;
 
       ShotParameters params =
           ShotCalculator.calculateShot(
@@ -187,7 +187,7 @@ public class ShootingCommands {
       Logger.recordOutput(
           "Mech/ShootingCommand/Current alliance", DriverStation.getAlliance().get());
 
-      System.out.println("SHOOTING ON THE MOVE TARGET:" + target);
+      // System.out.println("SHOOTING ON THE MOVE TARGET:" + target);
 
       if (params.shotSpeed == 0) { // if we dont have a valid shot
         shooterSubsystem.setDesiredRotorVelocity(0);

@@ -36,11 +36,12 @@ public class ShotCalculator {
   private static TricubicInterpolatingFunction shotSpeedInterpolator;
   private static TricubicInterpolatingFunction hoodAngleInterpolator;
   private static TricubicInterpolatingFunction turretAngleInterpolator;
+  public static Rotation2d hoodOffset = new Rotation2d(Math.toRadians(-5));
 
   public static final LoggedNetworkNumber rangeMult =
-      new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1);
+      new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1.25);
   public static final LoggedNetworkNumber rangeAdjust =
-      new LoggedNetworkNumber("/Tuning/Shooter/RangeAdjust", 0);
+      new LoggedNetworkNumber("/Tuning/Shooter/RangeAdjust", 1.4);
 
   // public static final LoggedNetworkNumber hoodAdjust =
   //     new LoggedNetworkNumber("/Tuning/Hood/hoodAdjust", 0);
@@ -251,7 +252,8 @@ public class ShotCalculator {
                 .turretAngle
                 .plus(uncompTurretToTargetAngle)
                 .minus(drivetrainPose.getRotation()),
-            trajectoryRelativeParams.hoodAngle, // .minus(new Rotation2d(Math.toRadians(3))),
+            trajectoryRelativeParams.hoodAngle.plus(
+                hoodOffset), // .minus(new Rotation2d(Math.toRadians(3))),
             trajectoryRelativeParams.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/turretAngle", botRelativeParams.turretAngle);
     Logger.recordOutput("Mech/ShotCalculator/landingCoords", landingCoords);
@@ -263,7 +265,6 @@ public class ShotCalculator {
     Logger.recordOutput("Mech/ShotCalculator/TurretAdjust", botRelativeParams.turretAngle);
     Logger.recordOutput("Mech/ShotCalculator/ShotSpeed", botRelativeParams.shotSpeed);
     Logger.recordOutput("Mech/ShotCalculator/validShot", botRelativeParams.shotSpeed != 0);
-
     return botRelativeParams;
   }
 
@@ -274,8 +275,8 @@ public class ShotCalculator {
         radialVelo,
         uncompRange,
         elevation,
-        HoodConstants.MIN_ANGLE,
-        HoodConstants.RETRACTED_POSITION);
+        HoodConstants.MIN_ANGLE.minus(hoodOffset),
+        HoodConstants.RETRACTED_POSITION.minus(hoodOffset));
   }
 
   public static ShotParameters sweepTrajectories(
@@ -468,7 +469,7 @@ public class ShotCalculator {
   }
 
   public static ShotParameters[][][] getShootingLookupTable(double elevation) {
-    System.out.println("GENERATING TABLE");
+    // System.out.println("GENERATING TABLE");
     double startTime = System.currentTimeMillis();
     int veloIncrements =
         (int)
@@ -479,8 +480,8 @@ public class ShotCalculator {
         (int) (ShotCalculatorConditions.MAX_RANGE / ShotCalculatorConditions.RANGE_INCREMENT);
     ShotParameters[][][] lookupTable =
         new ShotParameters[veloIncrements][veloIncrements][rangeIncrements];
-    System.out.println("INCREMENTS: " + veloIncrements + ", " + rangeIncrements);
-    System.out.println("ITERATIONS: " + veloIncrements * veloIncrements * rangeIncrements);
+    // System.out.println("INCREMENTS: " + veloIncrements + ", " + rangeIncrements);
+    // System.out.println("ITERATIONS: " + veloIncrements * veloIncrements * rangeIncrements);
 
     for (int i = 0; i < veloIncrements; i++) {
       double tangentialVelo =
@@ -505,7 +506,7 @@ public class ShotCalculator {
   /** Variant for desktop/offboard generators that should not depend on {@link HoodConstants}. */
   public static ShotParameters[][][] getShootingLookupTable(
       double elevation, Rotation2d hoodMinAngle, Rotation2d hoodRetractedPosition) {
-    System.out.println("GENERATING TABLE");
+    // System.out.println("GENERATING TABLE");
     double startTime = System.currentTimeMillis();
     int veloIncrements =
         (int)
@@ -516,8 +517,8 @@ public class ShotCalculator {
         (int) (ShotCalculatorConditions.MAX_RANGE / ShotCalculatorConditions.RANGE_INCREMENT);
     ShotParameters[][][] lookupTable =
         new ShotParameters[veloIncrements][veloIncrements][rangeIncrements];
-    System.out.println("INCREMENTS: " + veloIncrements + ", " + rangeIncrements);
-    System.out.println("ITERATIONS: " + veloIncrements * veloIncrements * rangeIncrements);
+    // System.out.println("INCREMENTS: " + veloIncrements + ", " + rangeIncrements);
+    // System.out.println("ITERATIONS: " + veloIncrements * veloIncrements * rangeIncrements);
 
     for (int i = 0; i < veloIncrements; i++) {
       double tangentialVelo =
@@ -552,11 +553,11 @@ public class ShotCalculator {
       double range,
       double elevation) {
 
-    System.out.println("RANGE: " + range);
-    System.out.println(
-        "MAX RANGE: "
-            + (Constants.ShotCalculatorConditions.MAX_RANGE
-                - ShotCalculatorConditions.RANGE_INCREMENT));
+    // System.out.println("RANGE: " + range);
+    // System.out.println(
+    //     "MAX RANGE: "
+    //         + (Constants.ShotCalculatorConditions.MAX_RANGE
+    //             - ShotCalculatorConditions.RANGE_INCREMENT));
     if (range
         > Constants.ShotCalculatorConditions.MAX_RANGE - ShotCalculatorConditions.RANGE_INCREMENT) {
       // out of range
@@ -638,13 +639,13 @@ public class ShotCalculator {
     Logger.recordOutput(
         "shotCalculator/turretAngleArrayValue", Math.toDegrees(turretAngleTable[i][j][k]));
 
-    System.out.println(
-        "PARAMS RETURNED FROM TABLE: "
-            + params.shotSpeed
-            + ", "
-            + params.hoodAngle
-            + ", "
-            + params.turretAngle);
+    // System.out.println(
+    //     "PARAMS RETURNED FROM TABLE: "
+    //         + params.shotSpeed
+    //         + ", "
+    //         + params.hoodAngle
+    //         + ", "
+    //         + params.turretAngle);
     return params;
   }
 }

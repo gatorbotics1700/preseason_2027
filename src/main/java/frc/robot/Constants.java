@@ -622,8 +622,8 @@ public final class Constants {
     /** Rotor speed (rps) below which StopShooting ends after coasting the flywheel. */
     public static final double FLYWHEEL_COAST_STOPPED_RPS = 4.0;
 
-    public static final double FLYWHEEL_GEAR_RATIO = 14.0 / 30.0;
-    public static final double FLYWHEEL_SLIP = 0.779; // TODO: tune?
+    public static final double FLYWHEEL_GEAR_RATIO = 24.0 / 18.0;
+    public static final double FLYWHEEL_SLIP = 0.275; // TODO: tune?
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER = new Translation3d(0.127, 0, 0.429);
@@ -641,7 +641,7 @@ public final class Constants {
 
     public static final double TURRET_DEADBAND = 0.75;
 
-    public static final double TURRET_ENCODER_OFFSET = 0.46;
+    public static final double TURRET_ENCODER_OFFSET = 0.54;
     public static final double TURRET_HOMING_ANGLE = 0.0;
     public static final double MIN_TURRET_ANGLE = -285;
     public static final double MAX_TURRET_ANGLE = 105;
@@ -682,8 +682,8 @@ public final class Constants {
     // shot height measures the highest point of the arc in meters, max should be ceiling height
     // minus a bit, and min should be just over the target height
     public static final double MIN_SHOT_HEIGHT = 2; // 1 for MSLL
-    public static final double MV_MAX_SHOT_HEIGHT = 2.85; // 3.35; // 2 meters for MSLL
-    public static final double COMP_MAX_SHOT_HEIGHT = 4;
+    public static final double MV_MAX_SHOT_HEIGHT = 5; // 3.35; // 2 meters for MSLL
+    public static final double COMP_MAX_SHOT_HEIGHT = 5;
     public static final double MAX_SHOT_SPEED =
         90
             * ShooterConstants.FLYWHEEL_GEAR_RATIO
