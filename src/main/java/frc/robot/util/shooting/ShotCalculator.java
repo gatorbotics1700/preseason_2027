@@ -39,9 +39,9 @@ public class ShotCalculator {
   public static Rotation2d hoodOffset = new Rotation2d(Math.toRadians(-5));
 
   public static final LoggedNetworkNumber rangeMult =
-      new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1.25);
+      new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1);
   public static final LoggedNetworkNumber rangeAdjust =
-      new LoggedNetworkNumber("/Tuning/Shooter/RangeAdjust", 1.4);
+      new LoggedNetworkNumber("/Tuning/Shooter/RangeAdjust", 0);
 
   // public static final LoggedNetworkNumber hoodAdjust =
   //     new LoggedNetworkNumber("/Tuning/Hood/hoodAdjust", 0);
@@ -294,7 +294,7 @@ public class ShotCalculator {
     Rotation2d angleIncrement =
         new Rotation2d(Math.toRadians(hoodAngleRange / (double) angleIterations));
 
-    double highestArc = 0;
+    double lowestArc = 1000;
     double maxHeight;
     if (uncompRange > 4.2) {
       maxHeight = ShotCalculatorConditions.COMP_MAX_SHOT_HEIGHT;
@@ -351,11 +351,11 @@ public class ShotCalculator {
             && vertexRange < compRange
             && testShotSpeed <= ShotCalculatorConditions.MAX_SHOT_SPEED
             && Math.abs(error) <= ShotCalculatorConditions.SHOT_DEADBAND
-            && vertexHeight > highestArc) {
+            && vertexHeight < lowestArc) {
           bestTurretAdjust = testTurretAdjust;
           bestHoodAngle = testHoodAngle;
           bestShotSpeed = testShotSpeed;
-          highestArc = vertexHeight;
+          lowestArc = vertexHeight;
           // System.out.println(bestHoodAngle.getDegrees() + ", " + highestArc);
         }
 

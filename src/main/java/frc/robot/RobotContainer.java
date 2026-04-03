@@ -186,10 +186,11 @@ public class RobotContainer {
         new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem));
 
     NamedCommands.registerCommand(
-        "Auto Init", HomeMechanisms()
-        // .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
-        // .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
-        );
+        "Auto Init",
+        HomeMechanisms()
+            .andThen(IntakeCommands.DeployIntake(intakeSubsystem))
+            .andThen(IntakeCommands.RunIntake(intakeSubsystem)));
+
     // Set up auto routines with PathPlanner's auto chooser (using pre-made .auto files)
     autoChooser =
         new LoggedDashboardChooser<>("Auto/PathPlanner Auto", AutoBuilder.buildAutoChooser());
@@ -1073,7 +1074,7 @@ public class RobotContainer {
   public Command HomeMechanisms() {
     return (new HoodCommands.HoodHomingCommand(hoodSubsystem)
             .alongWith(IntakeCommands.HomeIntake(intakeSubsystem)))
-        .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret(), turretSubsystem))
+        // .alongWith(new InstantCommand(() -> turretSubsystem.homeTurret(), turretSubsystem))
         .withName("Home Mechansims");
   }
 
