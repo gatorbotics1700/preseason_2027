@@ -991,6 +991,16 @@ public class RobotContainer {
                   () ->
                       CommandScheduler.getInstance()
                           .schedule(DriveSystemsCheckCommands.DriveSystemCheckCommand(drive))));
+      controller_two
+          .start()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    shooterSubsystem.runFarthestShot();
+                    hoodSubsystem.setDesiredAngle(HoodConstants.MIN_ANGLE);
+                    hopperFloorSubsystem.setDesiredHopperFloorSpeed(
+                        HopperFloorConstants.HOPPER_FLOOR_SPEED);
+                  }));
     }
   }
 

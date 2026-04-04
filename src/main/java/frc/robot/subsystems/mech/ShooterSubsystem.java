@@ -278,4 +278,13 @@ public class ShooterSubsystem extends SubsystemBase {
       flywheelMotor.getConfigurator().apply(flywheelTalonFXConfigs);
     }
   }
+
+  public void runFarthestShot() {
+    setDesiredRotorVelocity(90); // set velocity to our desired velocity
+    if (Math.abs(getFlywheelRotorVelocity() - 90)
+        < ShooterConstants
+            .FLYWHEEL_SPEED_DEADBAND) { // once flywheel is running close to our desired velocity
+      setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
+    }
+  }
 }
