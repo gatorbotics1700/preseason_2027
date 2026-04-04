@@ -905,12 +905,30 @@ public class RobotContainer {
         controller_two = new CommandXboxController(1);
       }
 
+      // Right Bumper -- Deploy Intake
+      controller_two
+          .rightBumper()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.DeployIntake(intakeSubsystem))));
+
+      // Left Bumper -- Retract Intake
+      controller_two
+          .leftBumper()
+          .onTrue(
+              new InstantCommand(
+                  () ->
+                      CommandScheduler.getInstance()
+                          .schedule(IntakeCommands.RetractIntake(intakeSubsystem))));
+
       controller_two
           .a()
           .onTrue(
               new InstantCommand(
                   () -> {
-                    shooterSubsystem.setDesiredRotorVelocity(80);
+                    shooterSubsystem.setDesiredRotorVelocity(30);
                     shooterSubsystem.setDesiredTransitionSpeed(ShooterConstants.TRANSITION_SPEED);
                     hopperFloorSubsystem.setDesiredHopperFloorSpeed(
                         HopperFloorConstants.HOPPER_FLOOR_SPEED);

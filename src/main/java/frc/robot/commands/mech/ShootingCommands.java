@@ -166,7 +166,7 @@ public class ShootingCommands {
                 ? FieldCoordinates.BLUE_HUB
                 : FieldCoordinates.RED_HUB;
       }
-      // target = FieldCoordinates.RED_HUB;
+      // target = FieldCoordinates.RED_LEFT_FUNNELING;
 
       ShotParameters params =
           ShotCalculator.calculateShot(

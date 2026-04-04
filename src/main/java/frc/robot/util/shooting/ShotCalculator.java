@@ -36,7 +36,7 @@ public class ShotCalculator {
   private static TricubicInterpolatingFunction shotSpeedInterpolator;
   private static TricubicInterpolatingFunction hoodAngleInterpolator;
   private static TricubicInterpolatingFunction turretAngleInterpolator;
-  public static Rotation2d hoodOffset = new Rotation2d(Math.toRadians(-5));
+  public static Rotation2d hoodOffset = new Rotation2d(Math.toRadians(0));
 
   public static final LoggedNetworkNumber rangeMult =
       new LoggedNetworkNumber("/Tuning/Shooter/RangeMultiplier", 1);
