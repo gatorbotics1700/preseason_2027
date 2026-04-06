@@ -50,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private double desiredRotorVelocity = 0;
 
   public static LoggedNetworkNumber flyWheelSlip =
-      new LoggedNetworkNumber("/Tuning/Shooter/flywheelSlip", 0.265);
+      new LoggedNetworkNumber("/Tuning/Shooter/flywheelSlip", 0.255);
 
   // Tunable PID gains flywheel
   public static final LoggedNetworkNumber flywheelKP =

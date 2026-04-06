@@ -514,17 +514,38 @@ public class RobotContainer {
                                     hoodSubsystem,
                                     intakeSubsystem))));
 
-        // Left Trigger -- Turret Angle 0˚
-        controller_two
-            .leftTrigger()
-            .onTrue(
-                new InstantCommand(
-                    () -> turretSubsystem.setDesiredAngle(new Rotation2d(Math.toRadians(0)))));
+        // Y -- Hood Home
+        controller_two.y().onTrue(new HoodCommands.HoodHomingCommand(hoodSubsystem));
 
-        // Left Bumper -- Home Turret
         controller_two
             .leftBumper()
-            .onTrue(new InstantCommand(() -> turretSubsystem.homeTurret()).ignoringDisable(true));
+            .whileTrue(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.ReverseIntake(intakeSubsystem))))
+            .onFalse(
+                new InstantCommand(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(IntakeCommands.StopIntake(intakeSubsystem))));
+
+        // Left Trigger -- Shoot with Turret (while true)
+        controller_two
+            .leftTrigger()
+            .whileTrue(
+                Commands.runOnce(
+                    () ->
+                        CommandScheduler.getInstance()
+                            .schedule(
+                                new ShootingCommands.ShootOnTheMoveCommand(
+                                    shooterSubsystem,
+                                    hoodSubsystem,
+                                    hopperFloorSubsystem,
+                                    turretSubsystem,
+                                    robotPose,
+                                    chassisSpeeds))))
+            .onFalse(new ShootingCommands.StopShooting(shooterSubsystem, hopperFloorSubsystem));
 
         // Right Bumper -- Home Hood
         controller_two

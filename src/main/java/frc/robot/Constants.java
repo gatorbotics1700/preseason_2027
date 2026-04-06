@@ -594,8 +594,8 @@ public final class Constants {
     public static final Rotation2d RETRACTED_POSITION =
         new Rotation2d(Math.toRadians(RETRACTED_ANGLE_DEGREES));
 
-    public static final double HOMING_SPEED = -0.2; // TODO tune
-    public static final double RETRACTING_SPEED = -0.2; // TODO: tune
+    public static final double HOMING_SPEED = -0.4; // TODO tune
+    public static final double RETRACTING_SPEED = -0.4; // TODO: tune
     public static final double INTAKING_SPEED = -1; // TODO: tune
 
     public static final double ROBOT_TO_INTAKE_YAW_DEGREES = 180;
@@ -623,7 +623,7 @@ public final class Constants {
     public static final double FLYWHEEL_COAST_STOPPED_RPS = 4.0;
 
     public static final double FLYWHEEL_GEAR_RATIO = 24.0 / 18.0;
-    public static final double FLYWHEEL_SLIP = 0.265; // TODO: tune?
+    public static final double FLYWHEEL_SLIP = 0.255; // TODO: tune?
     public static final double FLYWHEEL_RADIUS_METERS = 0.0508;
 
     public static final Translation3d BOT_TO_SHOOTER = new Translation3d(0.127, 0, 0.429);

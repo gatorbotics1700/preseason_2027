@@ -174,7 +174,7 @@ public class ShootingCommands {
               drivetrainVelocity.get(),
               target); // calculates the shot params with turretAngle
       double desiredRotorVelocity = ShooterSubsystem.launchSpeedToRotorSpeed(params.shotSpeed);
-
+      Logger.recordOutput("Mech/ShootingCommand/isRunning", true);
       Logger.recordOutput("Mech/ShootingCommand/validShot", params.shotSpeed != 0);
       Logger.recordOutput("Mech/ShootingCommand/shotSpeed", params.shotSpeed);
       Logger.recordOutput("Mech/ShootingCommand/rotorSpeed", desiredRotorVelocity);
@@ -215,6 +215,7 @@ public class ShootingCommands {
 
     @Override
     public void end(boolean interrupted) {
+      Logger.recordOutput("Mech/ShootingCommand/isRunning", false);
       hopperFloorSubsystem.setDesiredHopperFloorSpeed(0);
       shooterSubsystem.setDesiredTransitionSpeed(0);
     }

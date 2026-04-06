@@ -4,16 +4,16 @@
   "holonomicMode": true,
   "pathFolders": [
     "BLUE 1P RB",
-    "Blue Non-starters",
+    "Blue non-starters",
     "Blue Starters",
     "Fuel Pile Inner Paths",
-    "under DA trench",
     "RED 1P RB",
     "Red Non-starters",
     "Red Starters",
     "Shoot",
     "field elements",
-    "over DA bump"
+    "over DA bump",
+    "under DA trench"
   ],
   "autoFolders": [
     "Center Autos",

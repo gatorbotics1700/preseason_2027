@@ -31,6 +31,7 @@ public class PointAtTargetCommand extends Command {
 
   @Override
   public void execute() {
+    Logger.recordOutput("PoinAtTargetCommand/isRunning", true);
     Translation3d target;
 
     if (FieldCoordinates.BLUE_BUMP_AND_TRENCH_X <= drivetrainPose.get().getX()
@@ -66,6 +67,7 @@ public class PointAtTargetCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    Logger.recordOutput("PoinAtTargetCommand/isRunning", false);
     drive.stop();
   }
 
@@ -77,6 +79,10 @@ public class PointAtTargetCommand extends Command {
         drive.calculateRotationError(
                 drive.getPose().getRotation().getDegrees(), desiredHubAngle.getDegrees())
             == 0.0;
+    Logger.recordOutput(
+        "PoinAtTargetCommand/error",
+        drive.calculateRotationError(
+            drive.getPose().getRotation().getDegrees(), desiredHubAngle.getDegrees()));
 
     onTargetCycles = atDesiredRotation ? onTargetCycles + 1 : 0;
     return onTargetCycles >= REQUIRED_ON_TARGET_CYCLES;
