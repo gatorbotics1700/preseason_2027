@@ -79,8 +79,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     flywheelSlot0Configs = flywheelTalonFXConfigs.Slot0;
 
-
-    // look at HoodSubsystem for explanations :)  
+    // look at HoodSubsystem for explanations :)
     flywheelSlot0Configs.kS = 0.37577; // Add __ V output to overcome static friction
     flywheelSlot0Configs.kV = 0.12289; // A velocity target of 1 rps results in 0.12-0.2 V output
     flywheelSlot0Configs.kA = 0.023452;
@@ -167,7 +166,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   // shotSpeed in meters/second
-  public static double launchSpeedToRotorSpeed(double shotSpeed) { 
+  public static double launchSpeedToRotorSpeed(double shotSpeed) {
     return shotSpeed
         / ShooterConstants.FLYWHEEL_GEAR_RATIO
         / 2

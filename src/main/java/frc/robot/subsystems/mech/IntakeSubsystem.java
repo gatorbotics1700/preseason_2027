@@ -52,7 +52,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private double desiredIntakeSpeed;
 
-  private boolean prevRetractHall = false; 
+  private boolean prevRetractHall = false;
   private boolean prevDeployedHall = false;
   private boolean wasSeekingRetractHall = false;
   private boolean wasSeekingDeployHall = false;
@@ -99,8 +99,8 @@ public class IntakeSubsystem extends SubsystemBase {
     updateCurrentLimitConfigs();
     // updateDeployStatorLimitForPosition();
 
-    if (!sysIdRunning) { //if sysId is running
-      if (deployManualControl) { //if being controlled manually
+    if (!sysIdRunning) { // if sysId is running
+      if (deployManualControl) { // if being controlled manually
         /* set motor speed and update all of the hall effect position states */
         deployMotor.set(deployManualSpeed);
         boolean retractHall = isHallEffectTriggered();
@@ -127,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase {
         boolean retractHall = isHallEffectTriggered();
         boolean deployedHall = isDeployedHallEffectTriggered();
 
-        // 
+        //
         if (deployGoalExtended && !deployedHall) {
           deployMotor.set(-IntakeConstants.HOMING_SPEED);
           wasSeekingDeployHall = true;

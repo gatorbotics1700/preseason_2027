@@ -69,32 +69,32 @@ public class HoodSubsystem extends SubsystemBase {
 
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
-    slot0Configs.kG =
-        hoodKg.get(); // Add ____V output to overcome gravity
-    slot0Configs.kS =
-        hoodKs.get();  // Add _____ V output to overcome static friction 
+    slot0Configs.kG = hoodKg.get(); // Add ____V output to overcome gravity
+    slot0Configs.kS = hoodKs.get(); // Add _____ V output to overcome static friction
 
     slot0Configs.kV = hoodKv.get(); // Output per unit of target velocity (output/rps)
-    slot0Configs.kA = hoodKa.get();  // Output per unit of target (output/(rps/s))
+    slot0Configs.kA = hoodKa.get(); // Output per unit of target (output/(rps/s))
 
     // Initial PID gains come from tunable LoggedNetworkNumbers
     slot0Configs.kP = hoodKp.get(); // Output per unit of error in position (output/rotation)
-    slot0Configs.kI = hoodKi.get(); // Output per unit of integrated error in position (output/(rotation*s))
+    slot0Configs.kI =
+        hoodKi.get(); // Output per unit of integrated error in position (output/(rotation*s))
     slot0Configs.kD = hoodKd.get(); // Output per unit of error in velocity (output/rps)
 
     // MOTION MAGIC EXPO
     MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 
-    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // when 0, unlimited cruise velocity 
-    motionMagicConfigs.MotionMagicExpo_kV = 0.16; // Voltage required to apply a given acceleration (V/(rps/s))
-    motionMagicConfigs.MotionMagicExpo_kA = 0.2; // Voltage required to maintain a given velocity (V/rps)
+    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // when 0, unlimited cruise velocity
+    motionMagicConfigs.MotionMagicExpo_kV =
+        0.16; // Voltage required to apply a given acceleration (V/(rps/s))
+    motionMagicConfigs.MotionMagicExpo_kA =
+        0.2; // Voltage required to maintain a given velocity (V/rps)
 
     hoodMotor.getConfigurator().apply(talonFXConfigs);
 
     m_request = new MotionMagicExpoVoltage(0);
   }
 
-   
   @Override
   public void periodic() {
     // desiredAngle = new Rotation2d(Math.toRadians(tunableHoodAngle.get()));
@@ -132,7 +132,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     /* tells it to stop if using position and at limitswitch
         if by speed and not position, also tells to stop
-    
+
     if the current limit is triggered and sysId is not running
      *   if the hood is being controlled by position
      *      if the desired angle is greater than the current angle
@@ -140,7 +140,7 @@ public class HoodSubsystem extends SubsystemBase {
      *         set the hood speed to 0
      *   if hood is not being controlled by position
      *      if hood speed is greater than 0
-     *        set the hood speed to 0 
+     *        set the hood speed to 0
      */
     if (isCurrentLimitReached() && !sysIdRunning) {
       if (positionControl) {
@@ -225,7 +225,7 @@ public class HoodSubsystem extends SubsystemBase {
     return false;
   }
 
-  // sets the hood position to 0 
+  // sets the hood position to 0
   public void zeroHood() {
     hoodMotor.setPosition(degreesToRevs(HoodConstants.RETRACTED_POSITION.getDegrees()));
     setDesiredAngle(HoodConstants.RETRACTED_POSITION);
@@ -272,7 +272,6 @@ public class HoodSubsystem extends SubsystemBase {
     // System.out.println("CREATING NEW SYSID ROUTINE");
     sysIdRoutine = new SysIdRoutine(config, mechanism);
   }
-
 
   // tests if outside of the sysId boundaries
   private boolean isSysIdOutOfBounds() {
@@ -325,7 +324,7 @@ public class HoodSubsystem extends SubsystemBase {
         .withName("Hood SysId Dynamic " + direction);
   }
 
-  //logs various things for hood (desired angle, angle, current limit, etc.)
+  // logs various things for hood (desired angle, angle, current limit, etc.)
   public void hoodLogs() {
     TalonFXLogger.log(hoodMotor, "Mech", "Hood");
 

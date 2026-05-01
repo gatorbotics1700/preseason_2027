@@ -28,7 +28,7 @@ public class HopperFloorSubsystem extends SubsystemBase {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    hopperFloorCurrentLimitsConfigs = hopperFloorTalonFXConfigs.CurrentLimits; 
+    hopperFloorCurrentLimitsConfigs = hopperFloorTalonFXConfigs.CurrentLimits;
     hopperFloorCurrentLimitsConfigs.StatorCurrentLimit = 80;
     hopperFloorCurrentLimitsConfigs.StatorCurrentLimitEnable = true;
     desiredHopperSpeed = 0.0;

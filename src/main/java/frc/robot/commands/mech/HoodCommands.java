@@ -31,8 +31,8 @@ public class HoodCommands {
     @Override
     public void execute() {}
 
-
-    // is finished if the hood is within the deadband of the target position or if the current limit is reached
+    // is finished if the hood is within the deadband of the target position or if the current limit
+    // is reached
     @Override
     public boolean isFinished() {
       if (Math.abs(
@@ -74,7 +74,7 @@ public class HoodCommands {
     public boolean isFinished() {
       return hoodSubsystem.isCurrentLimitReached();
     }
-    
+
     // zeroes/homes the hood at end of command when isFinished is true or if interrupted
     // maybe if using for reference think about whether you want it to zero when it is interrupted
     @Override

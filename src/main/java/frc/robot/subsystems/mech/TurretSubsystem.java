@@ -124,7 +124,7 @@ public class TurretSubsystem extends SubsystemBase {
     turretLogs();
   }
 
-  // set the 
+  // set the
   public void setDesiredAngle(
       Rotation2d desiredAngle) { // this is for once we start testing targetting
     double desiredAngleDegrees =

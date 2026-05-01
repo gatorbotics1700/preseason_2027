@@ -109,6 +109,15 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
+// Make annotation-processor output visible to IDE type resolution.
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/generated/sources/annotationProcessor/java/main")
+        }
+    }
+}
+
 // test {
 //     useJUnitPlatform()
 //     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
