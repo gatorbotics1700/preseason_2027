@@ -13,7 +13,12 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -24,8 +29,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -300,7 +309,7 @@ public final class Constants {
         RobotConfigLoader.getBoolean("tuner.back_right_steer_encoder_inverted");
 
     private static final Distance kBackRightXPos =
-        Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.y_inches"));
+        Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.x_inches")); // used to load from y so I fixed it, was it intentional??
     private static final Distance kBackRightYPos =
         Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.y_inches"));
 
@@ -700,6 +709,18 @@ public final class Constants {
     public static final double MAX_RANGE =
         8; // m //TODO calculate furthest distance we would ever want to shoot from
     // kraken x60 max velocity is ~100 rps
+
+  }
+
+  public class TrajectoryConstants {
+    public static final double MAX_VELOCITY = 6.0; // safe starting point, tune up from here
+
+    public static final double MAX_ACCELERATION = 3.0; // safe starting point, tune up from here
+
+    public static final double DRIVETRAIN_RADIUS = Math.sqrt(
+        Math.pow(TunerConstants.FrontLeft.LocationX, 2) +
+        Math.pow(TunerConstants.FrontLeft.LocationY, 2)
+    );
 
   }
 }

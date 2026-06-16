@@ -365,6 +365,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return states;
   }
 
+  public SwerveDriveKinematics getKinematics(){
+    return kinematics;
+  }
+
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
   public ChassisSpeeds getChassisSpeeds() {
@@ -434,6 +438,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  public void setModuleStates(SwerveModuleState[] states) {
+    for (int i = 0; i < modules.length; i++) {
+        modules[i].runSetpoint(states[i]);
+    }
   }
 
   public void toggleSlowDrive() {
