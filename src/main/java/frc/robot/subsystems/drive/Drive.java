@@ -365,7 +365,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return states;
   }
 
-  public SwerveDriveKinematics getKinematics(){
+  public SwerveDriveKinematics getKinematics() {
     return kinematics;
   }
 
@@ -442,7 +442,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   public void setModuleStates(SwerveModuleState[] states) {
     for (int i = 0; i < modules.length; i++) {
-        modules[i].runSetpoint(states[i]);
+      modules[i].runSetpoint(states[i]);
     }
   }
 

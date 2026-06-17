@@ -34,7 +34,6 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -309,7 +308,10 @@ public final class Constants {
         RobotConfigLoader.getBoolean("tuner.back_right_steer_encoder_inverted");
 
     private static final Distance kBackRightXPos =
-        Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.x_inches")); // used to load from y so I fixed it, was it intentional??
+        Inches.of(
+            RobotConfigLoader.getDouble(
+                "tuner.back_right_pos.x_inches")); // used to load from y so I fixed it, was it
+    // intentional??
     private static final Distance kBackRightYPos =
         Inches.of(RobotConfigLoader.getDouble("tuner.back_right_pos.y_inches"));
 
@@ -717,10 +719,9 @@ public final class Constants {
 
     public static final double MAX_ACCELERATION = 3.0; // safe starting point, tune up from here
 
-    public static final double DRIVETRAIN_RADIUS = Math.sqrt(
-        Math.pow(TunerConstants.FrontLeft.LocationX, 2) +
-        Math.pow(TunerConstants.FrontLeft.LocationY, 2)
-    );
-
+    public static final double DRIVETRAIN_RADIUS =
+        Math.sqrt(
+            Math.pow(TunerConstants.FrontLeft.LocationX, 2)
+                + Math.pow(TunerConstants.FrontLeft.LocationY, 2));
   }
 }
