@@ -67,6 +67,7 @@ public class TrajectoryCommand extends Command {
   @Override
   public void initialize() {
     trajectory = generateTrajectory();
+    timer.reset();
     timer.start();
   }
 
@@ -78,6 +79,16 @@ public class TrajectoryCommand extends Command {
         controller.calculate(drive.getPose(), desiredPose, desiredHeading);
     SwerveModuleState[] moduleStates = drive.getKinematics().toSwerveModuleStates(adjustedSpeeds);
     drive.setModuleStates(moduleStates);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds());
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    drive.stop();
   }
 
   public Trajectory generateTrajectory() {
