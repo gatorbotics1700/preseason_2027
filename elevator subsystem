@@ -1,0 +1,43 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
+
+public class ElevatorSubsystem extends SubsystemBase {
+    private TalonFX motor;
+    private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+    MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    var cfg = new TalonFXConfiguration();
+    var slot0 = cfg.Slot0;
+    slot0.kS = 0.25;  
+    slot0.kV = 0.12;  
+    slot0.kA = 0.01;  
+    slot0.kG = 0.30;  
+    slot0.kP = 4.8;
+    slot0.kI = 0;
+    slot0.kD = 0.1;
+
+ var mm = cfg.MotionMagic;
+  mm.MotionMagicCruiseVelocity = 80;   
+  mm.MotionMagicAcceleration   = 160;  
+  mm.MotionMagicJerk           = 1600; 
+m_motor.getConfigurator().apply(cfg);
+
+    public ElevatorSubsystem(){
+        motor = new TalonFX(Constants.ELEVATOR_CAN_ID);
+        motor.setNeutralMode(NeutralModeValue.Brake);
+    }
+
+    @Override
+    public void periodic(){
+        
+    }
+
+    public void setSpeed(double speed){
+        motor.setControl(dutyCycleOut.withOutput(speed));
+    }
+}
