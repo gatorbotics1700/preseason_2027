@@ -1,0 +1,33 @@
+package frc.robot.commands;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ElevatorSubsystem;
+
+public class ElevatorCommand extends Command {
+      private double speed; 
+      private ElevatorSubsystem elevatorSubsystem;
+
+    public ElevatorCommand (double speed, ElevatorSubsystem elevatorSubsystem)[
+          this.speed = speed;
+          this.elevatorSubsystem = ElevatorSubsystem; 
+          addRequirements(ElevatorSubsystem);
+  }
+  @Override 
+public void initialize(){
+  elevatorSubsystem.setspeed(0);
+}
+
+@Override 
+public void execute (){
+System.out.println("setting speed to:" + speed);
+elevatorSubsystem.setspeed(0):
+}
+
+@Override 
+public boolean isFinished(){
+if (speed == 0){
+  elevatorSubsystem.setspeed(0);
+  return true;
+}
+  return false;
+}
