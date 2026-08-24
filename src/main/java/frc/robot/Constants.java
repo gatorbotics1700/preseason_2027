@@ -702,4 +702,8 @@ public final class Constants {
     // kraken x60 max velocity is ~100 rps
 
   }
+
+  public static final class ElevatorConstants {
+    public static final double ERROR = 0.5; //placeholder
+  }
 }
