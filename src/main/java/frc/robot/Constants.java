@@ -704,6 +704,6 @@ public final class Constants {
   }
 
   public static final class ElevatorConstants {
-    public static final double ERROR = 0.5; //placeholder
+    public static final double ERROR = 0.5; // placeholder
   }
 }
