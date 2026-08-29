@@ -1,0 +1,98 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+
+
+public class ElevatorSubsystem extends SubsystemBase {
+    private TalonFX elevatorMotor;
+    private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+    private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0);
+
+    private double elevatorMotorVoltage; // used for sim/replay mode
+    private boolean isDeployed;
+
+    public static final double POSITION_TOLERANCE_ROTATIONS = 0.5; // TODO: tune
+    
+    public ElevatorSubsystem(){
+        elevatorMotor = new TalonFX(Constants.ELEVATOR_CAN_ID, Constants.MECH_CANBUS_NAME);
+        elevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+        currentLimitElevatorMotor();
+        configureMotionMagic();
+    }
+
+    private void currentLimitElevatorMotor(){
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
+        limits.SupplyCurrentLimitEnable = true;
+        limits.SupplyCurrentLimit = Constants.ELEVATOR_CURRENT_LIMIT; // TODO: add to Constants
+
+        elevatorMotor.getConfigurator().apply(limits);
+    }
+
+
+
+    private void configureMotionMagic() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        
+        config.MotionMagic.MotionMagicCruiseVelocity = 80; 
+        config.MotionMagic.MotionMagicAcceleration = 160;  
+        config.MotionMagic.MotionMagicJerk = 1600;         
+
+       
+        config.Slot0.kP = 0.0;
+        config.Slot0.kI = 0.0;
+        config.Slot0.kD = 0.0;
+        config.Slot0.kS = 0.0; 
+        config.Slot0.kV = 0.0; 
+        config.Slot0.kA = 0.0; 
+        config.Slot0.kG = 0.0; 
+
+        elevatorMotor.getConfigurator().apply(config);
+    }
+
+
+    public void periodic() {}
+
+   
+        elevatorMotor.setControl(dutyCycleOut.withOutput(speed));
+    }
+
+    
+        elevatorMotor.setControl(motionMagicRequest.withPosition(positionRotations));
+    
+
+    public double getPosition() {
+        return elevatorMotor.getPosition().getValueAsDouble();
+    }
+
+    public boolean atTarget(double targetRotations, double toleranceRotations) {
+        return Math.abs(getPosition() - targetRotations) < toleranceRotations;
+    }
+
+    public double getElevatorMotorVoltage(Mode currentMode) {
+        if (currentMode == Mode.REAL) {
+            return elevatorMotor.getMotorVoltage().getValueAsDouble();
+        } else {
+            return elevatorMotorVoltage;
+        }
+    }
+
+    public double getElevatorMotorCurrent(Mode currentMode) {
+        if (currentMode == Mode.REAL) {
+            return elevatorMotor.getStatorCurrent().getValueAsDouble();
+        } else {
+            return 0;
+        }
+    }
+
+    public boolean isDeployed() {
+        return isDeployed;
+    }
