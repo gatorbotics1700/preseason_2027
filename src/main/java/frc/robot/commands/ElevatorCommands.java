@@ -22,6 +22,7 @@ public class ElevatorCommands extends Command {
 
   @Override
   public boolean isFinished() {
+    //TODO no need to say "== true", it's unnecessary
     if (elevatorSubsystem.atDesiredPosition(rotations, ElevatorConstants.ERROR) == true) {
       return true;
     }

@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TunerConstants;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+
+//TODO your code is all correct, just make sure to add the ability for the elevator to stop as a safety
+
 public class ElevatorSubsystem extends SubsystemBase {
   private final TalonFX elevatorMotor = new TalonFX(0, TunerConstants.mechCANBus);
   private TalonFXConfiguration talonFXConfigs;
