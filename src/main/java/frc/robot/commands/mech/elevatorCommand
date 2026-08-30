@@ -8,11 +8,11 @@ public class ElevatorCommand extends Command {
     private ElevatorSubsystem elevatorSubsystem;
     private double target;
 
-    private static final double POSITION_TOLERANCE = 0.5;
+    private static final double POSITION_TOLERANCE = 0.5;//TODO unused
 
     public ElevatorCommand(double targetPosition, ElevatorSubsystem elevatorSubsystem) {
         this.elevatorSubsystem = elevatorSubsystem;
-        this.targetPosition = targetPosition;
+        this.targetPosition = targetPosition; //TOOD you named your variable target so this would not initialize correctly
         addRequirements(elevatorSubsystem);
         System.out.println("elevator command initialized")
     }
@@ -24,11 +24,12 @@ public class ElevatorCommand extends Command {
     
     @Override
     public void execute() {
-        System.out.println("executing...");
+        System.out.println("executing...");//TODO maybe helpful for sim or test but mostly just clogs the log. better to use an advantagescope logged value
     }
 
     @Override
     public boolean isFinished(){
+        //TODO while theoretically the motion magic should automatically make it stop when it reaches the comment, it's good to set speed to 0 here to be safe
         return elevatorSubsystem.atTarget(targetPosition, POSITION_TOLERANCE);
     }
 }

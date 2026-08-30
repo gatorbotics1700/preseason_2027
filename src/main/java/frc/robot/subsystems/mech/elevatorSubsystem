@@ -16,6 +16,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0);
 
+    //TODO were you using sim to test this? i want to hear about that if so! how would this value change? why just for voltage?
     private double elevatorMotorVoltage; // used for sim/replay mode
     private boolean isDeployed;
 
@@ -28,6 +29,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         configureMotionMagic();
     }
 
+    //TODO nice method organization with the current limit and motion magic configs
     private void currentLimitElevatorMotor(){
         CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
         limits.SupplyCurrentLimitEnable = true;
@@ -60,7 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 
     public void periodic() {}
-
+    //TODO your curly brackets are a little wonky here so not exactly sure what you intended but make sure not to control the elevator with speed and position at the same time
    
         elevatorMotor.setControl(dutyCycleOut.withOutput(speed));
     }
@@ -73,6 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return elevatorMotor.getPosition().getValueAsDouble();
     }
 
+    //TODO here's a nitpick! probably don't need toleranceRotations to be its own parameter cause it won't change
     public boolean atTarget(double targetRotations, double toleranceRotations) {
         return Math.abs(getPosition() - targetRotations) < toleranceRotations;
     }
@@ -93,6 +96,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+    //TODO i assume this is a mistake cause it's not called anywhere
     public boolean isDeployed() {
         return isDeployed;
     }
