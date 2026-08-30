@@ -68,10 +68,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setTargetPosition(double targetRotations) {
+    //TODO setControl() doesn't work if you just call it once to move somewhere, you have to call it repeatedly
     motor.setControl(m_request.withPosition(targetRotations));
   }
 
   public double getCurrentPosition() {
+    //TODO wow i had never heard of the refresh method, thx for the new info
     return motor.getPosition().refresh().getValueAsDouble();
   }
 
@@ -93,7 +95,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     Slot0Configs slot0Configs = talonFXConfigs.Slot0;
 
     // new values updated in logged network
-
     double newKp = elevatorKp.get();
     double newKi = elevatorKi.get();
     double newKd = elevatorKd.get();
