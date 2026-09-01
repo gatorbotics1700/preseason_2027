@@ -11,6 +11,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private TalonFX motor;
     private static DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    //TODO "var" is correct code, but we use it when there's ambiguity as to what the variable type is. here, you know that this is a "TalonFXConfiguration" object so it's cleaner not to use var
     var cfg = new TalonFXConfiguration();
     var slot0 = cfg.Slot0;
     slot0.kS = 0.25;  
@@ -32,6 +33,7 @@ m_motor.getConfigurator().apply(cfg);
         motor.setNeutralMode(NeutralModeValue.Brake);
     }
 
+    //TODO nice! remembering @Override. not sure if you need it for an empty method, but it's still nice to have
     @Override
     public void periodic(){
         

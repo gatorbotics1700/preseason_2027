@@ -6,8 +6,8 @@ import frc.robot.subsystems.ElevatorSubsystem;
 public class ElevatorCommand extends Command {
       private double speed; 
       private ElevatorSubsystem elevatorSubsystem;
-
-    public ElevatorCommand (double speed, ElevatorSubsystem elevatorSubsystem)[
+  //TODO your elevator uses speed control, which is fine in some scenarios, but it's much more common for position control to be more useful. ("go to top" rather than "go fast")
+    public ElevatorCommand (double speed, ElevatorSubsystem elevatorSubsystem){
           this.speed = speed;
           this.elevatorSubsystem = ElevatorSubsystem; 
           addRequirements(ElevatorSubsystem);
@@ -19,15 +19,19 @@ public void initialize(){
 
 @Override 
 public void execute (){
+  //TODO do you mean to set the speed to the variable "speed"? right now your elevator does not move ever
 System.out.println("setting speed to:" + speed);
 elevatorSubsystem.setspeed(0):
 }
 
 @Override 
 public boolean isFinished(){
+  //TODO this way of stopping the command has problems. let's say we want the elevator to go up, so we have a button that creates an elevatorCommand with a speed of 5. that instance of elevatorCommand always has a speed of 5, so this if statement will never be true
+  //TODO of course creating another command with a speed of 0 can interrupt the first one, but it's still a little bit suspicious
 if (speed == 0){
   elevatorSubsystem.setspeed(0);
   return true;
 }
   return false;
+}
 }
