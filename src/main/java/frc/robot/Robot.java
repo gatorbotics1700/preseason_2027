@@ -191,7 +191,7 @@ public class Robot extends LoggedRobot {
               robotContainer.getDriveSubsystem().setPose(startPose);
             });
 
-    CommandScheduler.getInstance().schedule(robotContainer.HomeMechanisms());
+    // CommandScheduler.getInstance().schedule(robotContainer.HomeMechanisms());
     // .andThen(IntakeCommands.DeployIntake(robotContainer.getIntakeSubsystem()))
     // .andThen(IntakeCommands.RunIntake(robotContainer.getIntakeSubsystem())));
 
